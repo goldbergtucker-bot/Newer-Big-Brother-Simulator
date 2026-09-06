@@ -1,6 +1,6 @@
 // ======================================================
 // BIG BROTHER SIMULATOR
-// PART 1 + PART 2
+// PART 1 + PART 2 - CLEAN VERSION
 // ======================================================
 
 // ======================================================
@@ -8,27 +8,18 @@
 // ======================================================
 
 let houseguests = [];
-
 let evictedHouseguests = [];
-
 let jury = [];
-
 let alliances = [];
-
 let relationships = [];
-
 let customTwists = [];
 
 let currentWeek = 1;
-
 let currentHOH = null;
-
 let nominees = [];
-
 let povWinner = null;
 
 let seasonStarted = false;
-
 let selectedSeasonTemplate = "custom";
 
 // ======================================================
@@ -39,218 +30,118 @@ const seasonTemplates = {
 
 ```
 custom: {
-
     name: "Custom Big Brother",
-
     year: "Custom Format",
-
     description:
         "Create your own Big Brother season with your own rules and twists.",
-
     startingPlayers: 16,
-
     nominationCount: 2,
-
     juryStartWeek: 5,
-
     twists: []
-
 },
-
 
 bb19: {
-
     name: "Big Brother 19",
-
     year: "2017",
-
     description:
         "A custom cast playing a format inspired by Big Brother 19 and its Summer of Temptation structure.",
-
     startingPlayers: 16,
-
     nominationCount: 2,
-
     juryStartWeek: 6,
-
     twists: [
-
         "Summer of Temptation",
-
         "Den of Temptation",
-
         "Temptation Competitions",
-
         "Halting Hex",
-
         "Battle Back"
-
     ]
-
 },
-
 
 bb20: {
-
     name: "Big Brother 20",
-
     year: "2018",
-
     description:
         "A custom cast playing a format inspired by Big Brother 20 and its technology twists.",
-
     startingPlayers: 16,
-
     nominationCount: 2,
-
     juryStartWeek: 6,
-
     twists: [
-
         "BB App Store",
-
         "Power Apps",
-
         "Hacker Competition",
-
         "Hacker Twist",
-
         "Battle Back"
-
     ]
-
 },
-
 
 bb23: {
-
     name: "Big Brother 23",
-
     year: "2021",
-
     description:
         "A custom cast playing a format inspired by Big Brother 23 with teams and Wildcard competitions.",
-
     startingPlayers: 16,
-
     nominationCount: 2,
-
     juryStartWeek: 6,
-
     twists: [
-
         "Teams",
-
         "Wildcard Competition",
-
         "Team Captains",
-
         "High Rollers Room",
-
         "BB Bucks"
-
     ]
-
 },
-
 
 bb24: {
-
     name: "Big Brother 24",
-
     year: "2022",
-
     description:
         "A custom cast playing a format inspired by Big Brother 24 and its major seasonal twists.",
-
     startingPlayers: 16,
-
     nominationCount: 2,
-
     juryStartWeek: 6,
-
     twists: [
-
         "Backstage Boss",
-
         "Backstage Pass",
-
         "Festie Besties",
-
         "Dyre Fest",
-
         "Split House"
-
     ]
-
 },
-
 
 bb25: {
-
     name: "Big Brother 25",
-
     year: "2023",
-
     description:
         "A custom cast playing a format inspired by Big Brother 25 and the BB Multiverse.",
-
     startingPlayers: 17,
-
     nominationCount: 2,
-
     juryStartWeek: 6,
-
     twists: [
-
         "BB Multiverse",
-
         "Comicverse",
-
         "Humiliverse",
-
         "Scaryverse",
-
         "Scrambleverse",
-
         "Power of Invincibility",
-
         "Zombie Week"
-
     ]
-
 },
 
-
 bb26: {
-
     name: "Big Brother 26",
-
     year: "2024",
-
     description:
         "A custom cast playing an AI-themed format with three nominees and the AI Arena.",
-
     startingPlayers: 16,
-
     nominationCount: 3,
-
     juryStartWeek: 5,
-
     twists: [
-
         "AINSLEY",
-
         "Three Nominees",
-
         "AI Arena",
-
         "AI Instigator",
-
         "BB AI"
-
     ]
-
 }
 ```
 
@@ -263,27 +154,17 @@ bb26: {
 function showSection(sectionName) {
 
 ```
-const sections =
-    document.querySelectorAll(".page-section");
-
+const sections = document.querySelectorAll(".page-section");
 
 sections.forEach(function(section) {
-
     section.classList.remove("active");
-
 });
 
-
-const selected =
-    document.getElementById(sectionName);
-
+const selected = document.getElementById(sectionName);
 
 if (selected) {
-
     selected.classList.add("active");
-
 }
-
 
 updateAllDisplays();
 ```
@@ -297,30 +178,22 @@ updateAllDisplays();
 function selectSeasonTemplate() {
 
 ```
-const selector =
-    document.getElementById("seasonTemplate");
+const selector = document.getElementById("seasonTemplate");
 
+if (!selector) {
+    return;
+}
 
-if (!selector) return;
+selectedSeasonTemplate = selector.value;
 
-
-selectedSeasonTemplate =
-    selector.value;
-
-
-const template =
-    seasonTemplates[selectedSeasonTemplate];
-
+const template = seasonTemplates[selectedSeasonTemplate];
 
 updateSelectedSeasonInfo();
-
 updateAllDisplays();
 
-
-alert(
-    template.name +
-    " has been selected!"
-);
+if (template) {
+    alert(template.name + " has been selected!");
+}
 ```
 
 }
@@ -332,19 +205,19 @@ alert(
 function updateSelectedSeasonInfo() {
 
 ```
-const info =
-    document.getElementById("selectedSeasonInfo");
+const info = document.getElementById("selectedSeasonInfo");
 
+if (!info) {
+    return;
+}
 
-if (!info) return;
+const template = seasonTemplates[selectedSeasonTemplate];
 
-
-const template =
-    seasonTemplates[selectedSeasonTemplate];
-
+if (!template) {
+    return;
+}
 
 let twistsHTML = "";
-
 
 if (template.twists.length === 0) {
 
@@ -358,18 +231,14 @@ if (template.twists.length === 0) {
         twistsHTML +=
             '<span class="template-twist">' +
             escapeHTML(twist) +
-            '</span>';
+            "</span>";
 
     });
 
 }
 
-
 info.innerHTML = `
-
-    <h3>
-        📺 ${escapeHTML(template.name)}
-    </h3>
+    <h3>📺 ${escapeHTML(template.name)}</h3>
 
     <p>
         <strong>Season:</strong>
@@ -397,7 +266,6 @@ info.innerHTML = `
     <div>
         ${twistsHTML}
     </div>
-
 `;
 ```
 
@@ -413,43 +281,27 @@ function addHouseguest() {
 const name =
     document.getElementById("nameInput").value.trim();
 
-
 const image =
     document.getElementById("imageInput").value.trim();
 
-
 const physical =
-    Number(
-        document.getElementById("physicalInput").value
-    ) || 5;
-
+    Number(document.getElementById("physicalInput").value) || 5;
 
 const mental =
-    Number(
-        document.getElementById("mentalInput").value
-    ) || 5;
-
+    Number(document.getElementById("mentalInput").value) || 5;
 
 const social =
-    Number(
-        document.getElementById("socialInput").value
-    ) || 5;
-
+    Number(document.getElementById("socialInput").value) || 5;
 
 const strategy =
-    Number(
-        document.getElementById("strategyInput").value
-    ) || 5;
-
+    Number(document.getElementById("strategyInput").value) || 5;
 
 if (!name) {
 
     alert("Please enter a houseguest name.");
 
     return;
-
 }
-
 
 const houseguest = {
 
@@ -462,45 +314,27 @@ const houseguest = {
         "https://placehold.co/400x500?text=" +
         encodeURIComponent(name),
 
-    physical:
-        Math.min(10, Math.max(1, physical)),
+    physical: Math.min(10, Math.max(1, physical)),
 
-    mental:
-        Math.min(10, Math.max(1, mental)),
+    mental: Math.min(10, Math.max(1, mental)),
 
-    social:
-        Math.min(10, Math.max(1, social)),
+    social: Math.min(10, Math.max(1, social)),
 
-    strategy:
-        Math.min(10, Math.max(1, strategy)),
+    strategy: Math.min(10, Math.max(1, strategy)),
 
     status: "In House"
-
 };
-
 
 houseguests.push(houseguest);
 
-
 document.getElementById("nameInput").value = "";
-
 document.getElementById("imageInput").value = "";
-
 document.getElementById("physicalInput").value = "";
-
 document.getElementById("mentalInput").value = "";
-
 document.getElementById("socialInput").value = "";
-
 document.getElementById("strategyInput").value = "";
 
-
-addEvent(
-    "👤 " +
-    name +
-    " joined the cast."
-);
-
+addEvent("👤 " + name + " joined the cast.");
 
 updateAllDisplays();
 ```
@@ -516,33 +350,24 @@ function removeHouseguest(id) {
 ```
 const player =
     houseguests.find(function(p) {
-
         return p.id === id;
-
     });
 
-
-if (!player) return;
-
+if (!player) {
+    return;
+}
 
 const confirmed =
-    confirm(
-        "Remove " +
-        player.name +
-        " from the cast?"
-    );
+    confirm("Remove " + player.name + " from the cast?");
 
-
-if (!confirmed) return;
-
+if (!confirmed) {
+    return;
+}
 
 houseguests =
     houseguests.filter(function(p) {
-
         return p.id !== id;
-
     });
-
 
 updateAllDisplays();
 ```
@@ -559,9 +384,9 @@ function updateCastDisplay() {
 const grid =
     document.getElementById("castGrid");
 
-
-if (!grid) return;
-
+if (!grid) {
+    return;
+}
 
 if (houseguests.length === 0) {
 
@@ -569,25 +394,19 @@ if (houseguests.length === 0) {
         '<div class="empty">No houseguests added yet.</div>';
 
     return;
-
 }
 
-
 grid.innerHTML = "";
-
 
 houseguests.forEach(function(player) {
 
     const card =
         document.createElement("div");
 
-
     card.className =
         "houseguest-card";
 
-
     card.innerHTML = `
-
         <img
             src="${escapeHTML(player.image)}"
             alt="${escapeHTML(player.name)}"
@@ -601,53 +420,28 @@ houseguests.forEach(function(player) {
             </h3>
 
             <div class="stat">
-
                 <span>💪 Physical</span>
-
-                <strong>
-                    ${player.physical}/10
-                </strong>
-
+                <strong>${player.physical}/10</strong>
             </div>
 
             <div class="stat">
-
                 <span>🧠 Mental</span>
-
-                <strong>
-                    ${player.mental}/10
-                </strong>
-
+                <strong>${player.mental}/10</strong>
             </div>
 
             <div class="stat">
-
                 <span>❤️ Social</span>
-
-                <strong>
-                    ${player.social}/10
-                </strong>
-
+                <strong>${player.social}/10</strong>
             </div>
 
             <div class="stat">
-
                 <span>♟ Strategy</span>
-
-                <strong>
-                    ${player.strategy}/10
-                </strong>
-
+                <strong>${player.strategy}/10</strong>
             </div>
 
             <div class="stat">
-
                 <span>Status</span>
-
-                <strong>
-                    ${escapeHTML(player.status)}
-                </strong>
-
+                <strong>${escapeHTML(player.status)}</strong>
             </div>
 
             <button
@@ -658,12 +452,9 @@ houseguests.forEach(function(player) {
             </button>
 
         </div>
-
     `;
 
-
     grid.appendChild(card);
-
 });
 ```
 
@@ -679,19 +470,15 @@ function createTwist() {
 const name =
     document.getElementById("twistNameInput").value.trim();
 
-
 const description =
     document.getElementById("twistDescriptionInput").value.trim();
-
 
 if (!name) {
 
     alert("Please enter a twist name.");
 
     return;
-
 }
-
 
 customTwists.push({
 
@@ -704,20 +491,12 @@ customTwists.push({
         "Custom Big Brother twist.",
 
     enabled: true
-
 });
 
-
 document.getElementById("twistNameInput").value = "";
-
 document.getElementById("twistDescriptionInput").value = "";
 
-
-addEvent(
-    "🌀 Custom twist created: " +
-    name
-);
-
+addEvent("🌀 Custom twist created: " + name);
 
 updateAllDisplays();
 ```
@@ -734,9 +513,9 @@ function updateTwistDisplay() {
 const list =
     document.getElementById("twistList");
 
-
-if (!list) return;
-
+if (!list) {
+    return;
+}
 
 if (customTwists.length === 0) {
 
@@ -744,26 +523,20 @@ if (customTwists.length === 0) {
         '<div class="empty">No custom twists created.</div>';
 
     return;
-
 }
 
-
 list.innerHTML = "";
-
 
 customTwists.forEach(function(twist) {
 
     const card =
         document.createElement("div");
 
-
     card.className =
         "twist-card" +
         (twist.enabled ? " enabled" : "");
 
-
     card.innerHTML = `
-
         <h3>
             ${escapeHTML(twist.name)}
         </h3>
@@ -791,12 +564,9 @@ customTwists.forEach(function(twist) {
         >
             DELETE
         </button>
-
     `;
 
-
     list.appendChild(card);
-
 });
 ```
 
@@ -811,18 +581,15 @@ function toggleTwist(id) {
 ```
 const twist =
     customTwists.find(function(t) {
-
         return t.id === id;
-
     });
 
-
-if (!twist) return;
-
+if (!twist) {
+    return;
+}
 
 twist.enabled =
     !twist.enabled;
-
 
 updateAllDisplays();
 ```
@@ -838,11 +605,8 @@ function deleteTwist(id) {
 ```
 customTwists =
     customTwists.filter(function(t) {
-
         return t.id !== id;
-
     });
-
 
 updateAllDisplays();
 ```
@@ -859,36 +623,27 @@ function createAlliance() {
 const name =
     document.getElementById("allianceNameInput").value.trim();
 
-
 const membersText =
     document.getElementById("allianceMembersInput").value.trim();
-
 
 if (!name) {
 
     alert("Please enter an alliance name.");
 
     return;
-
 }
-
 
 const members =
     membersText
         ? membersText
             .split(",")
             .map(function(member) {
-
                 return member.trim();
-
             })
             .filter(function(member) {
-
                 return member !== "";
-
             })
         : [];
-
 
 alliances.push({
 
@@ -897,20 +652,12 @@ alliances.push({
     name: name,
 
     members: members
-
 });
 
-
 document.getElementById("allianceNameInput").value = "";
-
 document.getElementById("allianceMembersInput").value = "";
 
-
-addEvent(
-    "🤝 Alliance formed: " +
-    name
-);
-
+addEvent("🤝 Alliance formed: " + name);
 
 updateAllDisplays();
 ```
@@ -927,9 +674,9 @@ function updateAllianceDisplay() {
 const list =
     document.getElementById("allianceList");
 
-
-if (!list) return;
-
+if (!list) {
+    return;
+}
 
 if (alliances.length === 0) {
 
@@ -937,52 +684,38 @@ if (alliances.length === 0) {
         '<div class="empty">No alliances created.</div>';
 
     return;
-
 }
 
-
 list.innerHTML = "";
-
 
 alliances.forEach(function(alliance) {
 
     const card =
         document.createElement("div");
 
-
     card.className =
         "alliance-card";
 
-
     card.innerHTML = `
-
         <h3>
             🤝 ${escapeHTML(alliance.name)}
         </h3>
 
         <p>
-
             <strong>Members:</strong>
-
             ${
                 alliance.members.length
                     ? alliance.members
                         .map(function(member) {
-
                             return escapeHTML(member);
-
                         })
                         .join(", ")
                     : "No members listed"
             }
-
         </p>
-
     `;
 
-
     list.appendChild(card);
-
 });
 ```
 
@@ -998,50 +731,39 @@ function updateRelationshipPlayers() {
 const player1 =
     document.getElementById("relationshipPlayer1");
 
-
 const player2 =
     document.getElementById("relationshipPlayer2");
 
-
-if (!player1 || !player2) return;
-
+if (!player1 || !player2) {
+    return;
+}
 
 player1.innerHTML = "";
-
 player2.innerHTML = "";
-
 
 houseguests.forEach(function(player) {
 
     const option1 =
         document.createElement("option");
 
-
     option1.value =
         player.id;
-
 
     option1.textContent =
         player.name;
 
-
     player1.appendChild(option1);
-
 
     const option2 =
         document.createElement("option");
 
-
     option2.value =
         player.id;
-
 
     option2.textContent =
         player.name;
 
-
     player2.appendChild(option2);
-
 });
 ```
 
@@ -1056,27 +778,18 @@ function createRelationship() {
 ```
 const player1Id =
     Number(
-        document.getElementById(
-            "relationshipPlayer1"
-        ).value
+        document.getElementById("relationshipPlayer1").value
     );
-
 
 const player2Id =
     Number(
-        document.getElementById(
-            "relationshipPlayer2"
-        ).value
+        document.getElementById("relationshipPlayer2").value
     );
-
 
 const score =
     Number(
-        document.getElementById(
-            "relationshipScore"
-        ).value
+        document.getElementById("relationshipScore").value
     ) || 50;
-
 
 if (!player1Id || !player2Id) {
 
@@ -1085,9 +798,7 @@ if (!player1Id || !player2Id) {
     );
 
     return;
-
 }
-
 
 if (player1Id === player2Id) {
 
@@ -1096,28 +807,21 @@ if (player1Id === player2Id) {
     );
 
     return;
-
 }
-
 
 const player1 =
     houseguests.find(function(player) {
-
         return player.id === player1Id;
-
     });
-
 
 const player2 =
     houseguests.find(function(player) {
-
         return player.id === player2Id;
-
     });
 
-
-if (!player1 || !player2) return;
-
+if (!player1 || !player2) {
+    return;
+}
 
 relationships.push({
 
@@ -1135,14 +839,11 @@ relationships.push({
                 score
             )
         )
-
 });
-
 
 document.getElementById(
     "relationshipScore"
 ).value = "";
-
 
 updateAllDisplays();
 ```
@@ -1157,13 +858,11 @@ function updateRelationshipDisplay() {
 
 ```
 const list =
-    document.getElementById(
-        "relationshipList"
-    );
+    document.getElementById("relationshipList");
 
-
-if (!list) return;
-
+if (!list) {
+    return;
+}
 
 if (relationships.length === 0) {
 
@@ -1171,25 +870,19 @@ if (relationships.length === 0) {
         '<div class="empty">No relationships created.</div>';
 
     return;
-
 }
 
-
 list.innerHTML = "";
-
 
 relationships.forEach(function(rel) {
 
     const card =
         document.createElement("div");
 
-
     card.className =
         "relationship-card";
 
-
     card.innerHTML = `
-
         <strong>
             ${escapeHTML(rel.player1)}
         </strong>
@@ -1207,12 +900,9 @@ relationships.forEach(function(rel) {
         <strong>
             ${rel.score}/100
         </strong>
-
     `;
 
-
     list.appendChild(card);
-
 });
 ```
 
@@ -1226,10 +916,11 @@ function startNewSeason() {
 
 ```
 const template =
-    seasonTemplates[
-        selectedSeasonTemplate
-    ];
+    seasonTemplates[selectedSeasonTemplate];
 
+if (!template) {
+    return;
+}
 
 if (houseguests.length < 4) {
 
@@ -1238,9 +929,7 @@ if (houseguests.length < 4) {
     );
 
     return;
-
 }
-
 
 if (
     houseguests.length !==
@@ -1263,39 +952,24 @@ if (
 
         );
 
-
     if (!continueSeason) {
-
         return;
-
     }
-
 }
 
-
 houseguests.forEach(function(player) {
-
     player.status = "In House";
-
 });
 
-
 evictedHouseguests = [];
-
 jury = [];
 
-
 currentWeek = 1;
-
 currentHOH = null;
-
 nominees = [];
-
 povWinner = null;
 
-
 seasonStarted = true;
-
 
 addEvent(
     "🏠 " +
@@ -1303,9 +977,7 @@ addEvent(
     " has officially started!"
 );
 
-
 updateAllDisplays();
-
 
 showSection("week");
 ```
@@ -1321,72 +993,44 @@ function competitionWinner(type) {
 ```
 const available =
     houseguests.filter(function(player) {
-
         return player.status === "In House";
-
     });
 
-
 if (available.length === 0) {
-
     return null;
-
 }
 
-
 let winner = null;
-
 let highestScore = -Infinity;
-
 
 available.forEach(function(player) {
 
     let score =
         Math.random() * 10;
 
-
     if (type === "physical") {
-
-        score +=
-            player.physical * 2;
-
+        score += player.physical * 2;
     }
-
 
     if (type === "mental") {
-
-        score +=
-            player.mental * 2;
-
+        score += player.mental * 2;
     }
-
 
     if (type === "social") {
-
-        score +=
-            player.social * 2;
-
+        score += player.social * 2;
     }
-
 
     if (type === "strategy") {
-
-        score +=
-            player.strategy * 2;
-
+        score += player.strategy * 2;
     }
-
 
     if (score > highestScore) {
 
         highestScore = score;
 
         winner = player;
-
     }
-
 });
-
 
 return winner;
 ```
@@ -1407,29 +1051,23 @@ if (!seasonStarted) {
     );
 
     return;
-
 }
-
 
 const winner =
     competitionWinner("physical");
 
-
-if (!winner) return;
-
+if (!winner) {
+    return;
+}
 
 currentHOH =
     winner;
 
-
 addEvent(
-
     "🏆 " +
     winner.name +
     " won Head of Household!"
-
 );
-
 
 updateAllDisplays();
 ```
@@ -1450,9 +1088,7 @@ if (!seasonStarted) {
     );
 
     return;
-
 }
-
 
 if (!currentHOH) {
 
@@ -1461,31 +1097,23 @@ if (!currentHOH) {
     );
 
     return;
-
 }
 
-
 const template =
-    seasonTemplates[
-        selectedSeasonTemplate
-    ];
-
+    seasonTemplates[selectedSeasonTemplate];
 
 const nominationCount =
     template.nominationCount;
-
 
 const candidates =
     houseguests.filter(function(player) {
 
         return (
-            player.status === "In House"
-        ) && (
+            player.status === "In House" &&
             player.id !== currentHOH.id
         );
 
     });
-
 
 if (
     candidates.length <
@@ -1497,20 +1125,14 @@ if (
     );
 
     return;
-
 }
-
 
 const shuffled =
     [...candidates];
 
-
 shuffled.sort(function() {
-
     return Math.random() - 0.5;
-
 });
-
 
 nominees =
     shuffled.slice(
@@ -1518,26 +1140,19 @@ nominees =
         nominationCount
     );
 
-
 const nomineeNames =
     nominees
         .map(function(player) {
-
             return player.name;
-
         })
         .join(", ");
 
-
 addEvent(
-
     "📋 " +
     currentHOH.name +
     " nominated: " +
     nomineeNames
-
 );
-
 
 updateAllDisplays();
 ```
@@ -1558,9 +1173,7 @@ if (!seasonStarted) {
     );
 
     return;
-
 }
-
 
 if (nominees.length < 2) {
 
@@ -1569,29 +1182,23 @@ if (nominees.length < 2) {
     );
 
     return;
-
 }
-
 
 const winner =
     competitionWinner("mental");
 
-
-if (!winner) return;
-
+if (!winner) {
+    return;
+}
 
 povWinner =
     winner;
 
-
 addEvent(
-
     "🥇 " +
     winner.name +
     " won the Power of Veto!"
-
 );
-
 
 updateAllDisplays();
 ```
@@ -1612,9 +1219,7 @@ if (!povWinner) {
     );
 
     return;
-
 }
-
 
 const wantsToUse =
     confirm(
@@ -1625,34 +1230,24 @@ const wantsToUse =
 
     );
 
-
 if (!wantsToUse) {
 
     addEvent(
-
         "🦸 " +
         povWinner.name +
         " did not use the Power of Veto."
-
     );
-
 
     updateAllDisplays();
 
     return;
-
 }
 
-
-let nomineeToRemove =
-    null;
-
+let nomineeToRemove = null;
 
 if (
     nominees.some(function(player) {
-
         return player.id === povWinner.id;
-
     })
 ) {
 
@@ -1668,56 +1263,33 @@ if (
                 nominees.length
             )
         ];
-
 }
-
 
 nominees =
     nominees.filter(function(player) {
-
         return player.id !== nomineeToRemove.id;
-
     });
-
 
 const replacementCandidates =
     houseguests.filter(function(player) {
 
-        if (
-            player.status !== "In House"
-        ) {
-
+        if (player.status !== "In House") {
             return false;
-
         }
 
-
-        if (
-            player.id === currentHOH.id
-        ) {
-
+        if (player.id === currentHOH.id) {
             return false;
-
         }
 
-
-        if (
-            player.id === povWinner.id
-        ) {
-
+        if (player.id === povWinner.id) {
             return false;
-
         }
-
 
         return !nominees.some(function(nominee) {
-
             return nominee.id === player.id;
-
         });
 
     });
-
 
 if (replacementCandidates.length === 0) {
 
@@ -1726,9 +1298,7 @@ if (replacementCandidates.length === 0) {
     );
 
     return;
-
 }
-
 
 const replacement =
     replacementCandidates[
@@ -1738,31 +1308,23 @@ const replacement =
         )
     ];
 
-
 nominees.push(replacement);
 
-
 addEvent(
-
     "🦸 " +
     povWinner.name +
     " used the POV on " +
     nomineeToRemove.name +
     "."
-
 );
 
-
 addEvent(
-
     "📋 " +
     currentHOH.name +
     " nominated " +
     replacement.name +
     " as the replacement nominee."
-
 );
-
 
 updateAllDisplays();
 ```
@@ -1785,9 +1347,7 @@ if (
     );
 
     return;
-
 }
-
 
 if (nominees.length !== 3) {
 
@@ -1796,9 +1356,7 @@ if (nominees.length !== 3) {
     );
 
     return;
-
 }
-
 
 const winner =
     nominees[
@@ -1808,23 +1366,16 @@ const winner =
         )
     ];
 
-
 nominees =
     nominees.filter(function(player) {
-
         return player.id !== winner.id;
-
     });
 
-
 addEvent(
-
     "🤖 AI ARENA: " +
     winner.name +
     " won and is SAFE!"
-
 );
-
 
 updateAllDisplays();
 ```
@@ -1845,9 +1396,7 @@ if (!seasonStarted) {
     );
 
     return;
-
 }
-
 
 if (nominees.length !== 2) {
 
@@ -1860,9 +1409,7 @@ if (nominees.length !== 2) {
     );
 
     return;
-
 }
-
 
 const evicted =
     nominees[
@@ -1872,21 +1419,15 @@ const evicted =
         )
     ];
 
-
 evicted.status =
     "Evicted";
-
 
 evictedHouseguests.push(
     evicted
 );
 
-
 const template =
-    seasonTemplates[
-        selectedSeasonTemplate
-    ];
-
+    seasonTemplates[selectedSeasonTemplate];
 
 if (
     currentWeek >=
@@ -1896,31 +1437,21 @@ if (
     jury.push(
         evicted
     );
-
 }
 
-
 addEvent(
-
     "🚪 " +
     evicted.name +
     " was evicted from the Big Brother house!"
-
 );
 
-
 nominees = [];
-
 povWinner = null;
-
 currentHOH = null;
-
 
 currentWeek++;
 
-
 checkForFinale();
-
 
 updateAllDisplays();
 ```
@@ -1936,59 +1467,44 @@ function checkForFinale() {
 ```
 const remaining =
     houseguests.filter(function(player) {
-
         return player.status === "In House";
-
     });
-
 
 if (remaining.length <= 2) {
 
     seasonStarted = false;
 
-
     const finale =
-        document.getElementById(
-            "finaleContent"
-        );
-
+        document.getElementById("finaleContent");
 
     if (finale) {
 
         finale.innerHTML = `
-
             <h2>
                 🎉 FINAL TWO!
             </h2>
 
             <h3>
-
-                ${remaining
-                    .map(function(player) {
-
-                        return escapeHTML(player.name);
-
-                    })
-                    .join(" vs. ")}
-
+                ${
+                    remaining
+                        .map(function(player) {
+                            return escapeHTML(player.name);
+                        })
+                        .join(" vs. ")
+                }
             </h3>
 
             <p>
                 Your custom season has reached the finale!
             </p>
-
         `;
-
     }
-
 
     addEvent(
         "👑 The Final Two has been reached!"
     );
 
-
     showSection("finale");
-
 }
 ```
 
@@ -2002,28 +1518,23 @@ function addEvent(message) {
 
 ```
 const eventLog =
-    document.getElementById(
-        "eventLog"
-    );
+    document.getElementById("eventLog");
 
-
-if (!eventLog) return;
-
+if (!eventLog) {
+    return;
+}
 
 const event =
     document.createElement("div");
 
-
 event.className =
     "event";
-
 
 event.textContent =
     "Week " +
     currentWeek +
     ": " +
     message;
-
 
 eventLog.prepend(event);
 ```
@@ -2038,29 +1549,23 @@ function updateMemoryWall() {
 
 ```
 const wall =
-    document.getElementById(
-        "memoryWall"
-    );
+    document.getElementById("memoryWall");
 
-
-if (!wall) return;
-
+if (!wall) {
+    return;
+}
 
 wall.innerHTML = "";
-
 
 houseguests.forEach(function(player) {
 
     const card =
         document.createElement("div");
 
-
     card.className =
         "memory-card";
 
-
     card.innerHTML = `
-
         <img
             src="${escapeHTML(player.image)}"
             alt="${escapeHTML(player.name)}"
@@ -2068,7 +1573,6 @@ houseguests.forEach(function(player) {
         >
 
         <div>
-
             <strong>
                 ${escapeHTML(player.name)}
             </strong>
@@ -2078,14 +1582,10 @@ houseguests.forEach(function(player) {
             <small>
                 ${escapeHTML(player.status)}
             </small>
-
         </div>
-
     `;
 
-
     wall.appendChild(card);
-
 });
 ```
 
@@ -2099,13 +1599,11 @@ function updateJuryDisplay() {
 
 ```
 const list =
-    document.getElementById(
-        "juryList"
-    );
+    document.getElementById("juryList");
 
-
-if (!list) return;
-
+if (!list) {
+    return;
+}
 
 if (jury.length === 0) {
 
@@ -2113,29 +1611,22 @@ if (jury.length === 0) {
         '<div class="empty">No jury members yet.</div>';
 
     return;
-
 }
 
-
 list.innerHTML = "";
-
 
 jury.forEach(function(player) {
 
     const row =
         document.createElement("div");
 
-
     row.className =
         "player-row";
-
 
     row.textContent =
         player.name;
 
-
     list.appendChild(row);
-
 });
 ```
 
@@ -2149,13 +1640,11 @@ function updateEvictedDisplay() {
 
 ```
 const list =
-    document.getElementById(
-        "evictedPlayers"
-    );
+    document.getElementById("evictedPlayers");
 
-
-if (!list) return;
-
+if (!list) {
+    return;
+}
 
 if (evictedHouseguests.length === 0) {
 
@@ -2163,30 +1652,23 @@ if (evictedHouseguests.length === 0) {
         '<div class="empty">No evicted houseguests yet.</div>';
 
     return;
-
 }
 
-
 list.innerHTML = "";
-
 
 evictedHouseguests.forEach(function(player) {
 
     const row =
         document.createElement("div");
 
-
     row.className =
         "player-row";
-
 
     row.textContent =
         player.name +
         " — Evicted";
 
-
     list.appendChild(row);
-
 });
 ```
 
@@ -2200,63 +1682,42 @@ function updateGameDisplay() {
 
 ```
 const template =
-    seasonTemplates[
-        selectedSeasonTemplate
-    ];
+    seasonTemplates[selectedSeasonTemplate];
 
+if (!template) {
+    return;
+}
 
 const weekTitle =
-    document.getElementById(
-        "weekTitle"
-    );
-
+    document.getElementById("weekTitle");
 
 const formatDisplay =
-    document.getElementById(
-        "formatDisplay"
-    );
-
+    document.getElementById("formatDisplay");
 
 const hohDisplay =
-    document.getElementById(
-        "hohDisplay"
-    );
-
+    document.getElementById("hohDisplay");
 
 const nomineesDisplay =
-    document.getElementById(
-        "nomineesDisplay"
-    );
-
+    document.getElementById("nomineesDisplay");
 
 const povDisplay =
-    document.getElementById(
-        "povDisplay"
-    );
-
+    document.getElementById("povDisplay");
 
 const weekDisplay =
-    document.getElementById(
-        "weekDisplay"
-    );
-
+    document.getElementById("weekDisplay");
 
 if (weekTitle) {
 
     weekTitle.textContent =
         "Week " +
         currentWeek;
-
 }
-
 
 if (formatDisplay) {
 
     formatDisplay.textContent =
         template.name;
-
 }
-
 
 if (hohDisplay) {
 
@@ -2264,9 +1725,7 @@ if (hohDisplay) {
         currentHOH
             ? currentHOH.name
             : "Not Played";
-
 }
-
 
 if (nomineesDisplay) {
 
@@ -2274,15 +1733,11 @@ if (nomineesDisplay) {
         nominees.length
             ? nominees
                 .map(function(player) {
-
                     return player.name;
-
                 })
                 .join(" & ")
             : "None";
-
 }
-
 
 if (povDisplay) {
 
@@ -2290,15 +1745,12 @@ if (povDisplay) {
         povWinner
             ? povWinner.name
             : "Not Played";
-
 }
-
 
 if (weekDisplay) {
 
     weekDisplay.textContent =
         currentWeek;
-
 }
 ```
 
@@ -2312,98 +1764,68 @@ function updateSeasonSummary() {
 
 ```
 const summary =
-    document.getElementById(
-        "seasonSummary"
-    );
+    document.getElementById("seasonSummary");
 
-
-if (!summary) return;
-
+if (!summary) {
+    return;
+}
 
 const template =
-    seasonTemplates[
-        selectedSeasonTemplate
-    ];
+    seasonTemplates[selectedSeasonTemplate];
 
+if (!template) {
+    return;
+}
 
 const remaining =
     houseguests.filter(function(player) {
-
         return player.status === "In House";
-
     });
 
-
 summary.innerHTML = `
-
     <p>
-
         <strong>Season Format:</strong>
-
         ${escapeHTML(template.name)}
-
     </p>
 
     <p>
-
         <strong>Season Started:</strong>
-
         ${seasonStarted ? "Yes" : "No"}
-
     </p>
 
     <p>
-
         <strong>Current Week:</strong>
-
         ${currentWeek}
-
     </p>
 
     <p>
-
         <strong>Total Cast:</strong>
-
         ${houseguests.length}
-
     </p>
 
     <p>
-
         <strong>Still in House:</strong>
-
         ${remaining.length}
-
     </p>
 
     <p>
-
         <strong>Evicted:</strong>
-
         ${evictedHouseguests.length}
-
     </p>
 
     <p>
-
         <strong>Jury:</strong>
-
         ${jury.length}
-
     </p>
 
     <p>
-
         <strong>Active Custom Twists:</strong>
-
-        ${customTwists.filter(function(twist) {
-
-            return twist.enabled;
-
-        }).length}
-
+        ${
+            customTwists.filter(function(twist) {
+                return twist.enabled;
+            }).length
+        }
     </p>
-
 `;
 ```
 
@@ -2452,7 +1874,8 @@ const gameState = {
 
     houseguests: houseguests,
 
-    evictedHouseguests: evictedHouseguests,
+    evictedHouseguests:
+        evictedHouseguests,
 
     jury: jury,
 
@@ -2474,18 +1897,12 @@ const gameState = {
 
     selectedSeasonTemplate:
         selectedSeasonTemplate
-
 };
 
-
 localStorage.setItem(
-
     "bigBrotherSimulatorSave",
-
     JSON.stringify(gameState)
-
 );
-
 
 alert(
     "Your season has been saved!"
@@ -2506,7 +1923,6 @@ const saved =
         "bigBrotherSimulatorSave"
     );
 
-
 if (!saved) {
 
     alert(
@@ -2514,81 +1930,62 @@ if (!saved) {
     );
 
     return;
-
 }
-
 
 try {
 
     const gameState =
         JSON.parse(saved);
 
-
     houseguests =
         gameState.houseguests || [];
-
 
     evictedHouseguests =
         gameState.evictedHouseguests || [];
 
-
     jury =
         gameState.jury || [];
-
 
     alliances =
         gameState.alliances || [];
 
-
     relationships =
         gameState.relationships || [];
-
 
     customTwists =
         gameState.customTwists || [];
 
-
     currentWeek =
         gameState.currentWeek || 1;
-
 
     currentHOH =
         gameState.currentHOH || null;
 
-
     nominees =
         gameState.nominees || [];
-
 
     povWinner =
         gameState.povWinner || null;
 
-
     seasonStarted =
         gameState.seasonStarted || false;
-
 
     selectedSeasonTemplate =
         gameState.selectedSeasonTemplate ||
         "custom";
-
 
     const selector =
         document.getElementById(
             "seasonTemplate"
         );
 
-
     if (selector) {
 
         selector.value =
             selectedSeasonTemplate;
-
     }
 
-
     updateAllDisplays();
-
 
     alert(
         "Your saved season has been loaded!"
@@ -2598,11 +1995,9 @@ try {
 
     console.error(error);
 
-
     alert(
         "There was a problem loading the saved season."
     );
-
 }
 ```
 
@@ -2617,14 +2012,12 @@ function resetGame() {
 ```
 const confirmed =
     confirm(
-
         "Are you sure you want to delete everything?"
-
     );
 
-
-if (!confirmed) return;
-
+if (!confirmed) {
+    return;
+}
 
 houseguests = [];
 
@@ -2638,7 +2031,6 @@ relationships = [];
 
 customTwists = [];
 
-
 currentWeek = 1;
 
 currentHOH = null;
@@ -2649,65 +2041,52 @@ povWinner = null;
 
 seasonStarted = false;
 
-selectedSeasonTemplate = "custom";
-
+selectedSeasonTemplate =
+    "custom";
 
 localStorage.removeItem(
     "bigBrotherSimulatorSave"
 );
-
 
 const selector =
     document.getElementById(
         "seasonTemplate"
     );
 
-
 if (selector) {
 
-    selector.value = "custom";
-
+    selector.value =
+        "custom";
 }
-
 
 const eventLog =
     document.getElementById(
         "eventLog"
     );
 
-
 if (eventLog) {
 
     eventLog.innerHTML = `
-
         <div class="event">
             Your simulator is ready.
         </div>
-
     `;
-
 }
-
 
 const finale =
     document.getElementById(
         "finaleContent"
     );
 
-
 if (finale) {
 
     finale.textContent =
         "The finale will appear here when your season reaches the end.";
-
 }
-
 
 updateAllDisplays();
 
-
 showSection("home");
-
 
 alert(
     "Everything has been reset."
@@ -2724,15 +2103,10 @@ function escapeHTML(value) {
 
 ```
 return String(value)
-
     .replace(/&/g, "&amp;")
-
     .replace(/</g, "&lt;")
-
     .replace(/>/g, "&gt;")
-
     .replace(/"/g, "&quot;")
-
     .replace(/'/g, "&#039;");
 ```
 
@@ -2750,7 +2124,6 @@ function() {
     console.log(
         "Big Brother Simulator loaded successfully!"
     );
-
 
     updateAllDisplays();
 
