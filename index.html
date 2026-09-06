@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Big Brother Simulator</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo-area">
+        <h1>BIG BROTHER</h1>
+        <p>CUSTOM SEASON SIMULATOR</p>
+    </div>
+
+</header>
+
+
+<nav>
+
+    <button onclick="showPage('home')">HOME</button>
+
+    <button onclick="showPage('setup')">SETUP</button>
+
+    <button onclick="showPage('cast')">CAST</button>
+
+    <button onclick="showPage('relationships')">RELATIONSHIPS</button>
+
+    <button onclick="showPage('simulation')">SIMULATOR</button>
+
+    <button onclick="showPage('results')">RESULTS</button>
+
+</nav>
+
+
+
+<main>
+
+
+<!-- =========================
+HOME
+========================= -->
+
+<section id="home" class="page active">
+
+    <div class="hero">
+
+        <h2>Create Your Own Big Brother Season</h2>
+
+        <p>
+            Create your cast. Choose a season format.
+            Build alliances and relationships.
+            Then simulate your entire season.
+        </p>
+
+        <button onclick="showPage('setup')" class="big-button">
+            START A NEW SEASON
+        </button>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="feature">
+            <h3>🎭 CUSTOM CAST</h3>
+            <p>Create completely original houseguests.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🏆 COMPETITIONS</h3>
+            <p>HOH and POV competitions based on player abilities.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🤝 ALLIANCES</h3>
+            <p>Houseguests can form alliances and betray each other.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🌀 TWISTS</h3>
+            <p>Choose different Big Brother season formats.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+SETUP
+========================= -->
+
+<section id="setup" class="page">
+
+    <div class="panel">
+
+        <h2>SEASON SETUP</h2>
+
+        <label>Season Name</label>
+
+        <input
+            type="text"
+            id="seasonName"
+            placeholder="My Big Brother Season"
+        >
+
+
+        <label>Choose a Season Format</label>
+
+        <select id="seasonFormat">
+
+            <option value="custom">
+                Custom Big Brother Season
+            </option>
+
+            <option value="bb19">
+                Big Brother 19 Style
+            </option>
+
+            <option value="bb20">
+                Big Brother 20 Style
+            </option>
+
+            <option value="bb23">
+                Big Brother 23 Style
+            </option>
+
+            <option value="bb24">
+                Big Brother 24 Style
+            </option>
+
+            <option value="bb25">
+                Big Brother 25 Style
+            </option>
+
+            <option value="bb26">
+                Big Brother 26 Style
+            </option>
+
+        </select>
+
+
+        <label>Number of Jury Members</label>
+
+        <select id="jurySize">
+
+            <option value="7">7 Person Jury</option>
+
+            <option value="9" selected>
+                9 Person Jury
+            </option>
+
+        </select>
+
+
+        <button onclick="saveSeasonSetup()">
+            SAVE SEASON SETUP
+        </button>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>CURRENT SEASON</h2>
+
+        <div id="seasonInfo">
+
+            No season has been configured yet.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+CAST
+========================= -->
+
+<section id="cast" class="page">
+
+    <div class="panel">
+
+        <h2>CREATE HOUSEGUEST</h2>
+
+
+        <div class="form-grid">
+
+            <input
+                id="hgName"
+                placeholder="Name"
+            >
+
+
+            <input
+                id="hgAge"
+                type="number"
+                placeholder="Age"
+            >
+
+
+            <input
+                id="hgOccupation"
+                placeholder="Occupation"
+            >
+
+
+            <input
+                id="hgImage"
+                placeholder="Image URL (optional)"
+            >
+
+        </div>
+
+
+        <h3>HOUSEGUEST ABILITIES</h3>
+
+
+        <div class="stats-grid">
+
+            <div>
+
+                <label>Physical: <span id="physicalValue">5</span></label>
+
+                <input
+                    type="range"
+                    id="physical"
+                    min="1"
+                    max="10"
+                    value="5"
+                    oninput="updateStatValue('physical')"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Mental: <span id="mentalValue">5</span></label>
+
+                <input
+                    type="range"
+                    id="mental"
+                    min="1"
+                    max="10"
+                    value="5"
+                    oninput="updateStatValue('mental')"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Social: <span id="socialValue">5</span></label>
+
+                <input
+                    type="range"
+                    id="social"
+                    min="1"
+                    max="10"
+                    value="5"
+                    oninput="updateStatValue('social')"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Strategy: <span id="strategyValue">5</span></label>
+
+                <input
+                    type="range"
+                    id="strategy"
+                    min="1"
+                    max="10"
+                    value="5"
+                    oninput="updateStatValue('strategy')"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Competition: <span id="competitionValue">5</span></label>
+
+                <input
+                    type="range"
+                    id="competition"
+                    min="1"
+                    max="10"
+                    value="5"
+                    oninput="updateStatValue('competition')"
+                >
+
+            </div>
+
+        </div>
+
+
+        <button onclick="addHouseguest()">
+            + ADD HOUSEGUEST
+        </button>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <h2>YOUR CAST</h2>
+
+        <p id="castCount">
+            0 Houseguests
+        </p>
+
+        <div id="castGrid" class="cast-grid"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+RELATIONSHIPS
+========================= -->
+
+<section id="relationships" class="page">
+
+    <div class="panel">
+
+        <h2>CREATE RELATIONSHIP</h2>
+
+        <select id="relationshipPlayer1"></select>
+
+        <select id="relationshipPlayer2"></select>
+
+
+        <label>Relationship</label>
+
+        <select id="relationshipType">
+
+            <option value="allies">
+                Allies
+            </option>
+
+            <option value="friends">
+                Friends
+            </option>
+
+            <option value="neutral">
+                Neutral
+            </option>
+
+            <option value="rivals">
+                Rivals
+            </option>
+
+            <option value="enemies">
+                Enemies
+            </option>
+
+            <option value="showmance">
+                Showmance
+            </option>
+
+        </select>
+
+
+        <button onclick="addRelationship()">
+            ADD RELATIONSHIP
+        </button>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <h2>RELATIONSHIPS</h2>
+
+        <div id="relationshipList"></div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+SIMULATOR
+========================= -->
+
+<section id="simulation" class="page">
+
+    <div class="panel simulator-panel">
+
+        <h2 id="weekTitle">
+            READY TO START
+        </h2>
+
+
+        <div class="game-status">
+
+            <div>
+
+                <span>HOH</span>
+
+                <strong id="hohDisplay">
+                    None
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>NOMINEES</span>
+
+                <strong id="nomineesDisplay">
+                    None
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>POV</span>
+
+                <strong id="povDisplay">
+                    None
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="simulation-buttons">
+
+            <button onclick="startSeason()">
+                START SEASON
+            </button>
+
+            <button onclick="runHOH()">
+                RUN HOH
+            </button>
+
+            <button onclick="makeNominations()">
+                NOMINATIONS
+            </button>
+
+            <button onclick="runPOV()">
+                RUN POV
+            </button>
+
+            <button onclick="vetoCeremony()">
+                VETO CEREMONY
+            </button>
+
+            <button onclick="runEviction()">
+                EVICTION
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <h2>SEASON STORY</h2>
+
+        <div id="eventLog" class="event-log">
+
+            <p>Your Big Brother season is waiting to begin.</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+RESULTS
+========================= -->
+
+<section id="results" class="page">
+
+    <div class="panel">
+
+        <h2>HOUSEGUEST STATUS</h2>
+
+        <div id="resultsList"></div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>JURY</h2>
+
+        <div id="juryList"></div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>WINNER</h2>
+
+        <div id="winnerDisplay">
+
+            The season has not finished yet.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+    <p>
+        Custom Big Brother Simulator
+    </p>
+
+</footer>
+
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
