@@ -1,7 +1,3 @@
-seasons/
-│
-├── bb20.js
-└── bb20-cast.js
 const BB20_CAST = [
 
     {
