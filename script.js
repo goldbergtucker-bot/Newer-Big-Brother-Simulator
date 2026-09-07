@@ -6994,3 +6994,210 @@ if (document.readyState === "loading") {
 } else {
     bbInitializeEnhancements();
 }
+/* =========================================================
+   BIG BROTHER SIMULATOR — ALLIANCE / TWIST FIXES v2
+========================================================= */
+
+const BB20_TWIST_META = {
+    appStore: {
+        name: "App Store",
+        weeks: [1,2,3],
+        description: "Power Apps and Crap Apps are awarded during the first three weeks.",
+        powers: ["Bonus Life", "The Cloud", "Identity Theft"]
+    },
+    hacker: {
+        name: "Hacker Competition",
+        weeks: [6,7],
+        description: "A secret Hacker can affect nominations, choose a Veto player, or nullify a vote.",
+        powers: ["Replace one nominee", "Choose one Veto player", "Nullify one eviction vote"]
+    },
+    juryBattleBack: {
+        name: "Jury Battle Back",
+        weeks: [10],
+        description: "Four eligible jurors compete for a chance to return to the game.",
+        powers: ["Return to the game"]
+    }
+};
+
+function bbEnsureAllianceControlsFixed() {
+    const select = document.getElementById("allianceMembers");
+    if (!select) return;
+
+    select.multiple = true;
+    select.size = Math.max(8, Math.min(16, houseguests.length || 8));
+    select.removeAttribute("disabled");
+    select.style.display = "block";
+    select.style.width = "100%";
+    select.style.minHeight = "180px";
+    select.style.cursor = "pointer";
+
+    // Always repopulate from the current cast, while preserving selected IDs.
+    const selected = new Set(Array.from(select.selectedOptions || []).map(o => o.value));
+    const previousAlliance = window.__bbAllianceEditingMembers || [];
+    previousAlliance.forEach(id => selected.add(id));
+
+    const html = houseguests.map(player =>
+        `<option value="${escapeAttribute(player.id)}"${selected.has(player.id) ? " selected" : ""}>${escapeHTML(getDisplayName(player))}</option>`
+    ).join("");
+
+    if (select.innerHTML !== html) select.innerHTML = html;
+
+    // Make it possible to select by clicking/tapping without losing the browser's native multi-select behavior.
+    select.onchange = function() {
+        window.__bbAllianceEditingMembers = Array.from(select.selectedOptions).map(o => o.value);
+    };
+}
+
+function bbCreateAllianceFixed() {
+    const nameEl = document.getElementById("allianceName");
+    const memberEl = document.getElementById("allianceMembers");
+    const strengthEl = document.getElementById("allianceStrength");
+
+    if (!nameEl || !memberEl) {
+        alert("The alliance editor could not be found. Please refresh the page.");
+        return;
+    }
+
+    const name = nameEl.value.trim();
+    const members = Array.from(memberEl.selectedOptions || []).map(o => o.value).filter(Boolean);
+    const strength = strengthEl?.value || "moderate";
+
+    if (!name) {
+        alert("Enter an alliance name.");
+        return;
+    }
+    if (members.length < 2) {
+        alert("Select at least TWO Houseguests in the Members box. Hold CTRL (Windows) or CMD (Mac) while clicking to select multiple players.");
+        return;
+    }
+
+    alliances.push({
+        id: "alliance_" + Date.now() + "_" + Math.random().toString(36).slice(2),
+        name,
+        members,
+        strength
+    });
+
+    window.__bbAllianceEditingMembers = [];
+    nameEl.value = "";
+    memberEl.selectedIndex = -1;
+    if (strengthEl) strengthEl.value = "moderate";
+
+    renderAlliances();
+    saveGameSilently();
+    addEvent(`Alliance created: ${name} (${getAllianceStrength(alliances[alliances.length - 1]).label}).`);
+    updateAllDisplays();
+}
+
+function bbEnsureBuiltInTwistsPanel() {
+    const section = document.getElementById("twists");
+    if (!section) return;
+
+    let panel = document.getElementById("bbBuiltInTwistsPanel");
+    if (!panel) {
+        panel = document.createElement("div");
+        panel.id = "bbBuiltInTwistsPanel";
+        panel.className = "panel bb-built-in-twists-panel";
+        const list = document.getElementById("twistList");
+        if (list) list.insertAdjacentElement("beforebegin", panel);
+        else section.appendChild(panel);
+    }
+
+    let html = `<h2>Season Twists</h2><p class="form-help">These are the twists built into the selected season format. They are shown here and are automatically checked by the simulation when their active week arrives.</p>`;
+
+    if (selectedSeasonTemplate === "bb20" && typeof BB20 !== "undefined" && BB20.twists) {
+        const t = BB20.twists;
+        const cards = [];
+        if (t.appStore) {
+            cards.push(`<div class="bb-twist-card"><h3>📱 App Store <span class="bb-twist-weeks">Weeks ${t.appStore.activeWeeks.join(", ")}</span></h3><p>Power Apps and Crap Apps are distributed during the first three weeks.</p><ul>${t.appStore.powerApps.map(x => `<li><strong>${escapeHTML(x.name)}</strong> — ${escapeHTML(x.description)}</li>`).join("")}</ul></div>`);
+        }
+        if (t.hacker) {
+            cards.push(`<div class="bb-twist-card"><h3>🕵️ Hacker Competition <span class="bb-twist-weeks">Weeks ${t.hacker.activeWeeks.join(", ")}</span></h3><p>Each active week includes a secret Hacker Competition.</p><ul>${t.hacker.abilities.map(x => `<li>${escapeHTML(x)}</li>`).join("")}</ul></div>`);
+        }
+        if (t.juryBattleBack) {
+            cards.push(`<div class="bb-twist-card"><h3>🎪 Jury Battle Back</h3><p>${escapeHTML(t.juryBattleBack.jurors)} jurors compete in <strong>${escapeHTML(t.juryBattleBack.competition)}</strong> for a return.</p></div>`);
+        }
+        html += cards.join("");
+    } else {
+        html += `<div class="bb-twist-card"><h3>No built-in twists for this format</h3><p>Create a Custom Twist below.</p></div>`;
+    }
+
+    panel.innerHTML = html;
+}
+
+function bbEnsureTwistControlsFixed() {
+    const section = document.getElementById("twists");
+    if (!section || document.getElementById("bbTwistHelp")) return;
+    const form = document.getElementById("twistName")?.closest(".panel");
+    if (!form) return;
+    const help = document.createElement("div");
+    help.id = "bbTwistHelp";
+    help.className = "form-help";
+    help.style.marginTop = "12px";
+    help.innerHTML = "<strong>Custom twists:</strong> These are saved with your season and displayed in the Twist Log. Built-in Big Brother 20 twists are automatically executed by the season engine on their scheduled weeks.";
+    form.appendChild(help);
+}
+
+function bbRenderTwistsFixed() {
+    const list = document.getElementById("twistList");
+    if (!list) return;
+    const twists = Array.isArray(customTwists) ? customTwists : [];
+    if (!twists.length) {
+        list.innerHTML = `<div class="panel"><strong>Custom Twists</strong><p>No custom twists created yet.</p></div>`;
+        return;
+    }
+    list.innerHTML = `<h2>Custom Twists</h2>` + twists.map((twist, index) =>
+        `<div class="panel bb-custom-twist-card"><h3>${escapeHTML(twist.name)}</h3><p>${escapeHTML(twist.description || "No description provided.")}</p><div class="bb-twist-status">CUSTOM TWIST ${index + 1} · SAVED</div></div>`
+    ).join("");
+}
+
+function bbRenderTwistsAndControls() {
+    bbEnsureBuiltInTwistsPanel();
+    bbEnsureTwistControlsFixed();
+    bbRenderTwistsFixed();
+}
+
+// Make alliance member loading independent of the original update-order.
+const bbOldUpdateAllDisplaysV2 = updateAllDisplays;
+updateAllDisplays = function() {
+    bbOldUpdateAllDisplaysV2();
+    bbEnsureAllianceControlsFixed();
+    bbRenderTwistsAndControls();
+};
+
+// Replace the alliance button handler with the reliable version.
+createAlliance = bbCreateAllianceFixed;
+
+// Ensure the controls exist even before the first full display update.
+function bbInitializeFixesV2() {
+    bbEnsureAllianceControlsFixed();
+    bbEnsureBuiltInTwistsPanel();
+    bbEnsureTwistControlsFixed();
+    bbRenderTwistsFixed();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bbInitializeFixesV2);
+} else {
+    bbInitializeFixesV2();
+}
+
+/* v2 visual polish */
+(function bbInjectV2Styles(){
+    if (document.getElementById("bb-v2-fix-styles")) return;
+    const style = document.createElement("style");
+    style.id = "bb-v2-fix-styles";
+    style.textContent = `
+        #allianceMembers { min-height:180px !important; height:auto !important; overflow-y:auto !important; }
+        #allianceMembers option { padding:8px 10px; }
+        .bb-built-in-twists-panel { margin-bottom:18px; }
+        .bb-twist-card { border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px; margin-top:10px; background:rgba(255,255,255,.035); }
+        .bb-twist-card h3 { margin:0 0 6px; }
+        .bb-twist-card ul { margin:8px 0 0 18px; }
+        .bb-twist-weeks { float:right; font-size:10px; opacity:.7; font-weight:800; }
+        .bb-twist-status { font-size:10px; font-weight:800; letter-spacing:.08em; opacity:.6; }
+    `;
+    document.head.appendChild(style);
+})();
+
+renderTwists = bbRenderTwistsFixed;
