@@ -1,6 +1,6 @@
 /* =========================================================
    BIG BROTHER SIMULATOR
-   COMPLETE GAME ENGINE
+   CAST / RELATIONSHIP MANAGEMENT
 ========================================================= */
 
 
@@ -16,8 +16,8 @@ let alliances = [];
 let relationships = [];
 let customTwists = [];
 
-let currentWeek = 0;
-let cycleInWeek = 1;
+let currentWeek = 1;
+let currentCycle = 1;
 
 let currentHOH = null;
 let nominees = [];
@@ -30,91 +30,314 @@ let hackerSelectedVetoPlayer = null;
 
 let seasonStarted = false;
 let selectedSeasonTemplate = "bb20";
-let currentStage = "ready";
+let currentStage = "idle";
 
 let evictionHistory = [];
 let voteHistory = [];
+
+let currentVoteRevealIndex = 0;
 
 let appStoreRecipients = [];
 let appStoreHistory = [];
 
 let battleBackUsed = false;
-let openingSafety = [];
 
-let vetoUsed = false;
+let openingSafety = {
+    completed: false,
+    protectedIds: []
+};
 
-let finalHOHWinner = null;
-let finalHOHPart1Winner = null;
-let finalHOHPart2Winner = null;
-let finalThree = [];
+let finalHOH = {
+    part1: null,
+    part2: null,
+    part3: null,
+    winner: null
+};
 
-let finaleJuryVotes = {};
-let seasonWinner = null;
+let finaleWinner = null;
 
-let currentEvictionResult = null;
-let voteRevealIndex = 0;
-
-let doubleEvictionActive = false;
-
-let events = [];
 
 
 /* =========================================================
    SEASON TEMPLATES
 ========================================================= */
 
-const SEASON_TEMPLATES = {
+const seasonTemplates = {
 
     custom: {
         name: "Custom Season",
         startingPlayers: 16,
-        jurySize: 9,
-        nominationCount: 2
+        nominationCount: 2,
+        jurySize: 9
     },
 
     bb19: {
         name: "Big Brother 19",
         startingPlayers: 16,
-        jurySize: 9,
-        nominationCount: 2
+        nominationCount: 2,
+        jurySize: 9
     },
 
     bb20: {
         name: "Big Brother 20",
         startingPlayers: 16,
+        nominationCount: 2,
         jurySize: 9,
-        nominationCount: 2
+        juryStartAfterEvictions: 7
     },
 
     bb23: {
         name: "Big Brother 23",
         startingPlayers: 16,
-        jurySize: 9,
-        nominationCount: 2
+        nominationCount: 2,
+        jurySize: 9
     },
 
     bb24: {
         name: "Big Brother 24",
         startingPlayers: 16,
-        jurySize: 8,
-        nominationCount: 2
+        nominationCount: 2,
+        jurySize: 7
     },
 
     bb25: {
         name: "Big Brother 25",
-        startingPlayers: 17,
-        jurySize: 7,
-        nominationCount: 2
+        startingPlayers: 16,
+        nominationCount: 2,
+        jurySize: 7
     },
 
     bb26: {
         name: "Big Brother 26",
         startingPlayers: 16,
-        jurySize: 9,
-        nominationCount: 3
+        nominationCount: 3,
+        jurySize: 7
     }
 
 };
+
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function escapeAttribute(value) {
+    return escapeHTML(value);
+}
+
+
+function getInitials(name) {
+
+    if (!name) {
+        return "?";
+    }
+
+    return name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0])
+        .join("")
+        .toUpperCase();
+}
+
+
+
+/* =========================================================
+   NEW HOUSEGUEST IDENTITY SYSTEM
+========================================================= */
+
+function getDisplayName(player) {
+
+    if (!player) {
+        return "";
+    }
+
+    if (player.nickname && player.nickname.trim()) {
+        return player.nickname.trim();
+    }
+
+    if (player.firstName && player.firstName.trim()) {
+        return player.firstName.trim();
+    }
+
+    if (player.name && player.name.trim()) {
+        return player.name.trim();
+    }
+
+    return "Houseguest";
+}
+
+
+function getFullName(player) {
+
+    if (!player) {
+        return "";
+    }
+
+    const first = (player.firstName || "").trim();
+    const last = (player.lastName || "").trim();
+
+    if (first && last) {
+        return `${first} ${last}`;
+    }
+
+    if (first) {
+        return first;
+    }
+
+    if (last) {
+        return last;
+    }
+
+    if (player.fullName) {
+        return player.fullName;
+    }
+
+    if (player.name) {
+        return player.name;
+    }
+
+    return getDisplayName(player);
+}
+
+
+function normalizeHouseguest(player) {
+
+    if (!player) {
+        return player;
+    }
+
+    /*
+       Compatibility with the old system.
+
+       Old cast members only had:
+
+       name
+
+       New cast members use:
+
+       firstName
+       lastName
+       nickname
+    */
+
+    if (!player.firstName) {
+
+        const oldName = player.name || "";
+
+        const pieces = oldName.trim().split(/\s+/);
+
+        if (pieces.length > 1) {
+
+            player.firstName = pieces.shift();
+            player.lastName = pieces.join(" ");
+
+        } else {
+
+            player.firstName = oldName;
+
+        }
+    }
+
+    if (!player.lastName) {
+        player.lastName = "";
+    }
+
+    if (!player.nickname) {
+        player.nickname = "";
+    }
+
+    if (!player.image) {
+        player.image = "";
+    }
+
+    player.physical = Number(player.physical) || 5;
+    player.mental = Number(player.mental) || 5;
+    player.social = Number(player.social) || 5;
+    player.strategy = Number(player.strategy) || 5;
+
+    player.name = getDisplayName(player);
+    player.fullName = getFullName(player);
+
+    if (!player.status) {
+        player.status = "Active";
+    }
+
+    return player;
+}
+
+
+function normalizeAllHouseguests() {
+
+    houseguests.forEach(normalizeHouseguest);
+}
+
+
+
+/* =========================================================
+   IMAGE SYSTEM
+========================================================= */
+
+function getPlayerImageHTML(player, className = "") {
+
+    if (!player) {
+        return `<div class="${className} player-placeholder">?</div>`;
+    }
+
+    const displayName = escapeAttribute(getDisplayName(player));
+    const initials = escapeHTML(getInitials(getDisplayName(player)));
+
+    if (player.image && player.image.trim()) {
+
+        return `
+            <img
+                class="${className}"
+                src="${escapeAttribute(player.image)}"
+                alt="${displayName}"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div
+                class="${className} player-placeholder"
+                style="display:none;">
+                ${initials}
+            </div>
+        `;
+
+    }
+
+    return `
+        <div class="${className} player-placeholder">
+            ${initials}
+        </div>
+    `;
+}
+
 
 
 /* =========================================================
@@ -123,18 +346,19 @@ const SEASON_TEMPLATES = {
 
 function showSection(sectionId) {
 
-    document.querySelectorAll(".page-section")
+    document
+        .querySelectorAll(".page-section")
         .forEach(section => {
-            section.classList.remove("active");
+            section.classList.remove("active-section");
         });
 
-    const section = document.getElementById(sectionId);
+    const section = $(sectionId);
 
     if (section) {
-        section.classList.add("active");
+        section.classList.add("active-section");
     }
-
 }
+
 
 
 /* =========================================================
@@ -143,351 +367,564 @@ function showSection(sectionId) {
 
 function selectSeasonTemplate() {
 
-    const selector =
-        document.getElementById("seasonSelector");
-
-    if (!selector) return;
-
-    selectedSeasonTemplate =
-        selector.value;
+    selectedSeasonTemplate = $("seasonSelect").value;
 
     updateSelectedSeasonInfo();
 
+    if (selectedSeasonTemplate === "bb20") {
+
+        addEvent(
+            "Big Brother 20 format selected."
+        );
+
+    }
 }
 
 
 function updateSelectedSeasonInfo() {
 
-    const info =
-        document.getElementById("selectedSeasonInfo");
-
-    if (!info) return;
-
     const template =
-        SEASON_TEMPLATES[selectedSeasonTemplate]
-        || SEASON_TEMPLATES.custom;
+        seasonTemplates[selectedSeasonTemplate];
 
-    let competitionHTML = "";
+    if (!template) {
+        return;
+    }
 
-    if (selectedSeasonTemplate === "bb20") {
+    let competitionsHTML = "";
 
-        const competitions =
-            BB20.competitions;
+    if (
+        selectedSeasonTemplate === "bb20" &&
+        typeof BB20 !== "undefined"
+    ) {
 
-        competitionHTML = Object.entries(competitions)
+        competitionsHTML = Object.entries(BB20.competitions)
             .map(([week, data]) => {
 
-                if (data.finalHOH) {
+                let text =
+                    `<strong>Week ${week}</strong>: `;
 
-                    return `
-                        <div class="competition-chip">
-                            <strong>FINAL HOH</strong>
-                            <span>
-                                ${data.finalHOH.map(x => x.name).join(" • ")}
-                            </span>
-                        </div>
-                    `;
-
+                if (data.doubleEviction) {
+                    text += "Double Eviction";
                 }
 
-                return `
-                    <div class="competition-chip">
-                        <strong>WEEK ${week}</strong>
-                        <span>HOH: ${escapeHTML(data.hoh)}</span>
-                        <small>
-                            POV: ${escapeHTML(data.pov || "—")}
-                        </small>
-                    </div>
-                `;
+                if (data.hoh) {
+                    text += `HOH — ${escapeHTML(data.hoh)}`;
+                }
+
+                if (data.pov) {
+                    text += ` | POV — ${escapeHTML(data.pov)}`;
+                }
+
+                return `<div>${text}</div>`;
 
             })
             .join("");
 
     }
 
-    info.innerHTML = `
+    $("selectedSeasonInfo").innerHTML = `
 
-        <h3>
-            ${escapeHTML(template.name)}
-        </h3>
+        <h3>${escapeHTML(template.name)}</h3>
 
-        <div class="summary-grid">
+        <p>
+            Starting Houseguests:
+            <strong>${template.startingPlayers}</strong>
+        </p>
 
-            <div>
-                <span>STARTING CAST</span>
-                <strong>${template.startingPlayers}</strong>
-            </div>
+        <p>
+            Nominees:
+            <strong>${template.nominationCount}</strong>
+        </p>
 
-            <div>
-                <span>NOMINEES</span>
-                <strong>${template.nominationCount}</strong>
-            </div>
-
-            <div>
-                <span>JURY</span>
-                <strong>${template.jurySize}</strong>
-            </div>
-
-        </div>
+        <p>
+            Jury:
+            <strong>${template.jurySize}</strong>
+        </p>
 
         ${
-            competitionHTML
-                ? `<div class="template-twist-grid" style="margin-top:15px">
-                    ${competitionHTML}
-                   </div>`
+            competitionsHTML
+                ? `
+                    <hr>
+                    <h4>Competition Schedule</h4>
+                    ${competitionsHTML}
+                  `
                 : ""
         }
-
     `;
-
 }
 
 
+
 /* =========================================================
-   CAST
+   STAT DISPLAY
 ========================================================= */
 
-function addHouseguest() {
+function updateStatValue(stat) {
 
-    const name =
-        document.getElementById("playerName").value.trim();
+    const input = $(stat);
+    const output = $(`${stat}Value`);
 
-    if (!name) {
+    if (input && output) {
+        output.textContent = input.value;
+    }
+}
 
-        alert("Enter a houseguest name.");
+
+function updateAllStatDisplays() {
+
+    [
+        "physical",
+        "mental",
+        "social",
+        "strategy"
+    ].forEach(updateStatValue);
+}
+
+
+
+/* =========================================================
+   ADD / EDIT HOUSEGUEST
+========================================================= */
+
+function saveHouseguest() {
+
+    const firstName =
+        $("firstName").value.trim();
+
+    const lastName =
+        $("lastName").value.trim();
+
+    const nickname =
+        $("nickname").value.trim();
+
+    const image =
+        $("imageUrl").value.trim();
+
+    if (!firstName && !lastName && !nickname) {
+
+        alert(
+            "Please enter at least a first name, last name, or nickname."
+        );
 
         return;
     }
 
 
-    const image =
-        document.getElementById("playerImage").value.trim();
-
     const physical =
-        clamp(
-            Number(document.getElementById("playerPhysical").value) || 5,
-            1,
-            10
-        );
+        Number($("physical").value);
 
     const mental =
-        clamp(
-            Number(document.getElementById("playerMental").value) || 5,
-            1,
-            10
-        );
+        Number($("mental").value);
 
     const social =
-        clamp(
-            Number(document.getElementById("playerSocial").value) || 5,
-            1,
-            10
-        );
+        Number($("social").value);
 
     const strategy =
-        clamp(
-            Number(document.getElementById("playerStrategy").value) || 5,
-            1,
-            10
+        Number($("strategy").value);
+
+
+    const editingId =
+        $("editingHouseguestId").value;
+
+
+    if (editingId) {
+
+        const player =
+            houseguests.find(
+                p => p.id === editingId
+            );
+
+        if (!player) {
+            cancelHouseguestEdit();
+            return;
+        }
+
+        player.firstName = firstName;
+        player.lastName = lastName;
+        player.nickname = nickname;
+        player.image = image;
+
+        player.physical = physical;
+        player.mental = mental;
+        player.social = social;
+        player.strategy = strategy;
+
+        normalizeHouseguest(player);
+
+        addEvent(
+            `${getDisplayName(player)} was edited.`
         );
 
+    } else {
 
-    const player = {
+        const player = {
 
-        id:
-            "player_" +
-            Date.now() +
-            "_" +
-            Math.random().toString(36).slice(2, 8),
+            id:
+                "hg_" +
+                Date.now() +
+                "_" +
+                Math.random()
+                    .toString(36)
+                    .slice(2),
 
-        name,
+            firstName,
+            lastName,
+            nickname,
+            image,
 
-        image,
+            physical,
+            mental,
+            social,
+            strategy,
 
-        physical,
-        mental,
-        social,
-        strategy,
+            name: nickname || firstName,
 
-        status: "Active",
+            status: "Active",
 
-        app: null,
-        punishment: null,
+            app: null,
+            punishment: null,
 
-        appUsed: false,
+            appUsed: false,
 
-        cloudAvailable: false,
-        identityTheftAvailable: false,
-        bonusLifeAvailable: false,
+            cloudAvailable: false,
+            identityTheftAvailable: false,
+            bonusLifeAvailable: false,
 
-        hackerWins: 0,
+            hackerWins: 0,
 
-        safety: false,
+            safety: false
 
-        returned: false,
+        };
 
-        evictionOrder: null,
+        normalizeHouseguest(player);
 
-        placement: null
+        houseguests.push(player);
 
-    };
+        addEvent(
+            `${getDisplayName(player)} was added to the cast.`
+        );
+    }
 
 
-    houseguests.push(player);
-
-    clearCastForm();
+    clearHouseguestEditor();
 
     updateAllDisplays();
 
+    saveGameSilently();
 }
 
 
-function clearCastForm() {
+function editHouseguest(id) {
 
-    [
-        "playerName",
-        "playerImage"
-    ].forEach(id => {
+    const player =
+        houseguests.find(
+            p => p.id === id
+        );
 
-        const element =
-            document.getElementById(id);
+    if (!player) {
+        return;
+    }
 
-        if (element) {
-            element.value = "";
-        }
+    normalizeHouseguest(player);
 
+    $("editingHouseguestId").value =
+        player.id;
+
+    $("firstName").value =
+        player.firstName || "";
+
+    $("lastName").value =
+        player.lastName || "";
+
+    $("nickname").value =
+        player.nickname || "";
+
+    $("imageUrl").value =
+        player.image || "";
+
+    $("physical").value =
+        player.physical || 5;
+
+    $("mental").value =
+        player.mental || 5;
+
+    $("social").value =
+        player.social || 5;
+
+    $("strategy").value =
+        player.strategy || 5;
+
+    updateAllStatDisplays();
+
+    $("castEditorTitle").textContent =
+        `Edit ${getDisplayName(player)}`;
+
+    $("saveHouseguestButton").textContent =
+        "SAVE CHANGES";
+
+    $("cancelEditButton")
+        .classList.remove("hidden");
+
+    showSection("cast");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
     });
-
 }
 
 
-function renderCast() {
+function cancelHouseguestEdit() {
 
-    const grid =
-        document.getElementById("castGrid");
-
-    if (!grid) return;
-
-    document.getElementById("castCount").textContent =
-        houseguests.length;
-
-
-    grid.innerHTML =
-        houseguests.map(player => `
-
-            <div class="cast-card">
-
-                <div class="cast-image-wrapper">
-
-                    ${getPlayerImageHTML(player)}
-
-                </div>
-
-                <h3>
-                    ${escapeHTML(player.name)}
-                </h3>
-
-                <div class="player-stats">
-
-                    <span>
-                        Physical: ${player.physical}
-                    </span>
-
-                    <span>
-                        Mental: ${player.mental}
-                    </span>
-
-                    <span>
-                        Social: ${player.social}
-                    </span>
-
-                    <span>
-                        Strategy: ${player.strategy}
-                    </span>
-
-                </div>
-
-                ${
-                    player.app
-                    ? `<div class="player-status active">
-                        ${escapeHTML(player.app)}
-                       </div>`
-                    : ""
-                }
-
-                ${
-                    player.punishment
-                    ? `<div class="player-status evicted">
-                        ${escapeHTML(player.punishment)}
-                       </div>`
-                    : ""
-                }
-
-                <div class="
-                    player-status
-                    ${player.status === "Active"
-                        ? "active"
-                        : "evicted"}
-                ">
-
-                    ${escapeHTML(player.status)}
-
-                </div>
-
-            </div>
-
-        `).join("");
-
+    clearHouseguestEditor();
 }
+
+
+function clearHouseguestEditor() {
+
+    $("editingHouseguestId").value = "";
+
+    $("firstName").value = "";
+    $("lastName").value = "";
+    $("nickname").value = "";
+    $("imageUrl").value = "";
+
+    $("physical").value = 5;
+    $("mental").value = 5;
+    $("social").value = 5;
+    $("strategy").value = 5;
+
+    updateAllStatDisplays();
+
+    $("castEditorTitle").textContent =
+        "Add Houseguest";
+
+    $("saveHouseguestButton").textContent =
+        "ADD HOUSEGUEST";
+
+    $("cancelEditButton")
+        .classList.add("hidden");
+}
+
 
 
 /* =========================================================
-   IMAGES
+   DELETE HOUSEGUEST
 ========================================================= */
 
-function getPlayerImageHTML(player) {
+function deleteHouseguest(id) {
 
-    const initials =
-        getInitials(player.name);
+    const player =
+        houseguests.find(
+            p => p.id === id
+        );
 
-    if (!player.image) {
+    if (!player) {
+        return;
+    }
 
-        return `
-            <div class="image-placeholder">
-                ${escapeHTML(initials)}
+
+    if (seasonStarted) {
+
+        alert(
+            "You cannot permanently remove a Houseguest after the season has started. This protects the simulation history. Reset the season if you need to completely rebuild the cast."
+        );
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Remove ${getDisplayName(player)} from the cast?`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    houseguests =
+        houseguests.filter(
+            p => p.id !== id
+        );
+
+
+    /*
+       Also remove their relationships.
+    */
+
+    relationships =
+        relationships.filter(
+            r =>
+                r.from !== id &&
+                r.to !== id
+        );
+
+
+    /*
+       Remove them from alliances.
+    */
+
+    alliances.forEach(alliance => {
+
+        alliance.members =
+            alliance.members.filter(
+                memberId =>
+                    memberId !== id
+            );
+
+    });
+
+
+    alliances =
+        alliances.filter(
+            alliance =>
+                alliance.members.length > 0
+        );
+
+
+    addEvent(
+        `${getDisplayName(player)} was removed from the cast.`
+    );
+
+
+    updateAllDisplays();
+
+    saveGameSilently();
+}
+
+
+
+/* =========================================================
+   CAST RENDER
+========================================================= */
+
+function renderCast() {
+
+    normalizeAllHouseguests();
+
+    $("castCount").textContent =
+        houseguests.length;
+
+
+    if (!houseguests.length) {
+
+        $("castGrid").innerHTML = `
+            <div class="empty-state">
+                No Houseguests added yet.
             </div>
         `;
 
+        return;
     }
 
-    return `
 
-        <img
-            class="player-photo"
-            src="${escapeAttribute(player.image)}"
-            alt="${escapeAttribute(player.name)}"
-            onerror="
-                this.outerHTML =
-                '<div class=&quot;image-placeholder&quot;>${escapeHTML(initials)}</div>'
-            "
-        >
+    $("castGrid").innerHTML =
+        houseguests
+            .map(player => {
 
-    `;
+                return `
 
+                    <div class="cast-card">
+
+                        <div class="cast-photo">
+
+                            ${getPlayerImageHTML(
+                                player,
+                                "player-photo"
+                            )}
+
+                        </div>
+
+
+                        <div class="cast-info">
+
+                            <div class="cast-display-name">
+                                ${escapeHTML(
+                                    getDisplayName(player)
+                                )}
+                            </div>
+
+                            <div class="cast-full-name">
+
+                                ${escapeHTML(
+                                    getFullName(player)
+                                )}
+
+                                ${
+                                    player.nickname
+                                        ? `
+                                            ·
+                                            Goes by
+                                            "${escapeHTML(
+                                                player.nickname
+                                            )}"
+                                          `
+                                        : ""
+                                }
+
+                            </div>
+
+
+                            <div class="cast-stats">
+
+                                <div class="cast-stat">
+                                    <span>Physical</span>
+                                    <strong>
+                                        ${player.physical}
+                                    </strong>
+                                </div>
+
+                                <div class="cast-stat">
+                                    <span>Mental</span>
+                                    <strong>
+                                        ${player.mental}
+                                    </strong>
+                                </div>
+
+                                <div class="cast-stat">
+                                    <span>Social</span>
+                                    <strong>
+                                        ${player.social}
+                                    </strong>
+                                </div>
+
+                                <div class="cast-stat">
+                                    <span>Strategy</span>
+                                    <strong>
+                                        ${player.strategy}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="cast-actions">
+
+                            <button
+                                onclick="editHouseguest('${player.id}')">
+                                EDIT
+                            </button>
+
+                            <button
+                                class="delete"
+                                onclick="deleteHouseguest('${player.id}')">
+                                DELETE
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
 }
 
-
-function getInitials(name) {
-
-    return name
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(word => word[0])
-        .join("")
-        .toUpperCase();
-
-}
 
 
 /* =========================================================
@@ -497,53 +934,73 @@ function getInitials(name) {
 function createTwist() {
 
     const name =
-        document.getElementById("twistName").value.trim();
+        $("twistName").value.trim();
 
     const description =
-        document.getElementById("twistDescription").value.trim();
+        $("twistDescription").value.trim();
 
-    if (!name) return;
+    if (!name) {
+        alert("Enter a twist name.");
+        return;
+    }
 
     customTwists.push({
+
+        id:
+            "twist_" +
+            Date.now(),
+
         name,
         description
+
     });
 
-    document.getElementById("twistName").value = "";
-    document.getElementById("twistDescription").value = "";
+    $("twistName").value = "";
+    $("twistDescription").value = "";
 
     renderTwists();
 
+    saveGameSilently();
 }
 
 
 function renderTwists() {
 
-    const list =
-        document.getElementById("twistList");
+    if (!customTwists.length) {
 
-    if (!list) return;
+        $("twistList").innerHTML =
+            `<p>No custom twists created.</p>`;
 
-    list.innerHTML =
-        customTwists.length
-        ? customTwists.map(twist => `
+        return;
+    }
 
-            <div class="player-item">
 
-                <strong>
-                    ${escapeHTML(twist.name)}
-                </strong>
+    $("twistList").innerHTML =
+        customTwists
+            .map(twist => {
 
-                <p>
-                    ${escapeHTML(twist.description)}
-                </p>
+                return `
 
-            </div>
+                    <div class="panel">
 
-        `).join("")
-        : "<p>No custom twists.</p>";
+                        <h3>
+                            ${escapeHTML(twist.name)}
+                        </h3>
 
+                        <p>
+                            ${escapeHTML(
+                                twist.description
+                            )}
+                        </p>
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
 }
+
 
 
 /* =========================================================
@@ -553,24 +1010,24 @@ function renderTwists() {
 function createAlliance() {
 
     const name =
-        document.getElementById("allianceName")
-            .value.trim();
+        $("allianceName").value.trim();
 
-    const select =
-        document.getElementById("allianceMembers");
+    const members =
+        Array.from(
+            $("allianceMembers").selectedOptions
+        ).map(option => option.value);
 
-    if (!name || !select) return;
 
-    const memberIds =
-        Array.from(select.selectedOptions)
-            .map(option => option.value);
-
-    if (memberIds.length < 2) {
-
-        alert("Choose at least two Houseguests.");
-
+    if (!name) {
+        alert("Enter an alliance name.");
         return;
     }
+
+    if (members.length < 2) {
+        alert("An alliance needs at least two Houseguests.");
+        return;
+    }
+
 
     alliances.push({
 
@@ -580,242 +1037,730 @@ function createAlliance() {
 
         name,
 
-        members: memberIds
+        members
 
     });
 
-    document.getElementById("allianceName").value = "";
 
-    renderAlliances();
+    $("allianceName").value = "";
 
+    updateAllDisplays();
+
+    saveGameSilently();
 }
 
 
 function renderAlliances() {
 
-    const list =
-        document.getElementById("allianceList");
-
-    if (!list) return;
-
     if (!alliances.length) {
 
-        list.innerHTML =
-            "<p>No alliances created.</p>";
+        $("allianceList").innerHTML =
+            `<div class="panel">
+                No alliances created yet.
+             </div>`;
 
         return;
     }
 
 
-    list.innerHTML =
-        alliances.map(alliance => {
+    $("allianceList").innerHTML =
+        alliances
+            .map(alliance => {
 
-            const members =
-                alliance.members
-                    .map(id =>
-                        houseguests.find(p => p.id === id)
-                    )
-                    .filter(Boolean);
+                const members =
+                    alliance.members
+                        .map(id =>
+                            houseguests.find(
+                                p => p.id === id
+                            )
+                        )
+                        .filter(Boolean);
 
 
-            return `
+                return `
 
-                <div class="panel">
+                    <div class="alliance-card">
 
-                    <h3>
-                        ${escapeHTML(alliance.name)}
-                    </h3>
+                        <h3>
+                            ${escapeHTML(
+                                alliance.name
+                            )}
+                        </h3>
 
-                    <div class="game-houseguest-grid">
 
-                        ${members.map(player => `
+                        <div class="alliance-members">
 
-                            <div class="game-player-card">
+                            ${members
+                                .map(player => `
 
-                                <div class="game-player-photo">
-                                    ${getPlayerImageHTML(player)}
-                                </div>
+                                    <div class="alliance-member">
 
-                                <strong>
-                                    ${escapeHTML(player.name)}
-                                </strong>
+                                        ${getPlayerImageHTML(
+                                            player,
+                                            ""
+                                        )}
 
-                            </div>
+                                        <div class="alliance-member-name">
 
-                        `).join("")}
+                                            ${escapeHTML(
+                                                getDisplayName(player)
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                `)
+                                .join("")}
+
+                        </div>
 
                     </div>
 
-                </div>
+                `;
 
-            `;
-
-        }).join("");
-
+            })
+            .join("");
 }
+
+
+function updateAllianceDropdown() {
+
+    const select =
+        $("allianceMembers");
+
+    if (!select) {
+        return;
+    }
+
+
+    const selected =
+        Array.from(
+            select.selectedOptions
+        ).map(option => option.value);
+
+
+    select.innerHTML =
+        houseguests
+            .map(player => {
+
+                return `
+                    <option
+                        value="${player.id}"
+                        ${
+                            selected.includes(player.id)
+                                ? "selected"
+                                : ""
+                        }>
+
+                        ${escapeHTML(
+                            getDisplayName(player)
+                        )}
+
+                    </option>
+                `;
+
+            })
+            .join("");
+}
+
 
 
 /* =========================================================
-   RELATIONSHIPS
+   RELATIONSHIP SYSTEM
 ========================================================= */
 
-function createRelationship() {
 
-    const a =
-        document.getElementById("relationshipA").value;
+/*
+   This is the critical change.
 
-    const b =
-        document.getElementById("relationshipB").value;
+   The user chooses:
 
-    const value =
-        clamp(
-            Number(
-                document.getElementById("relationshipValue").value
-            ) || 0,
-            -100,
-            100
-        );
+   Houseguest A
+   ↓
+   Houseguest B
+   ↓
+   Love / Like / Neutral / Dislike / Hate
 
-    if (!a || !b || a === b) return;
+   The simulator internally converts those labels into
+   numerical values for the AI.
+*/
 
-    relationships =
-        relationships.filter(
-            r =>
-                !(
-                    (r.a === a && r.b === b) ||
-                    (r.a === b && r.b === a)
-                )
-        );
+const relationshipValues = {
 
-    relationships.push({
-        a,
-        b,
-        value
-    });
+    love: 100,
+    like: 65,
+    neutral: 0,
+    dislike: -65,
+    hate: -100
 
-    renderRelationships();
+};
 
+
+const relationshipLabels = {
+
+    love: "❤️ Love",
+    like: "😊 Like",
+    neutral: "😐 Neutral",
+    dislike: "😒 Dislike",
+    hate: "😡 Hate"
+
+};
+
+
+function getRelationship(fromId, toId) {
+
+    return relationships.find(
+        relationship =>
+            relationship.from === fromId &&
+            relationship.to === toId
+    );
 }
 
 
-function getRelationship(a, b) {
+function getRelationshipValue(fromId, toId) {
 
-    const relation =
-        relationships.find(
-            r =>
-                (r.a === a && r.b === b) ||
-                (r.a === b && r.b === a)
+    const relationship =
+        getRelationship(
+            fromId,
+            toId
         );
 
-    return relation
-        ? relation.value
-        : 0;
+    if (!relationship) {
+        return 0;
+    }
 
+    return relationshipValues[
+        relationship.type
+    ] ?? 0;
+}
+
+
+function saveRelationship() {
+
+    const from =
+        $("relationshipFrom").value;
+
+    const to =
+        $("relationshipTo").value;
+
+    const type =
+        $("relationshipType").value;
+
+    const note =
+        $("relationshipNote").value.trim();
+
+
+    if (!from || !to) {
+
+        alert(
+            "Select both Houseguests."
+        );
+
+        return;
+    }
+
+
+    if (from === to) {
+
+        alert(
+            "A Houseguest cannot have a relationship with themselves."
+        );
+
+        return;
+    }
+
+
+    const existing =
+        getRelationship(
+            from,
+            to
+        );
+
+
+    if (existing) {
+
+        existing.type = type;
+        existing.note = note;
+
+    } else {
+
+        relationships.push({
+
+            id:
+                "relationship_" +
+                Date.now() +
+                "_" +
+                Math.random()
+                    .toString(36)
+                    .slice(2),
+
+            from,
+            to,
+            type,
+            note
+
+        });
+
+    }
+
+
+    renderRelationships();
+
+    clearRelationshipEditor();
+
+    saveGameSilently();
+}
+
+
+function loadSelectedRelationship() {
+
+    const from =
+        $("relationshipFrom").value;
+
+    const to =
+        $("relationshipTo").value;
+
+    const relationship =
+        getRelationship(
+            from,
+            to
+        );
+
+
+    if (!relationship) {
+
+        alert(
+            "No relationship has been created for this pair."
+        );
+
+        return;
+    }
+
+
+    $("relationshipType").value =
+        relationship.type;
+
+    $("relationshipNote").value =
+        relationship.note || "";
+}
+
+
+function deleteSelectedRelationship() {
+
+    const from =
+        $("relationshipFrom").value;
+
+    const to =
+        $("relationshipTo").value;
+
+
+    relationships =
+        relationships.filter(
+            relationship =>
+                !(
+                    relationship.from === from &&
+                    relationship.to === to
+                )
+        );
+
+
+    renderRelationships();
+
+    clearRelationshipEditor();
+
+    saveGameSilently();
+}
+
+
+function clearRelationshipEditor() {
+
+    $("relationshipType").value =
+        "neutral";
+
+    $("relationshipNote").value =
+        "";
+}
+
+
+function updateRelationshipDropdowns() {
+
+    const fromSelect =
+        $("relationshipFrom");
+
+    const toSelect =
+        $("relationshipTo");
+
+
+    if (!fromSelect || !toSelect) {
+        return;
+    }
+
+
+    const oldFrom =
+        fromSelect.value;
+
+    const oldTo =
+        toSelect.value;
+
+
+    const options =
+        houseguests
+            .map(player => {
+
+                return `
+                    <option value="${player.id}">
+                        ${escapeHTML(
+                            getDisplayName(player)
+                        )}
+                    </option>
+                `;
+
+            })
+            .join("");
+
+
+    fromSelect.innerHTML =
+        options;
+
+    toSelect.innerHTML =
+        options;
+
+
+    if (
+        houseguests.some(
+            player =>
+                player.id === oldFrom
+        )
+    ) {
+        fromSelect.value = oldFrom;
+    }
+
+
+    if (
+        houseguests.some(
+            player =>
+                player.id === oldTo
+        )
+    ) {
+        toSelect.value = oldTo;
+    }
+
+
+    if (
+        fromSelect.value ===
+        toSelect.value &&
+        houseguests.length > 1
+    ) {
+
+        const alternative =
+            houseguests.find(
+                player =>
+                    player.id !==
+                    fromSelect.value
+            );
+
+        if (alternative) {
+            toSelect.value =
+                alternative.id;
+        }
+    }
+
+
+    updateRelationshipPreviews();
+}
+
+
+function updateRelationshipPreviews() {
+
+    renderRelationshipPreview(
+        "relationshipFromPreview",
+        $("relationshipFrom").value
+    );
+
+    renderRelationshipPreview(
+        "relationshipToPreview",
+        $("relationshipTo").value
+    );
+}
+
+
+function renderRelationshipPreview(
+    elementId,
+    playerId
+) {
+
+    const element =
+        $(elementId);
+
+    if (!element) {
+        return;
+    }
+
+
+    const player =
+        houseguests.find(
+            p => p.id === playerId
+        );
+
+
+    if (!player) {
+
+        element.innerHTML = "";
+
+        return;
+    }
+
+
+    element.innerHTML = `
+
+        <div class="relationship-preview-card">
+
+            ${getPlayerImageHTML(
+                player,
+                ""
+            )}
+
+            <div>
+
+                <div class="relationship-preview-name">
+
+                    ${escapeHTML(
+                        getDisplayName(player)
+                    )}
+
+                </div>
+
+                <div class="relationship-preview-full">
+
+                    ${escapeHTML(
+                        getFullName(player)
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
 }
 
 
 function renderRelationships() {
 
-    const list =
-        document.getElementById("relationshipList");
+    const container =
+        $("relationshipsList");
 
-    if (!list) return;
 
-    list.innerHTML =
-        relationships.length
-        ? relationships.map(r => {
+    if (!relationships.length) {
 
-            const a =
-                houseguests.find(p => p.id === r.a);
+        container.innerHTML = `
+            <p>
+                No relationships have been created yet.
+            </p>
+        `;
 
-            const b =
-                houseguests.find(p => p.id === r.b);
+        return;
+    }
 
-            return `
 
-                <div class="player-item">
+    container.innerHTML =
+        relationships
+            .map(relationship => {
 
-                    <strong>
-                        ${escapeHTML(a?.name || "?")}
-                        ↔
-                        ${escapeHTML(b?.name || "?")}
-                    </strong>
+                const from =
+                    houseguests.find(
+                        p =>
+                            p.id ===
+                            relationship.from
+                    );
 
-                    <div>
-                        Relationship:
-                        ${r.value}
+                const to =
+                    houseguests.find(
+                        p =>
+                            p.id ===
+                            relationship.to
+                    );
+
+
+                if (!from || !to) {
+                    return "";
+                }
+
+
+                return `
+
+                    <div class="relationship-card">
+
+                        <div class="relationship-person-card">
+
+                            ${getPlayerImageHTML(
+                                from,
+                                ""
+                            )}
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        getDisplayName(from)
+                                    )}
+                                </strong>
+
+                                <small>
+                                    ${escapeHTML(
+                                        getFullName(from)
+                                    )}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="relationship-type">
+
+                            ${relationshipLabels[
+                                relationship.type
+                            ] || "Neutral"}
+
+                        </div>
+
+
+                        <div class="relationship-person-card">
+
+                            ${getPlayerImageHTML(
+                                to,
+                                ""
+                            )}
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        getDisplayName(to)
+                                    )}
+                                </strong>
+
+                                <small>
+                                    ${escapeHTML(
+                                        getFullName(to)
+                                    )}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="secondary-button"
+                            onclick="
+                                selectRelationshipForEditing(
+                                    '${relationship.from}',
+                                    '${relationship.to}'
+                                )
+                            ">
+
+                            EDIT
+
+                        </button>
+
                     </div>
 
-                </div>
+                    ${
+                        relationship.note
+                            ? `
+                                <div class="relationship-note">
+                                    ${escapeHTML(
+                                        relationship.note
+                                    )}
+                                </div>
+                              `
+                            : ""
+                    }
 
-            `;
+                `;
 
-        }).join("")
-        : "<p>No relationships created.</p>";
-
+            })
+            .join("");
 }
 
 
-/* =========================================================
-   RELATIONSHIP DROPDOWNS
-========================================================= */
+function selectRelationshipForEditing(
+    fromId,
+    toId
+) {
 
-function updateRelationshipDropdowns() {
+    $("relationshipFrom").value =
+        fromId;
 
-    const selects = [
+    $("relationshipTo").value =
+        toId;
 
-        document.getElementById("relationshipA"),
-        document.getElementById("relationshipB")
-
-    ];
-
-    selects.forEach(select => {
-
-        if (!select) return;
-
-        const old =
-            select.value;
-
-        select.innerHTML =
-            houseguests.map(player => `
-
-                <option value="${escapeAttribute(player.id)}">
-                    ${escapeHTML(player.name)}
-                </option>
-
-            `).join("");
-
-        if (
-            houseguests.some(
-                player => player.id === old
-            )
-        ) {
-            select.value = old;
-        }
-
-    });
+    const relationship =
+        getRelationship(
+            fromId,
+            toId
+        );
 
 
-    const allianceSelect =
-        document.getElementById("allianceMembers");
+    if (relationship) {
 
-    if (allianceSelect) {
+        $("relationshipType").value =
+            relationship.type;
 
-        allianceSelect.innerHTML =
-            houseguests
-                .filter(p => p.status === "Active")
-                .map(player => `
-
-                    <option value="${escapeAttribute(player.id)}">
-                        ${escapeHTML(player.name)}
-                    </option>
-
-                `)
-                .join("");
+        $("relationshipNote").value =
+            relationship.note || "";
 
     }
 
+
+    updateRelationshipPreviews();
+
+    showSection("house");
 }
+
+
+
+/* =========================================================
+   RELATIONSHIP AI
+========================================================= */
+
+function getRelationshipScore(
+    fromId,
+    toId
+) {
+
+    return getRelationshipValue(
+        fromId,
+        toId
+    );
+}
+
+
+function areAllied(
+    playerA,
+    playerB
+) {
+
+    if (!playerA || !playerB) {
+        return false;
+    }
+
+
+    return alliances.some(
+        alliance =>
+            alliance.members.includes(
+                playerA.id
+            ) &&
+            alliance.members.includes(
+                playerB.id
+            )
+    );
+}
+
 
 
 /* =========================================================
@@ -824,9 +1769,19 @@ function updateRelationshipDropdowns() {
 
 function startNewSeason() {
 
+    normalizeAllHouseguests();
+
+
     const template =
-        SEASON_TEMPLATES[selectedSeasonTemplate]
-        || SEASON_TEMPLATES.custom;
+        seasonTemplates[
+            selectedSeasonTemplate
+        ];
+
+
+    if (!template) {
+        alert("Invalid season format.");
+        return;
+    }
 
 
     if (
@@ -834,18 +1789,21 @@ function startNewSeason() {
         template.startingPlayers
     ) {
 
-        const proceed =
+        const continueAnyway =
             confirm(
-                `This format expects ${template.startingPlayers} Houseguests, but you have ${houseguests.length}. Continue anyway?`
+                `This format expects ${template.startingPlayers} Houseguests, but you currently have ${houseguests.length}. Continue anyway?`
             );
 
-        if (!proceed) return;
-
+        if (!continueAnyway) {
+            return;
+        }
     }
 
 
-    currentWeek = 0;
-    cycleInWeek = 1;
+    seasonStarted = true;
+
+    currentWeek = 1;
+    currentCycle = 1;
 
     currentHOH = null;
     nominees = [];
@@ -856,6 +1814,9 @@ function startNewSeason() {
     hackerVoteNullified = null;
     hackerSelectedVetoPlayer = null;
 
+    evictedHouseguests = [];
+    jury = [];
+
     evictionHistory = [];
     voteHistory = [];
 
@@ -863,29 +1824,28 @@ function startNewSeason() {
     appStoreHistory = [];
 
     battleBackUsed = false;
-    openingSafety = [];
 
-    vetoUsed = false;
+    finaleWinner = null;
 
-    finalHOHWinner = null;
-    finalHOHPart1Winner = null;
-    finalHOHPart2Winner = null;
+    finalHOH = {
+        part1: null,
+        part2: null,
+        part3: null,
+        winner: null
+    };
 
-    finalThree = [];
 
-    finaleJuryVotes = {};
-    seasonWinner = null;
+    openingSafety = {
+        completed: false,
+        protectedIds: []
+    };
 
-    currentEvictionResult = null;
-    voteRevealIndex = 0;
-
-    doubleEvictionActive = false;
-
-    events = [];
 
     houseguests.forEach(player => {
 
         player.status = "Active";
+
+        player.safety = false;
 
         player.app = null;
         player.punishment = null;
@@ -898,43 +1858,32 @@ function startNewSeason() {
 
         player.hackerWins = 0;
 
-        player.safety = false;
-
-        player.returned = false;
-
-        player.evictionOrder = null;
-        player.placement = null;
-
     });
 
 
-    evictedHouseguests = [];
-    jury = [];
+    addEvent(
+        `The ${template.name} season has begun.`
+    );
 
-    seasonStarted = true;
 
-    if (selectedSeasonTemplate === "bb20") {
+    if (
+        selectedSeasonTemplate === "bb20"
+    ) {
 
-        currentWeek = 1;
-
-        currentStage = "opening1";
-
-        addEvent(
-            "The Big Brother 20 premiere has begun."
-        );
+        currentStage =
+            "opening1";
 
         addEvent(
-            "The Houseguests will compete in a three-part opening safety sequence."
+            "The Big Brother 20 opening safety competition is beginning."
         );
 
     } else {
 
-        currentWeek = 1;
-
-        currentStage = "hoh";
+        currentStage =
+            "hoh";
 
         addEvent(
-            `${template.name} has begun.`
+            "The first Head of Household competition is beginning."
         );
 
     }
@@ -944,18 +1893,22 @@ function startNewSeason() {
 
     showSection("game");
 
+    saveGameSilently();
 }
 
 
+
 /* =========================================================
-   GAME ENGINE
+   STAGE ENGINE
 ========================================================= */
 
 function proceedGame() {
 
     if (!seasonStarted) {
 
-        startNewSeason();
+        alert(
+            "Start a season first."
+        );
 
         return;
     }
@@ -1004,19 +1957,19 @@ function proceedGame() {
             break;
 
         case "evictionVoting":
-            beginEvictionVoting();
+            prepareEvictionVotes();
             break;
 
         case "eviction":
-            revealNextVote();
+            revealNextEvictionVote();
             break;
 
         case "battleback":
             runBattleBack();
             break;
 
-        case "nextweek":
-            beginNextWeek();
+        case "nextcycle":
+            beginNextCycleOrWeek();
             break;
 
         case "finalHOH1":
@@ -1036,7 +1989,7 @@ function proceedGame() {
             break;
 
         case "juryVote":
-            runFinalJuryVote();
+            revealNextJuryVote();
             break;
 
         case "finished":
@@ -1044,18 +1997,18 @@ function proceedGame() {
             break;
 
         default:
-
-            if (selectedSeasonTemplate !== "bb20") {
-                proceedGenericSeason();
-            }
+            alert(
+                "The simulator is not currently at a playable stage."
+            );
 
     }
 
 }
 
 
+
 /* =========================================================
-   STAGE UI
+   STAGE DISPLAY
 ========================================================= */
 
 function setStage(stage) {
@@ -1064,308 +2017,364 @@ function setStage(stage) {
 
     updateStageDisplay();
 
+    updateGameDisplay();
 }
 
 
 function updateStageDisplay() {
 
-    const title =
-        document.getElementById("stageTitle");
-
-    const description =
-        document.getElementById("stageDescription");
-
-    const button =
-        document.getElementById("proceedButton");
-
-    const icon =
-        document.getElementById("stageIcon");
-
-
-    if (!title || !description || !button) return;
-
-
-    const stages = {
-
-        ready: [
-            "Ready",
-            "Start the season.",
-            "START SEASON",
-            "▶"
-        ],
+    const stageData = {
 
         opening1: [
-            "Premiere Safety — Part 1",
-            "The Houseguests compete for safety.",
-            "RUN PART 1",
-            "1"
+            "OPENING SAFETY",
+            "The Trash Folder",
+            "Opening safety competition — Part 1."
         ],
 
         opening2: [
-            "Premiere Safety — Part 2",
-            "The next safety competition begins.",
-            "RUN PART 2",
-            "2"
+            "OPENING SAFETY",
+            "HouseGuest CAPTCHA",
+            "Opening safety competition — Part 2."
         ],
 
         opening3: [
-            "Premiere Safety — Part 3",
-            "The final premiere safety competition determines the protected Houseguests.",
-            "RUN PART 3",
-            "3"
+            "OPENING SAFETY",
+            "Surfing the BB Web",
+            "Opening safety competition — Part 3."
         ],
 
         hoh: [
-            "Head of Household",
-            "Compete for the power to nominate two Houseguests.",
-            "RUN HOH",
-            "H"
+            "HEAD OF HOUSEHOLD",
+            "HOH Competition",
+            "Compete for the power to nominate two Houseguests."
         ],
 
         appstore: [
-            "Big Brother App Store",
-            "Houseguests receive the week's power and punishment apps.",
-            "OPEN APP STORE",
-            "A"
+            "BB APP STORE",
+            "App Store",
+            "Houseguests receive the week's App Store powers."
         ],
 
         nominations: [
+            "NOMINATIONS",
             "Nomination Ceremony",
-            "The HOH nominates two Houseguests.",
-            "MAKE NOMINATIONS",
-            "N"
+            "The HOH selects the nominees."
         ],
 
         hacker: [
+            "HACKER",
             "Hacker Competition",
-            "An anonymous Hacker can alter the nominations, choose a Veto player and nullify an eviction vote.",
-            "RUN HACKER",
-            "?"
+            "A secret Hacker gains the power to alter the week."
         ],
 
         povDraw: [
-            "Power of Veto Draw",
-            "The Veto players are selected.",
-            "DRAW VETO PLAYERS",
-            "V"
+            "POWER OF VETO",
+            "Veto Player Draw",
+            "The six Power of Veto players are selected."
         ],
 
         pov: [
-            "Power of Veto Competition",
-            "The selected Houseguests compete for the Power of Veto.",
-            "RUN POV",
-            "V"
+            "POWER OF VETO",
+            "Veto Competition",
+            "The Houseguests compete for the Power of Veto."
         ],
 
         veto: [
+            "POWER OF VETO",
             "Veto Ceremony",
-            "The Veto holder decides whether to use the Power of Veto.",
-            "HOLD VETO CEREMONY",
-            "✓"
+            "The POV holder decides whether to use the Veto."
         ],
 
         evictionVoting: [
-            "Eviction Voting",
-            "The eligible Houseguests prepare to cast their votes.",
-            "BEGIN VOTING",
-            "●"
+            "EVICTION",
+            "Prepare Votes",
+            "The eligible Houseguests secretly cast their votes."
         ],
 
         eviction: [
-            "Live Eviction",
-            "The eviction votes will be revealed one at a time.",
-            "REVEAL NEXT VOTE",
-            "!"
+            "EVICTION",
+            "Vote Reveal",
+            "Reveal each eviction vote individually."
         ],
 
         battleback: [
-            "Jury Battle Back",
-            "The eligible jurors compete for a chance to return to the game.",
-            "RUN BATTLE BACK",
-            "↩"
+            "BATTLE BACK",
+            "Big Top Drop",
+            "The first four jury members compete to return."
         ],
 
-        nextweek: [
-            "Next Week",
-            "Begin the next cycle of the season.",
-            "BEGIN NEXT WEEK",
-            "→"
+        nextcycle: [
+            "NEXT ROUND",
+            "Continue",
+            "Move to the next competition cycle."
         ],
 
         finalHOH1: [
-            "Final Head of Household — Part 1",
-            "The final three compete in the first part of the final HOH.",
-            "RUN PART 1",
-            "1"
+            "FINAL HOH",
+            "Part 1",
+            "The Final 3 compete in Part 1 of the Final HOH."
         ],
 
         finalHOH2: [
-            "Final Head of Household — Part 2",
-            "The remaining two Houseguests compete in Part 2.",
-            "RUN PART 2",
-            "2"
+            "FINAL HOH",
+            "Part 2",
+            "The remaining Final 3 compete in Part 2."
         ],
 
         finalHOH3: [
-            "Final Head of Household — Part 3",
-            "The Part 1 and Part 2 winners face off.",
-            "RUN PART 3",
-            "3"
+            "FINAL HOH",
+            "Part 3",
+            "The Part 1 and Part 2 winners face off."
         ],
 
         finalEviction: [
-            "Final Eviction",
-            "The final HOH decides which Houseguest joins the jury as the final juror.",
-            "EVICT THIRD PLACE",
-            "!"
+            "FINAL EVICTION",
+            "Final 3 Eviction",
+            "The Final HOH chooses who goes to the Final 2."
         ],
 
         juryVote: [
-            "Jury Vote",
-            "The jury votes to determine the winner.",
-            "REVEAL JURY VOTES",
-            "★"
+            "JURY",
+            "Final Vote",
+            "The jury votes for the winner."
         ],
 
         finished: [
+            "FINALE",
             "Season Complete",
-            "The Big Brother season has concluded.",
-            "VIEW FINALE",
-            "★"
+            "The season is complete."
         ]
 
     };
 
 
     const data =
-        stages[currentStage] ||
-        stages.ready;
+        stageData[currentStage];
 
 
-    title.textContent = data[0];
-
-    description.textContent = data[1];
-
-    button.textContent = data[2];
-
-    if (icon) {
-        icon.textContent = data[3];
+    if (!data) {
+        return;
     }
 
+
+    $("stageName").textContent =
+        data[0];
+
+    $("stageTitle").textContent =
+        data[1];
+
+    $("stageDescription").textContent =
+        data[2];
+
+
+    const buttonLabels = {
+
+        opening1: "PROCEED",
+        opening2: "PROCEED",
+        opening3: "PROCEED",
+
+        hoh: "RUN HOH",
+
+        appstore: "RUN APP STORE",
+
+        nominations: "MAKE NOMINATIONS",
+
+        hacker: "RUN HACKER",
+
+        povDraw: "DRAW POV PLAYERS",
+
+        pov: "RUN POV",
+
+        veto: "USE / DO NOT USE POV",
+
+        evictionVoting: "CAST EVICTION VOTES",
+
+        eviction: "REVEAL NEXT VOTE",
+
+        battleback: "RUN BATTLE BACK",
+
+        nextcycle: "CONTINUE",
+
+        finalHOH1: "RUN FINAL HOH PART 1",
+
+        finalHOH2: "RUN FINAL HOH PART 2",
+
+        finalHOH3: "RUN FINAL HOH PART 3",
+
+        finalEviction: "EVICT TO FINAL 2",
+
+        juryVote: "REVEAL NEXT JURY VOTE",
+
+        finished: "VIEW FINALE"
+
+    };
+
+
+    $("proceedButton").textContent =
+        buttonLabels[currentStage]
+        || "PROCEED";
 }
 
 
+
 /* =========================================================
-   PREMIERE SAFETY
+   OPENING SAFETY
 ========================================================= */
+
+let openingSafetyScores = {};
+
 
 function runOpeningSafetyPart(part) {
 
     const active =
         getActivePlayers();
 
-    if (!active.length) return;
-
-
-    let winner;
-
 
     if (part === 1) {
-
-        winner =
-            competitionWinner(
-                active,
-                "mental"
-            );
-
-        winner.safety = true;
-
-        addEvent(
-            `${winner.name} won Part 1 of the premiere safety competition.`
-        );
-
-        currentStage = "opening2";
-
+        openingSafetyScores = {};
     }
 
 
-    else if (part === 2) {
+    active.forEach(player => {
 
-        const eligible =
-            getActivePlayers()
-                .filter(p => !p.safety);
+        if (
+            !openingSafetyScores[player.id]
+        ) {
+            openingSafetyScores[player.id] = 0;
+        }
 
-        winner =
-            competitionWinner(
-                eligible,
-                "mental"
-            );
 
-        winner.safety = true;
+        let score = 0;
 
-        addEvent(
-            `${winner.name} won Part 2 of the premiere safety competition.`
+
+        if (part === 1) {
+            score =
+                player.mental * 2 +
+                player.social +
+                Math.random() * 10;
+        }
+
+        if (part === 2) {
+            score =
+                player.mental * 2 +
+                player.strategy * 1.5 +
+                Math.random() * 10;
+        }
+
+        if (part === 3) {
+            score =
+                player.social +
+                player.physical +
+                player.strategy +
+                Math.random() * 10;
+        }
+
+
+        openingSafetyScores[player.id] +=
+            score;
+
+    });
+
+
+    const partNames = {
+
+        1: "The Trash Folder",
+
+        2: "HouseGuest CAPTCHA",
+
+        3: "Surfing the BB Web"
+
+    };
+
+
+    const winner =
+        active
+            .slice()
+            .sort(
+                (a, b) =>
+                    openingSafetyScores[b.id] -
+                    openingSafetyScores[a.id]
+            )[0];
+
+
+    addEvent(
+        `Opening Safety Part ${part}: ${partNames[part]} was completed. ${getDisplayName(winner)} had the strongest performance in this part.`
+    );
+
+
+    if (part < 3) {
+
+        setStage(
+            `opening${part + 1}`
         );
 
-        currentStage = "opening3";
-
+        return;
     }
 
 
-    else {
+    /*
+       The eight highest cumulative performers
+       receive first-eviction safety.
+    */
 
-        const eligible =
-            getActivePlayers()
-                .filter(p => !p.safety);
+    const protectedPlayers =
+        active
+            .slice()
+            .sort(
+                (a, b) =>
+                    openingSafetyScores[b.id] -
+                    openingSafetyScores[a.id]
+            )
+            .slice(0, 8);
 
-        winner =
-            competitionWinner(
-                eligible,
-                "mixed"
-            );
 
-        winner.safety = true;
-
-        const protectedPlayers =
-            getActivePlayers()
-                .filter(p => p.safety);
-
-        openingSafety =
-            protectedPlayers.map(p => p.id);
-
-        addEvent(
-            `${winner.name} won the final premiere safety competition.`
+    openingSafety.protectedIds =
+        protectedPlayers.map(
+            player => player.id
         );
 
-        addEvent(
-            `${protectedPlayers.length} Houseguests are protected from the opening eviction.`
-        );
-
-        currentStage = "hoh";
-
-    }
+    openingSafety.completed = true;
 
 
-    updateAllDisplays();
+    protectedPlayers.forEach(
+        player => {
+            player.safety = true;
+        }
+    );
 
+
+    addEvent(
+        `The opening safety competition is complete. ${protectedPlayers.map(getDisplayName).join(", ")} are safe from the first eviction.`
+    );
+
+
+    setStage("hoh");
 }
 
 
+
 /* =========================================================
-   COMPETITION DATA
+   COMPETITIONS
 ========================================================= */
 
 function getCurrentWeekData() {
 
     if (
-        selectedSeasonTemplate === "bb20" &&
-        BB20.competitions[currentWeek]
+        selectedSeasonTemplate !==
+        "bb20"
     ) {
-        return BB20.competitions[currentWeek];
+        return null;
     }
 
-    return null;
+    if (
+        typeof BB20 === "undefined"
+    ) {
+        return null;
+    }
 
+    return BB20.competitions[
+        currentWeek
+    ];
 }
 
 
@@ -1374,25 +2383,20 @@ function getCurrentHOHCompetition() {
     const data =
         getCurrentWeekData();
 
-    if (!data) return null;
-
-    if (
-        cycleInWeek === 2 &&
-        data.secondHOH
-    ) {
-
-        return {
-            name: data.secondHOH,
-            type: data.secondHOHType || "mixed"
-        };
-
+    if (!data) {
+        return "Head of Household";
     }
 
-    return {
-        name: data.hoh,
-        type: data.hohType || "mixed"
-    };
 
+    if (
+        currentCycle === 2 &&
+        data.secondHOH
+    ) {
+        return data.secondHOH;
+    }
+
+
+    return data.hoh || "Head of Household";
 }
 
 
@@ -1401,26 +2405,133 @@ function getCurrentPOVCompetition() {
     const data =
         getCurrentWeekData();
 
-    if (!data) return null;
-
-    if (
-        cycleInWeek === 2 &&
-        data.secondPOV
-    ) {
-
-        return {
-            name: data.secondPOV,
-            type: data.secondPOVType || "mixed"
-        };
-
+    if (!data) {
+        return "Power of Veto";
     }
 
-    return {
-        name: data.pov,
-        type: data.povType || "mixed"
-    };
 
+    if (
+        currentCycle === 2 &&
+        data.secondPOV
+    ) {
+        return data.secondPOV;
+    }
+
+
+    return data.pov || "Power of Veto";
 }
+
+
+function getCompetitionType(name) {
+
+    const lower =
+        String(name || "")
+            .toLowerCase();
+
+
+    if (
+        lower.includes("comic") ||
+        lower.includes("hashtag") ||
+        lower.includes("code") ||
+        lower.includes("captcha") ||
+        lower.includes("launch") ||
+        lower.includes("product") ||
+        lower.includes("bloop") ||
+        lower.includes("bleep") ||
+        lower.includes("maze") ||
+        lower.includes("oddcast") ||
+        lower.includes("gif") ||
+        lower.includes("emojis")
+    ) {
+        return "mental";
+    }
+
+
+    if (
+        lower.includes("limb") ||
+        lower.includes("shot") ||
+        lower.includes("sky") ||
+        lower.includes("jetpack") ||
+        lower.includes("shell") ||
+        lower.includes("flow") ||
+        lower.includes("drop") ||
+        lower.includes("timing") ||
+        lower.includes("top")
+    ) {
+        return "physical";
+    }
+
+
+    return "mixed";
+}
+
+
+function competitionWinner(
+    players,
+    competitionName
+) {
+
+    if (!players.length) {
+        return null;
+    }
+
+
+    const type =
+        getCompetitionType(
+            competitionName
+        );
+
+
+    const scored =
+        players.map(player => {
+
+            let score;
+
+
+            if (type === "physical") {
+
+                score =
+                    player.physical * 3 +
+                    player.social +
+                    Math.random() * 15;
+
+            } else if (type === "mental") {
+
+                score =
+                    player.mental * 3 +
+                    player.strategy +
+                    Math.random() * 15;
+
+            } else {
+
+                score =
+                    player.physical +
+                    player.mental +
+                    player.strategy +
+                    player.social +
+                    Math.random() * 20;
+
+            }
+
+
+            return {
+                player,
+                score
+            };
+
+        });
+
+
+    scored.sort(
+        (a, b) =>
+            b.score -
+            a.score
+    );
+
+
+    return scored[0].player;
+}
+
 
 
 /* =========================================================
@@ -1429,19 +2540,27 @@ function getCurrentPOVCompetition() {
 
 function runHOH() {
 
-    const active =
-        getActivePlayers();
+    const players =
+        getActivePlayers()
+            .filter(
+                player =>
+                    !player.safety
+            );
 
 
-    const eligible =
-        active.filter(
+    /*
+       Safety only applies to the opening
+       eviction.
+    */
+
+    if (currentWeek > 1) {
+
+        houseguests.forEach(
             player =>
-                player.id !== currentHOH?.id &&
-                !player.safety
+                player.safety = false
         );
 
-
-    if (!eligible.length) return;
+    }
 
 
     const competition =
@@ -1450,46 +2569,35 @@ function runHOH() {
 
     const winner =
         competitionWinner(
-            eligible,
-            competition?.type || "mixed"
+            players,
+            competition
         );
 
 
-    currentHOH = winner;
+    currentHOH =
+        winner.id;
+
 
     addEvent(
-        `${winner.name} won HOH: ${competition?.name || "Head of Household"}.`
+        `${getDisplayName(winner)} won the HOH competition: ${competition}.`
     );
 
 
-    nominees = [];
-    povWinner = null;
-    povPlayers = [];
-
-    hackerWinner = null;
-    hackerVoteNullified = null;
-    hackerSelectedVetoPlayer = null;
-
-    vetoUsed = false;
-
-
     if (
-        selectedSeasonTemplate === "bb20" &&
-        BB20.twists.appStore.activeWeeks.includes(currentWeek)
+        currentWeek <= 3 &&
+        currentCycle === 1 &&
+        selectedSeasonTemplate === "bb20"
     ) {
 
-        currentStage = "appstore";
+        setStage("appstore");
 
     } else {
 
-        currentStage = "nominations";
+        setStage("nominations");
 
     }
-
-
-    updateAllDisplays();
-
 }
+
 
 
 /* =========================================================
@@ -1499,13 +2607,29 @@ function runHOH() {
 function runAppStore() {
 
     if (
-        selectedSeasonTemplate !== "bb20" ||
-        !BB20.twists.appStore.activeWeeks.includes(currentWeek)
+        selectedSeasonTemplate !==
+        "bb20" ||
+        typeof BB20 === "undefined"
     ) {
 
-        currentStage = "nominations";
+        setStage("nominations");
 
-        updateAllDisplays();
+        return;
+    }
+
+
+    const twist =
+        BB20.twists.appStore;
+
+
+    if (
+        !twist ||
+        !twist.activeWeeks.includes(
+            currentWeek
+        )
+    ) {
+
+        setStage("nominations");
 
         return;
     }
@@ -1515,128 +2639,192 @@ function runAppStore() {
         getActivePlayers()
             .filter(
                 player =>
-                    !player.app &&
-                    player.id !== currentHOH?.id
+                    !player.appUsed
             );
 
 
     if (!available.length) {
 
-        currentStage = "nominations";
-
-        updateAllDisplays();
+        setStage("nominations");
 
         return;
     }
 
 
-    const ranked =
-        [...available]
-            .sort(
-                (a, b) =>
-                    (
-                        b.social +
-                        Math.random() * 4
-                    ) -
-                    (
-                        a.social +
-                        Math.random() * 4
-                    )
-            );
+    const topTrending =
+        weightedRandomPlayer(
+            available,
+            player =>
+                player.social * 2 +
+                Math.random() * 10
+        );
 
 
-    const top =
-        ranked[0];
+    const remaining =
+        available.filter(
+            player =>
+                player.id !==
+                topTrending.id
+        );
 
 
-    const bottom =
-        ranked[ranked.length - 1];
+    const leastTrending =
+        remaining.length
+            ? weightedRandomPlayer(
+                remaining,
+                player =>
+                    20 -
+                    player.social * 2 +
+                    Math.random() * 10
+            )
+            : null;
 
 
-    const weekPower =
-        BB20.twists.appStore.powerApps[currentWeek - 1];
+    const powerByWeek = {
+
+        1: twist.powerApps.find(
+            app =>
+                app.type === "bonusLife"
+        ),
+
+        2: twist.powerApps.find(
+            app =>
+                app.type === "cloud"
+        ),
+
+        3: twist.powerApps.find(
+            app =>
+                app.type === "identityTheft"
+        )
+
+    };
 
 
-    const weekCrap =
-        BB20.twists.appStore.crapApps[currentWeek - 1];
+    const crapByWeek = {
+
+        1: twist.crapApps[0],
+
+        2: twist.crapApps[1],
+
+        3: twist.crapApps[2]
+
+    };
 
 
-    if (top) {
+    const power =
+        powerByWeek[currentWeek];
 
-        top.app =
-            weekPower.name;
 
-        if (weekPower.type === "bonusLife") {
-            top.bonusLifeAvailable = true;
+    const crap =
+        crapByWeek[currentWeek];
+
+
+    if (topTrending && power) {
+
+        topTrending.appUsed = true;
+
+        topTrending.app = power.name;
+
+
+        if (
+            power.type ===
+            "bonusLife"
+        ) {
+
+            topTrending.bonusLifeAvailable =
+                true;
+
         }
 
-        if (weekPower.type === "cloud") {
-            top.cloudAvailable = true;
+
+        if (
+            power.type ===
+            "cloud"
+        ) {
+
+            topTrending.cloudAvailable =
+                true;
+
         }
 
-        if (weekPower.type === "identityTheft") {
-            top.identityTheftAvailable = true;
+
+        if (
+            power.type ===
+            "identityTheft"
+        ) {
+
+            topTrending.identityTheftAvailable =
+                true;
+
         }
+
+
+        appStoreRecipients.push({
+            playerId: topTrending.id,
+            app: power.name,
+            type: power.type
+        });
+
+
+        addEvent(
+            `${getDisplayName(topTrending)} received the ${power.name} App.`
+        );
 
     }
 
 
-    if (
-        bottom &&
-        bottom.id !== top?.id
-    ) {
+    if (leastTrending && crap) {
 
-        bottom.punishment =
-            weekCrap.name;
+        leastTrending.appUsed = true;
+
+        leastTrending.punishment =
+            crap.name;
+
+
+        appStoreRecipients.push({
+            playerId: leastTrending.id,
+            app: crap.name,
+            type: "punishment"
+        });
+
+
+        addEvent(
+            `${getDisplayName(leastTrending)} received the ${crap.name} punishment.`
+        );
 
     }
 
 
-    appStoreRecipients.push({
+    appStoreHistory.push({
 
         week: currentWeek,
 
-        powerPlayer: top?.id || null,
+        powerPlayer:
+            topTrending
+                ? topTrending.id
+                : null,
 
-        power: weekPower.name,
+        power:
+            power
+                ? power.name
+                : null,
 
-        punishmentPlayer: bottom?.id || null,
+        punishmentPlayer:
+            leastTrending
+                ? leastTrending.id
+                : null,
 
-        punishment: weekCrap.name
+        punishment:
+            crap
+                ? crap.name
+                : null
 
     });
 
 
-    appStoreHistory.push(
-        appStoreRecipients[
-            appStoreRecipients.length - 1
-        ]
-    );
-
-
-    if (top) {
-
-        addEvent(
-            `${top.name} received ${weekPower.name} from the App Store.`
-        );
-
-    }
-
-
-    if (bottom) {
-
-        addEvent(
-            `${bottom.name} received the ${weekCrap.name} punishment.`
-        );
-
-    }
-
-
-    currentStage = "nominations";
-
-    updateAllDisplays();
-
+    setStage("nominations");
 }
+
 
 
 /* =========================================================
@@ -1645,144 +2833,232 @@ function runAppStore() {
 
 function makeNominations() {
 
-    const eligible =
-        getActivePlayers()
-            .filter(
-                player =>
-                    player.id !== currentHOH?.id &&
-                    !player.cloudAvailable &&
-                    !player.safety
-            );
-
-
-    if (eligible.length < 2) return;
-
-
-    nominees =
-        chooseNominees(
-            eligible,
-            2
+    const hoh =
+        houseguests.find(
+            p =>
+                p.id ===
+                currentHOH
         );
 
 
+    if (!hoh) {
+        return;
+    }
+
+
+    let eligible =
+        getActivePlayers()
+            .filter(
+                player =>
+                    player.id !==
+                    hoh.id
+            );
+
+
     /*
-       Identity Theft
+       Cloud protection.
+    */
+
+    const cloudHolder =
+        eligible.find(
+            player =>
+                player.cloudAvailable
+        );
+
+
+    const selected =
+        chooseNominees(
+            eligible,
+            hoh
+        );
+
+
+    nominees =
+        selected;
+
+
+    /*
+       Identity Theft.
     */
 
     const identityHolder =
         getActivePlayers()
             .find(
                 player =>
-                    player.identityTheftAvailable
+                    player.identityTheftAvailable &&
+                    player.id !== hoh.id
             );
 
 
     if (identityHolder) {
 
-        const replacementPool =
-            eligible.filter(
-                player =>
-                    player.id !== identityHolder.id
-            );
-
-
-        if (replacementPool.length >= 2) {
-
-            const stolen =
-                chooseNominees(
-                    replacementPool,
-                    2
+        const identityEligible =
+            getActivePlayers()
+                .filter(
+                    player =>
+                        player.id !== hoh.id &&
+                        player.id !== identityHolder.id
                 );
 
 
-            nominees = stolen;
+        nominees =
+            chooseNominees(
+                identityEligible,
+                identityHolder
+            );
 
-            identityHolder.identityTheftAvailable =
-                false;
 
-            addEvent(
-                `${identityHolder.name} secretly used Identity Theft and replaced the HOH's nominations.`
+        identityHolder.identityTheftAvailable =
+            false;
+
+
+        addEvent(
+            `${getDisplayName(identityHolder)} secretly used Identity Theft and replaced the HOH's nominations.`
+        );
+
+    }
+
+
+    /*
+       Cloud holder automatically protects themselves
+       if selected.
+    */
+
+    const protectedCloud =
+        nominees.find(
+            player =>
+                player.cloudAvailable
+        );
+
+
+    if (protectedCloud) {
+
+        protectedCloud.cloudAvailable =
+            false;
+
+        protectedCloud.app =
+            protectedCloud.app ===
+            "The Cloud"
+                ? "The Cloud (Used)"
+                : protectedCloud.app;
+
+
+        nominees =
+            nominees.filter(
+                player =>
+                    player.id !==
+                    protectedCloud.id
+            );
+
+
+        const replacementPool =
+            getActivePlayers()
+                .filter(
+                    player =>
+                        player.id !== hoh.id &&
+                        !nominees.some(
+                            nominee =>
+                                nominee.id ===
+                                player.id
+                        )
+                );
+
+
+        if (replacementPool.length) {
+
+            const replacement =
+                weightedRandomPlayer(
+                    replacementPool,
+                    player =>
+                        player.social +
+                        player.strategy +
+                        Math.random() * 20
+                );
+
+            nominees.push(
+                replacement
             );
 
         }
+
+
+        addEvent(
+            `${getDisplayName(protectedCloud)} used The Cloud to avoid the nomination.`
+        );
 
     }
 
 
     addEvent(
-        `${currentHOH.name} nominated ${nominees[0].name} and ${nominees[1].name}.`
+        `${getDisplayName(hoh)} nominated ${nominees.map(getDisplayName).join(" and ")}.`
     );
 
 
+    const weekData =
+        getCurrentWeekData();
+
+
     if (
-        selectedSeasonTemplate === "bb20" &&
-        BB20.twists.hacker.activeWeeks.includes(currentWeek)
+        weekData &&
+        weekData.hacker
     ) {
 
-        currentStage = "hacker";
+        setStage("hacker");
 
     } else {
 
-        currentStage = "povDraw";
+        setStage("povDraw");
 
     }
-
-
-    updateAllDisplays();
-
 }
 
 
-/* =========================================================
-   NOMINATION AI
-========================================================= */
+function chooseNominees(
+    eligible,
+    decisionMaker
+) {
 
-function chooseNominees(players, count) {
-
-    const selected = [];
-
-    const pool = [...players];
-
-    while (
-        selected.length < count &&
-        pool.length
-    ) {
-
-        const chosen =
-            weightedRandomPlayer(
-                pool,
-                player =>
-
-                    10 +
-
-                    player.strategy * 1.5 +
-
-                    player.physical * .5 +
-
-                    Math.random() * 10
-            );
-
-
-        if (!chosen) break;
-
-
-        selected.push(chosen);
-
-        const index =
-            pool.findIndex(
-                player =>
-                    player.id === chosen.id
-            );
-
-        if (index >= 0) {
-            pool.splice(index, 1);
-        }
-
+    if (eligible.length <= 2) {
+        return eligible.slice();
     }
 
-    return selected;
 
+    const first =
+        weightedRandomPlayer(
+            eligible,
+            player =>
+                evictionTargetScore(
+                    decisionMaker,
+                    player
+                )
+        );
+
+
+    const remaining =
+        eligible.filter(
+            player =>
+                player.id !==
+                first.id
+        );
+
+
+    const second =
+        weightedRandomPlayer(
+            remaining,
+            player =>
+                evictionTargetScore(
+                    decisionMaker,
+                    player
+                )
+        );
+
+
+    return [
+        first,
+        second
+    ];
 }
+
 
 
 /* =========================================================
@@ -1795,129 +3071,152 @@ function runHackerCompetition() {
         getActivePlayers();
 
 
-    if (!active.length) return;
+    const competition =
+        getCurrentWeekData().hacker;
 
 
-    const winner =
+    hackerWinner =
         competitionWinner(
             active,
-            "mental"
+            competition
         );
 
 
-    hackerWinner = winner;
-
-    winner.hackerWins =
-        (winner.hackerWins || 0) + 1;
+    hackerWinner.hackerWins =
+        (hackerWinner.hackerWins || 0) + 1;
 
 
     addEvent(
-        `${winner.name} secretly won the Hacker Competition.`
+        `${getDisplayName(hackerWinner)} secretly won the Hacker Competition: ${competition}.`
     );
 
 
     /*
-       Replace one nominee
+       Replace one nominee.
     */
+
+    const replaceableNominee =
+        weightedRandomPlayer(
+            nominees,
+            player =>
+                5 +
+                player.social +
+                Math.random() * 10
+        );
+
 
     const replacementPool =
         active.filter(
             player =>
-                player.id !== currentHOH?.id &&
+                player.id !==
+                currentHOH &&
                 !nominees.some(
-                    n => n.id === player.id
+                    nominee =>
+                        nominee.id ===
+                        player.id
                 )
         );
 
 
     if (
-        replacementPool.length &&
-        nominees.length
+        replaceableNominee &&
+        replacementPool.length
     ) {
-
-        const removed =
-            nominees[
-                Math.floor(
-                    Math.random() *
-                    nominees.length
-                )
-            ];
-
 
         const replacement =
             weightedRandomPlayer(
                 replacementPool,
                 player =>
-                    10 +
-                    player.strategy * 2 +
+                    player.strategy +
+                    player.social +
                     Math.random() * 10
             );
 
 
         nominees =
             nominees.filter(
-                n =>
-                    n.id !== removed.id
+                player =>
+                    player.id !==
+                    replaceableNominee.id
             );
 
 
-        nominees.push(replacement);
+        nominees.push(
+            replacement
+        );
 
 
         addEvent(
-            `The Hacker replaced ${removed.name} with ${replacement.name}.`
+            `The Hacker secretly replaced ${getDisplayName(replaceableNominee)} with ${getDisplayName(replacement)}.`
         );
 
     }
 
 
     /*
-       Hacker chooses one Veto player.
+       Choose one POV player.
     */
 
-    const vetoPool =
+    const povPool =
         active.filter(
             player =>
-                player.id !== currentHOH?.id &&
                 !nominees.some(
-                    n => n.id === player.id
-                )
+                    nominee =>
+                        nominee.id ===
+                        player.id
+                ) &&
+                player.id !==
+                currentHOH
         );
 
 
-    if (vetoPool.length) {
+    if (povPool.length) {
 
         hackerSelectedVetoPlayer =
             weightedRandomPlayer(
-                vetoPool,
+                povPool,
                 player =>
-                    player.mental * 2 +
-                    player.strategy * 1.5 +
+                    player.strategy +
+                    player.mental +
                     Math.random() * 10
             );
+
+
+        addEvent(
+            `The Hacker secretly selected ${getDisplayName(hackerSelectedVetoPlayer)} to play in the POV.`
+        );
 
     }
 
 
     /*
-       Hacker chooses a vote to nullify.
-       The identity remains hidden from the game narrative,
-       but the vote is recorded internally.
+       Nullify one eviction vote.
     */
 
-    chooseHackerVoteNullification();
+    hackerVoteNullified =
+        chooseHackerVoteNullification();
 
 
-    currentStage = "povDraw";
+    if (hackerVoteNullified) {
 
-    updateAllDisplays();
+        const nullifiedPlayer =
+            houseguests.find(
+                player =>
+                    player.id ===
+                    hackerVoteNullified
+            );
 
+
+        addEvent(
+            `The Hacker selected ${getDisplayName(nullifiedPlayer)} to have one eviction vote nullified.`
+        );
+
+    }
+
+
+    setStage("povDraw");
 }
 
-
-/* =========================================================
-   HACKER VOTE NULLIFICATION
-========================================================= */
 
 function chooseHackerVoteNullification() {
 
@@ -1925,37 +3224,33 @@ function chooseHackerVoteNullification() {
         getActivePlayers()
             .filter(
                 player =>
-                    player.id !== currentHOH?.id &&
+                    player.id !==
+                    currentHOH &&
                     !nominees.some(
-                        n => n.id === player.id
+                        nominee =>
+                            nominee.id ===
+                            player.id
                     )
             );
 
 
     if (!voters.length) {
-
-        hackerVoteNullified = null;
-
-        return;
+        return null;
     }
 
 
-    hackerVoteNullified =
+    const selected =
         weightedRandomPlayer(
             voters,
             player =>
-                10 +
                 player.strategy * 2 +
-                player.social +
-                Math.random() * 10
+                Math.random() * 20
         );
 
 
-    addEvent(
-        "The Hacker secretly selected an eviction vote to nullify."
-    );
-
+    return selected.id;
 }
+
 
 
 /* =========================================================
@@ -1964,106 +3259,112 @@ function chooseHackerVoteNullification() {
 
 function drawPOVPlayers() {
 
-    const active =
-        getActivePlayers();
-
-
-    const selected = [];
-
-
-    if (currentHOH) {
-
-        selected.push(currentHOH);
-
-    }
-
-
-    nominees.forEach(
-        nominee => {
-
-            if (
-                !selected.some(
-                    p => p.id === nominee.id
-                )
-            ) {
-
-                selected.push(nominee);
-
-            }
-
-        }
-    );
-
-
-    let available =
-        active.filter(
+    const hoh =
+        houseguests.find(
             player =>
-                !selected.some(
-                    p => p.id === player.id
-                )
+                player.id ===
+                currentHOH
         );
 
 
-    /*
-       Hacker-selected Veto player
-    */
-
-    if (
-        hackerSelectedVetoPlayer &&
-        available.some(
-            p =>
-                p.id === hackerSelectedVetoPlayer.id
-        )
-    ) {
-
-        selected.push(
-            hackerSelectedVetoPlayer
-        );
-
-        available =
-            available.filter(
-                p =>
-                    p.id !==
-                    hackerSelectedVetoPlayer.id
+    const pool =
+        getActivePlayers()
+            .filter(
+                player =>
+                    player.id !==
+                    currentHOH &&
+                    !nominees.some(
+                        nominee =>
+                            nominee.id ===
+                            player.id
+                    )
             );
 
-    }
+
+    povPlayers = [
+
+        hoh,
+
+        ...nominees
+
+    ];
+
+
+    const remaining =
+        pool.slice();
 
 
     while (
-        selected.length < 6 &&
-        available.length
+        povPlayers.length < 6 &&
+        remaining.length
     ) {
 
-        const randomIndex =
-            Math.floor(
-                Math.random() *
-                available.length
+        let candidate;
+
+
+        if (
+            hackerSelectedVetoPlayer &&
+            remaining.some(
+                player =>
+                    player.id ===
+                    hackerSelectedVetoPlayer.id
+            )
+        ) {
+
+            candidate =
+                hackerSelectedVetoPlayer;
+
+        } else {
+
+            candidate =
+                remaining[
+                    Math.floor(
+                        Math.random() *
+                        remaining.length
+                    )
+                ];
+
+        }
+
+
+        if (
+            !povPlayers.some(
+                player =>
+                    player.id ===
+                    candidate.id
+            )
+        ) {
+
+            povPlayers.push(
+                candidate
             );
 
-        selected.push(
-            available.splice(
-                randomIndex,
-                1
-            )[0]
-        );
+        }
+
+
+        const index =
+            remaining.findIndex(
+                player =>
+                    player.id ===
+                    candidate.id
+            );
+
+
+        if (index >= 0) {
+            remaining.splice(index, 1);
+        }
 
     }
 
 
-    povPlayers = selected;
-
-
     addEvent(
-        `The Veto players are ${povPlayers.map(p => p.name).join(", ")}.`
+        `POV players: ${povPlayers.map(getDisplayName).join(", ")}.`
     );
 
 
-    currentStage = "pov";
-
-    updateAllDisplays();
-
+    setStage("pov");
 }
+
 
 
 /* =========================================================
@@ -2072,38 +3373,25 @@ function drawPOVPlayers() {
 
 function runPOV() {
 
-    if (!povPlayers.length) {
-
-        drawPOVPlayers();
-
-        return;
-    }
-
-
     const competition =
         getCurrentPOVCompetition();
 
 
-    const winner =
+    povWinner =
         competitionWinner(
             povPlayers,
-            competition?.type || "mixed"
+            competition
         );
 
 
-    povWinner = winner;
-
-
     addEvent(
-        `${winner.name} won the Power of Veto: ${competition?.name || "Power of Veto"}.`
+        `${getDisplayName(povWinner)} won the Power of Veto competition: ${competition}.`
     );
 
 
-    currentStage = "veto";
-
-    updateAllDisplays();
-
+    setStage("veto");
 }
+
 
 
 /* =========================================================
@@ -2112,446 +3400,263 @@ function runPOV() {
 
 function usePOV() {
 
-    vetoUsed = false;
-
-
     if (!povWinner) {
 
-        currentStage = "evictionVoting";
-
-        updateAllDisplays();
+        setStage("evictionVoting");
 
         return;
     }
 
 
     /*
-       Final 4:
-       POV winner has automatic ability to save a nominee,
-       and the POV holder becomes the sole voter.
+       A nominee is more likely to use POV on themselves.
     */
 
-    if (
-        getActivePlayers().length === 4
-    ) {
+    const nomineeWinner =
+        nominees.some(
+            nominee =>
+                nominee.id ===
+                povWinner.id
+        );
 
-        if (
-            nominees.some(
-                n => n.id === povWinner.id
-            )
-        ) {
 
-            vetoUsed = true;
+    let useVeto;
 
-        } else {
 
-            vetoUsed =
-                Math.random() < .70;
+    if (nomineeWinner) {
 
-        }
+        useVeto = true;
 
     } else {
 
-        /*
-           Nominee POV winners almost always use it.
-        */
-
-        if (
-            nominees.some(
-                n => n.id === povWinner.id
-            )
-        ) {
-
-            vetoUsed = true;
-
-        } else {
-
-            vetoUsed =
-                Math.random() < .38;
-
-        }
+        useVeto =
+            Math.random() <
+            (
+                0.25 +
+                povWinner.social / 30
+            );
 
     }
 
 
-    if (vetoUsed) {
+    if (!useVeto) {
 
-        const savedNominee =
-            nominees.find(
-                n =>
-                    n.id === povWinner.id
-            )
-            ||
-            nominees[
-                Math.floor(
-                    Math.random() *
-                    nominees.length
-                )
-            ];
+        addEvent(
+            `${getDisplayName(povWinner)} chose not to use the Power of Veto.`
+        );
 
 
-        const replacementPool =
-            getActivePlayers()
-                .filter(
-                    player =>
-                        player.id !== currentHOH?.id &&
-                        player.id !== povWinner.id &&
-                        !nominees.some(
-                            n =>
-                                n.id === player.id
-                        )
-                );
+        setStage("evictionVoting");
+
+        return;
+    }
 
 
-        let replacement = null;
+    const removableNominees =
+        nominees.slice();
 
 
-        if (replacementPool.length) {
-
-            replacement =
-                chooseReplacementNominee(
-                    replacementPool
-                );
-
-        }
+    let savedNominee =
+        removableNominees[0];
 
 
-        if (replacement) {
+    if (
+        removableNominees.length > 1 &&
+        !nomineeWinner
+    ) {
 
-            nominees =
-                nominees.filter(
-                    n =>
-                        n.id !==
-                        savedNominee.id
-                );
-
-
-            nominees.push(
-                replacement
+        savedNominee =
+            weightedRandomPlayer(
+                removableNominees,
+                player =>
+                    player.social +
+                    player.strategy +
+                    Math.random() * 15
             );
-
-
-            addEvent(
-                `${povWinner.name} used the Power of Veto on ${savedNominee.name}.`
-            );
-
-
-            addEvent(
-                `${currentHOH.name} named ${replacement.name} as the replacement nominee.`
-            );
-
-        }
 
     } else {
 
+        savedNominee =
+            nominees.find(
+                nominee =>
+                    nominee.id ===
+                    povWinner.id
+            ) ||
+            nominees[0];
+
+    }
+
+
+    nominees =
+        nominees.filter(
+            nominee =>
+                nominee.id !==
+                savedNominee.id
+        );
+
+
+    const replacementPool =
+        getActivePlayers()
+            .filter(
+                player =>
+                    player.id !==
+                    currentHOH &&
+                    player.id !==
+                    povWinner.id &&
+                    !nominees.some(
+                        nominee =>
+                            nominee.id ===
+                            player.id
+                    )
+            );
+
+
+    if (replacementPool.length) {
+
+        const replacement =
+            weightedRandomPlayer(
+                replacementPool,
+                player =>
+                    player.strategy +
+                    player.social +
+                    Math.random() * 15
+            );
+
+
+        nominees.push(
+            replacement
+        );
+
+
         addEvent(
-            `${povWinner.name} did not use the Power of Veto.`
+            `${getDisplayName(povWinner)} used the POV to save ${getDisplayName(savedNominee)}. ${getDisplayName(replacement)} was named as the replacement nominee.`
         );
 
     }
 
 
-    currentStage = "evictionVoting";
-
-    updateAllDisplays();
-
+    setStage("evictionVoting");
 }
 
-
-function chooseReplacementNominee(pool) {
-
-    return weightedRandomPlayer(
-        pool,
-        player =>
-            10 +
-            player.strategy * 2 +
-            player.social +
-            player.physical * .5 +
-            Math.random() * 15
-    );
-
-}
 
 
 /* =========================================================
    EVICTION VOTING
 ========================================================= */
 
-function beginEvictionVoting() {
-
-    currentEvictionResult = {
-
-        week: currentWeek,
-
-        cycle: cycleInWeek,
-
-        nominees:
-            nominees.map(
-                n => n.id
-            ),
-
-        voters: [],
-
-        voteTotals: {},
-
-        votes: [],
-
-        tieBreaker: null,
-
-        evicted: null,
-
-        nullifiedVoter:
-            hackerVoteNullified?.id || null
-
-    };
+let currentEvictionVotes = {};
+let currentTieBreaker = null;
+let evictionVotePhase = "regular";
 
 
-    voteRevealIndex = 0;
+function prepareEvictionVotes() {
 
+    currentEvictionVotes = {};
+    currentTieBreaker = null;
 
-    const active =
-        getActivePlayers();
+    currentVoteRevealIndex = 0;
 
-
-    active.forEach(
-        player => {
-
-            const isHOH =
-                currentHOH &&
-                player.id === currentHOH.id;
-
-
-            const isNominee =
-                nominees.some(
-                    n =>
-                        n.id === player.id
-                );
-
-
-            currentEvictionResult.voters.push({
-
-                playerId: player.id,
-
-                eligible:
-                    !isHOH &&
-                    !isNominee,
-
-                vote: null,
-
-                nullified: false
-
-            });
-
-        }
-    );
-
-
-    addEvent(
-        "The live eviction vote has begun."
-    );
-
-
-    currentStage = "eviction";
-
-    updateAllDisplays();
-
-}
-
-
-/* =========================================================
-   INDIVIDUAL VOTE REVEAL
-========================================================= */
-
-function revealNextVote() {
-
-    if (!currentEvictionResult) {
-
-        beginEvictionVoting();
-
-        return;
-    }
+    evictionVotePhase = "regular";
 
 
     const voters =
-        currentEvictionResult.voters;
+        getActivePlayers();
 
 
-    /*
-       Find next eligible voter.
-    */
+    voters.forEach(voter => {
 
-    while (
-        voteRevealIndex <
-        voters.length
-    ) {
+        if (
+            voter.id ===
+            currentHOH
+        ) {
 
-        const entry =
-            voters[voteRevealIndex];
+            currentEvictionVotes[
+                voter.id
+            ] = {
+                type: "no-vote",
+                target: null
+            };
 
-
-        voteRevealIndex++;
-
-
-        if (!entry.eligible) {
-
-            continue;
-
+            return;
         }
 
 
-        const voter =
-            houseguests.find(
-                p =>
-                    p.id ===
-                    entry.playerId
-            );
+        if (
+            nominees.some(
+                nominee =>
+                    nominee.id ===
+                    voter.id
+            )
+        ) {
+
+            currentEvictionVotes[
+                voter.id
+            ] = {
+                type: "no-vote",
+                target: null
+            };
+
+            return;
+        }
 
 
-        if (!voter) continue;
-
-
-        /*
-           Generate vote.
-        */
-
-        const vote =
-            chooseEvictionVote(
+        const target =
+            chooseEvictionTarget(
                 voter
             );
 
 
-        entry.vote =
-            vote.id;
+        currentEvictionVotes[
+            voter.id
+        ] = {
+
+            type:
+                voter.id ===
+                hackerVoteNullified
+                    ? "nullified"
+                    : "vote",
+
+            target:
+                target.id
+
+        };
+
+    });
 
 
-        if (
-            hackerVoteNullified &&
-            voter.id ===
-            hackerVoteNullified.id
-        ) {
-
-            entry.nullified = true;
-
-            entry.originalVote = vote.id;
-
-            addEvent(
-                `The Hacker's selected vote was nullified.`
-            );
-
-        } else {
-
-            if (
-                !currentEvictionResult.voteTotals[vote.id]
-            ) {
-
-                currentEvictionResult.voteTotals[vote.id] = 0;
-
-            }
-
-
-            currentEvictionResult.voteTotals[vote.id]++;
-
-        }
-
-
-        currentEvictionResult.votes.push({
-
-            voter: voter.id,
-
-            target: vote.id,
-
-            nullified: entry.nullified
-
-        });
-
-
-        displayCurrentVoteReveal(
-            voter,
-            vote,
-            entry.nullified
-        );
-
-
-        updateAllDisplays();
-
-        return;
-
-    }
-
-
-    finishEviction();
-
-
-}
-
-
-/* =========================================================
-   VOTE AI
-========================================================= */
-
-function chooseEvictionVote(voter) {
-
-    const targets =
-        nominees.filter(
-            nominee =>
-                nominee.id !== voter.id
-        );
-
-
-    if (targets.length === 1) {
-
-        return targets[0];
-
-    }
-
-
-    const scores =
-        targets.map(
-            target => ({
-
-                player: target,
-
-                score:
-                    evictionTargetScore(
-                        voter,
-                        target
-                    )
-
-            })
-        );
-
-
-    scores.sort(
-        (a, b) =>
-            b.score - a.score
+    addEvent(
+        "The Houseguests have cast their eviction votes. The votes will now be revealed one at a time."
     );
 
 
-    /*
-       Add randomness so seasons don't
-       produce the same result every time.
-    */
+    renderEvictionVoteReveal();
 
-    if (
-        scores.length > 1 &&
-        Math.random() < .28
-    ) {
 
-        return scores[
-            Math.floor(
-                Math.random() *
-                Math.min(
-                    2,
-                    scores.length
-                )
-            )
-        ].player;
+    setStage("eviction");
+}
 
+
+function chooseEvictionTarget(
+    voter
+) {
+
+    const targets =
+        nominees;
+
+
+    if (!targets.length) {
+        return null;
     }
 
 
-    return scores[0].player;
-
+    return weightedRandomPlayer(
+        targets,
+        target =>
+            evictionTargetScore(
+                voter,
+                target
+            )
+    );
 }
 
 
@@ -2560,53 +3665,34 @@ function evictionTargetScore(
     target
 ) {
 
-    let score = 0;
+    if (!voter || !target) {
+        return 1;
+    }
 
 
-    /*
-       Strong personal relationship
-       makes a player less likely to
-       vote against someone.
-    */
+    let score =
+        10 +
+        target.strategy +
+        target.social;
+
 
     const relationship =
-        getRelationship(
+        getRelationshipScore(
             voter.id,
             target.id
         );
 
 
+    /*
+       Positive relationship = less likely
+       to vote them out.
+
+       Negative relationship = more likely.
+    */
+
     score -=
-        relationship * .65;
+        relationship * 0.5;
 
-
-    /*
-       Strategy threat.
-    */
-
-    score +=
-        target.strategy * 2;
-
-
-    /*
-       Social threat.
-    */
-
-    score +=
-        target.social;
-
-
-    /*
-       Physical threat.
-    */
-
-    score +=
-        target.physical * .5;
-
-
-    /*
-       Alliance protection.
-    */
 
     if (
         areAllied(
@@ -2615,535 +3701,266 @@ function evictionTargetScore(
         )
     ) {
 
-        score -= 35;
+        score -= 40;
 
     }
 
 
-    /*
-       Avoid voting against someone
-       with a strong relationship.
-    */
+    if (
+        target.strategy >= 8
+    ) {
+
+        score +=
+            target.strategy * 2;
+
+    }
+
 
     score +=
-        Math.random() * 30;
+        Math.random() * 25;
 
 
-    return score;
-
+    return Math.max(
+        1,
+        score
+    );
 }
 
 
+
 /* =========================================================
-   EVICTION REVEAL UI
+   INDIVIDUAL VOTE REVEAL
 ========================================================= */
 
-function displayCurrentVoteReveal(
-    voter,
-    target,
-    nullified
-) {
+function revealNextEvictionVote() {
 
-    const box =
-        document.getElementById(
-            "evictionResults"
+    const voters =
+        getActivePlayers();
+
+
+    const revealable =
+        voters.filter(
+            voter =>
+                currentEvictionVotes[
+                    voter.id
+                ] &&
+                currentEvictionVotes[
+                    voter.id
+                ].type !==
+                "no-vote"
         );
 
 
-    if (!box) return;
+    /*
+       Reveal normal votes one by one.
+    */
+
+    if (
+        currentVoteRevealIndex <
+        revealable.length
+    ) {
+
+        currentVoteRevealIndex++;
+
+        renderEvictionVoteReveal();
+
+        return;
+    }
 
 
-    box.classList.remove("hidden");
+    /*
+       All regular votes are revealed.
+    */
+
+    const totals =
+        calculateEvictionVoteTotals();
 
 
-    box.innerHTML = `
+    const nomineeA =
+        nominees[0];
 
-        <div class="eyebrow">
-            LIVE EVICTION
-        </div>
+    const nomineeB =
+        nominees[1];
 
-        <div class="vote-reveal-box">
 
-            <h3>
-                ${escapeHTML(voter.name)}
-            </h3>
+    if (
+        totals[nomineeA.id] ===
+        totals[nomineeB.id]
+    ) {
 
-            <div class="vote-reveal-player">
+        if (!currentTieBreaker) {
 
-                ${getPlayerImageHTML(voter)}
+            const hoh =
+                houseguests.find(
+                    player =>
+                        player.id ===
+                        currentHOH
+                );
 
-            </div>
 
-            ${
-                nullified
+            currentTieBreaker =
+                chooseEvictionTarget(
+                    hoh
+                );
 
-                ? `
 
-                    <div class="nullified-vote">
-                        HACKER VOTE NULLIFIED
-                    </div>
+            evictionVotePhase =
+                "tie";
 
-                    <p>
-                        ${escapeHTML(voter.name)}'s vote
-                        was nullified.
-                    </p>
 
-                  `
+            addEvent(
+                `The eviction vote is tied ${totals[nomineeA.id]}-${totals[nomineeB.id]}. ${getDisplayName(hoh)} must break the tie.`
+            );
 
-                : `
 
-                    <p>
-                        ${escapeHTML(voter.name)}
-                        voted to evict:
-                    </p>
+            renderTieBreaker();
 
-                    <div class="vote-reveal-player">
+            return;
+        }
 
-                        ${getPlayerImageHTML(target)}
+    }
 
-                    </div>
 
-                    <h3>
-                        ${escapeHTML(target.name)}
-                    </h3>
+    resolveEviction();
+}
 
-                  `
 
-            }
+function calculateEvictionVoteTotals() {
 
-        </div>
+    const totals = {};
 
-        <p style="text-align:center;color:#888894">
-            Click PROCEED to reveal the next vote.
+    nominees.forEach(
+        nominee => {
+            totals[nominee.id] = 0;
+        }
+    );
+
+
+    Object.values(
+        currentEvictionVotes
+    ).forEach(vote => {
+
+        if (
+            vote.type === "vote" &&
+            vote.target
+        ) {
+
+            totals[vote.target] =
+                (
+                    totals[vote.target] ||
+                    0
+                ) + 1;
+
+        }
+
+    });
+
+
+    return totals;
+}
+
+
+function renderEvictionVoteReveal() {
+
+    const container =
+        $("evictionResults");
+
+
+    container.classList.remove(
+        "hidden"
+    );
+
+
+    const voters =
+        getActivePlayers();
+
+
+    const revealable =
+        voters.filter(
+            voter =>
+                currentEvictionVotes[
+                    voter.id
+                ] &&
+                currentEvictionVotes[
+                    voter.id
+                ].type !==
+                "no-vote"
+        );
+
+
+    const revealedIds =
+        new Set(
+            revealable
+                .slice(
+                    0,
+                    currentVoteRevealIndex
+                )
+                .map(
+                    voter =>
+                        voter.id
+                )
+        );
+
+
+    let html = `
+
+        <h2>
+            Eviction Vote Reveal
+        </h2>
+
+        <p>
+            Revealed:
+            ${Math.min(
+                currentVoteRevealIndex,
+                revealable.length
+            )}
+            /
+            ${revealable.length}
+            votes
         </p>
 
     `;
 
-}
+
+    voters.forEach(voter => {
+
+        const vote =
+            currentEvictionVotes[
+                voter.id
+            ];
 
 
-/* =========================================================
-   FINISH EVICTION
-========================================================= */
-
-function finishEviction() {
-
-    const result =
-        currentEvictionResult;
-
-
-    /*
-       Count totals.
-    */
-
-    const totals = {};
-
-
-    nominees.forEach(
-        nominee => {
-
-            totals[nominee.id] =
-                result.voteTotals[nominee.id]
-                || 0;
-
+        if (!vote) {
+            return;
         }
-    );
-
-
-    let evicted;
-
-
-    const sorted =
-        nominees
-            .map(
-                nominee => ({
-
-                    player: nominee,
-
-                    votes:
-                        totals[nominee.id]
-
-                })
-            )
-            .sort(
-                (a, b) =>
-                    b.votes - a.votes
-            );
-
-
-    if (
-        sorted.length >= 2 &&
-        sorted[0].votes ===
-        sorted[1].votes
-    ) {
-
-        /*
-           HOH breaks tie.
-        */
-
-        const preferred =
-            chooseEvictionVote(
-                currentHOH,
-            );
 
 
         /*
-           Ensure tie breaker selects
-           one of the tied nominees.
+           HOH / nominees don't vote.
         */
 
         if (
-            sorted.some(
-                x =>
-                    x.player.id ===
-                    preferred.id &&
-                    x.votes ===
-                    sorted[0].votes
-            )
+            vote.type ===
+            "no-vote"
         ) {
 
-            evicted =
-                preferred;
-
-        } else {
-
-            evicted =
-                sorted[0].player;
-
-        }
-
-
-        result.tieBreaker =
-            currentHOH?.id || null;
-
-
-        if (currentHOH) {
-
-            addEvent(
-                `${currentHOH.name} broke the tie and evicted ${evicted.name}.`
-            );
-
-        }
-
-    } else {
-
-        evicted =
-            sorted[0]?.player;
-
-    }
-
-
-    if (!evicted) return;
-
-
-    result.evicted =
-        evicted.id;
-
-
-    result.voteTotals =
-        totals;
-
-
-    result.nomineeObjects =
-        nominees.map(
-            n => n.id
-        );
-
-
-    voteHistory.push(
-        JSON.parse(
-            JSON.stringify(result)
-        )
-    );
-
-
-    evictionHistory.push(
-        JSON.parse(
-            JSON.stringify(result)
-        )
-    );
-
-
-    evicted.status = "Evicted";
-
-    evicted.evictionOrder =
-        evictedHouseguests.length + 1;
-
-
-    evicted.placement =
-        16 -
-        evicted.evictionOrder +
-        1;
-
-
-    evictedHouseguests.push(
-        evicted
-    );
-
-
-    addEvent(
-        `${evicted.name} was evicted from the Big Brother house.`
-    );
-
-
-    /*
-       Jury begins with the eighth evicted
-       player in a 16-person BB20 format.
-    */
-
-    if (
-        evictedHouseguests.length >=
-        BB20.juryStartAfterEvictions
-    ) {
-
-        if (
-            !jury.some(
-                p => p.id === evicted.id
-            )
-        ) {
-
-            jury.push(evicted);
-
-        }
-
-    }
-
-
-    /*
-       Bonus Life mechanic.
-    */
-
-    handleBonusLife(evicted);
-
-
-    /*
-       Display final results.
-    */
-
-    displayFinalEvictionResults(
-        result,
-        evicted
-    );
-
-
-    /*
-       Battle Back becomes available
-       after the fourth juror has entered
-       the jury.
-    */
-
-    if (
-        !battleBackUsed &&
-        jury.length >=
-        BB20.twists.juryBattleBack.jurors &&
-        !getActivePlayers().some(
-            p => p.returned
-        )
-    ) {
-
-        /*
-           Do not immediately interrupt an eviction.
-           It occurs at the next stage.
-        */
-
-        currentStage =
-            "battleback";
-
-    } else {
-
-        currentStage =
-            "nextweek";
-
-    }
-
-
-    updateAllDisplays();
-
-}
-
-
-/* =========================================================
-   BONUS LIFE
-========================================================= */
-
-function handleBonusLife(evicted) {
-
-    const holder =
-        houseguests.find(
-            player =>
-                player.bonusLifeAvailable
-        );
-
-
-    if (!holder) return;
-
-
-    /*
-       The Bonus Life expires after the
-       third eviction. If unused, the
-       fourth evicted player gets the
-       opportunity.
-    */
-
-    const evictionNumber =
-        evictedHouseguests.length;
-
-
-    if (
-        evictionNumber <= 3 ||
-        evictionNumber === 4
-    ) {
-
-        const usePower =
-            evictionNumber === 4
-            ? true
-            : Math.random() < .45;
-
-
-        if (usePower) {
-
-            holder.bonusLifeAvailable =
-                false;
-
-
-            const returnChance =
-                Math.random() < .50;
-
-
-            if (returnChance) {
-
-                evicted.status = "Active";
-
-                evicted.returned = true;
-
-                evicted.evictionOrder =
-                    null;
-
-                evicted.placement =
-                    null;
-
-
-                evictedHouseguests =
-                    evictedHouseguests.filter(
-                        p =>
-                            p.id !==
-                            evicted.id
-                    );
-
-
-                if (
-                    !jury.some(
-                        p =>
-                            p.id ===
-                            evicted.id
-                    )
-                ) {
-
-                    jury =
-                        jury.filter(
-                            p =>
-                                p.id !==
-                                evicted.id
-                        );
-
-                }
-
-
-                addEvent(
-                    `${evicted.name} won the Bonus Life return competition and returned to the game!`
-                );
-
-            } else {
-
-                addEvent(
-                    `${evicted.name} competed for the Bonus Life but failed to return.`
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   FINAL EVICTION DISPLAY
-========================================================= */
-
-function displayFinalEvictionResults(
-    result,
-    evicted
-) {
-
-    const box =
-        document.getElementById(
-            "evictionResults"
-        );
-
-
-    if (!box) return;
-
-
-    const rows =
-        result.voters
-            .map(entry => {
-
-                const voter =
-                    houseguests.find(
-                        p =>
-                            p.id ===
-                            entry.playerId
-                    );
-
-
-                if (!voter) return "";
-
-
-                const target =
-                    entry.vote
-                    ? houseguests.find(
-                        p =>
-                            p.id ===
-                            entry.vote
-                    )
-                    : null;
-
-
-                const isHOH =
-                    currentHOH &&
-                    voter.id ===
-                    currentHOH.id;
-
-
-                const isNominee =
-                    nominees.some(
-                        n =>
-                            n.id ===
-                            voter.id
-                    );
-
-
-                if (isHOH || isNominee) {
-
-                    return `
-
-                        <div class="vote-row">
-
-                            <div class="vote-person">
-
-                                ${getPlayerImageHTML(voter)}
-
-                                <strong>
-                                    ${escapeHTML(voter.name)}
-                                </strong>
-
-                            </div>
-
-                            <div class="vote-arrow">
-                                —
-                            </div>
+            html += `
+                <div class="vote-row">
+
+                    <div class="vote-person">
+
+                        ${getPlayerImageHTML(
+                            voter,
+                            ""
+                        )}
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    getDisplayName(voter)
+                                )}
+                            </strong>
 
                             <div>
                                 Does Not Vote
@@ -3151,142 +3968,627 @@ function displayFinalEvictionResults(
 
                         </div>
 
-                    `;
+                    </div>
 
-                }
+                    <div class="vote-arrow">
+                        —
+                    </div>
 
+                    <div>
+                        ${
+                            voter.id === currentHOH
+                                ? "HOH"
+                                : "Nominee"
+                        }
+                    </div>
 
-                if (entry.nullified) {
+                </div>
+            `;
 
-                    return `
-
-                        <div class="vote-row">
-
-                            <div class="vote-person">
-
-                                ${getPlayerImageHTML(voter)}
-
-                                <strong>
-                                    ${escapeHTML(voter.name)}
-                                </strong>
-
-                            </div>
-
-                            <div class="vote-arrow">
-                                —
-                            </div>
-
-                            <div class="nullified-vote">
-                                VOTE NULLIFIED
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }
+            return;
+        }
 
 
-                return `
+        /*
+           Hacker-nullified vote.
+        */
 
-                    <div class="vote-row">
+        if (
+            vote.type ===
+            "nullified"
+        ) {
 
-                        <div class="vote-person">
+            const isRevealed =
+                revealedIds.has(
+                    voter.id
+                );
 
-                            ${getPlayerImageHTML(voter)}
 
-                            <strong>
-                                ${escapeHTML(voter.name)}
-                            </strong>
+            html += `
+                <div class="vote-row">
 
-                        </div>
+                    <div class="vote-person">
 
-                        <div class="vote-arrow">
-                            →
-                        </div>
+                        ${getPlayerImageHTML(
+                            voter,
+                            ""
+                        )}
 
-                        <div class="vote-choice">
-
-                            ${
-                                target
-                                ? getPlayerImageHTML(target)
-                                : ""
-                            }
+                        <div>
 
                             <strong>
-                                ${target
-                                    ? escapeHTML(target.name)
-                                    : "No Vote"}
+                                ${escapeHTML(
+                                    getDisplayName(voter)
+                                )}
                             </strong>
 
                         </div>
 
                     </div>
 
-                `;
+                    <div class="vote-arrow">
+                        →
+                    </div>
 
-            })
-            .join("");
+                    <div class="${
+                        isRevealed
+                            ? "vote-nullified"
+                            : "vote-pending"
+                    }">
 
-
-    const totals =
-        nominees
-            .map(nominee => `
-
-                <div class="vote-total">
-
-                    ${getPlayerImageHTML(nominee)}
-
-                    <div>
-
-                        <strong>
-                            ${escapeHTML(nominee.name)}
-                        </strong>
-
-                        <span>
-                            ${
-                                result.voteTotals[nominee.id] || 0
-                            }
-                            vote(s)
-                        </span>
+                        ${
+                            isRevealed
+                                ? "VOTE NULLIFIED"
+                                : "VOTE PENDING"
+                        }
 
                     </div>
 
                 </div>
+            `;
 
-            `)
-            .join("");
-
-
-    box.classList.remove("hidden");
+            return;
+        }
 
 
-    box.innerHTML = `
+        /*
+           Normal vote.
+        */
 
-        <div class="eyebrow">
-            LIVE EVICTION COMPLETE
-        </div>
+        const isRevealed =
+            revealedIds.has(
+                voter.id
+            );
 
-        <h2>
-            ${escapeHTML(evicted.name)}
-            has been evicted.
-        </h2>
 
-        <div class="vote-total-grid">
+        if (!isRevealed) {
 
-            ${totals}
+            html += `
+                <div class="vote-row">
 
-        </div>
+                    <div class="vote-person">
 
-        <div class="vote-breakdown">
+                        ${getPlayerImageHTML(
+                            voter,
+                            ""
+                        )}
 
-            ${rows}
+                        <strong>
+                            ${escapeHTML(
+                                getDisplayName(voter)
+                            )}
+                        </strong>
+
+                    </div>
+
+                    <div class="vote-arrow">
+                        →
+                    </div>
+
+                    <div class="vote-pending">
+                        Vote Pending
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        const target =
+            houseguests.find(
+                player =>
+                    player.id ===
+                    vote.target
+            );
+
+
+        html += `
+            <div class="vote-row">
+
+                <div class="vote-person">
+
+                    ${getPlayerImageHTML(
+                        voter,
+                        ""
+                    )}
+
+                    <strong>
+                        ${escapeHTML(
+                            getDisplayName(voter)
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="vote-arrow">
+                    →
+                </div>
+
+
+                <div class="vote-person">
+
+                    ${
+                        target
+                            ? getPlayerImageHTML(
+                                target,
+                                ""
+                              )
+                            : ""
+                    }
+
+                    <strong>
+
+                        ${
+                            target
+                                ? escapeHTML(
+                                    getDisplayName(target)
+                                  )
+                                : "Unknown"
+                        }
+
+                    </strong>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+
+    container.innerHTML =
+        html;
+}
+
+
+function renderTieBreaker() {
+
+    const container =
+        $("evictionResults");
+
+
+    const hoh =
+        houseguests.find(
+            player =>
+                player.id ===
+                currentHOH
+        );
+
+
+    container.innerHTML += `
+
+        <div class="evicted-result">
+
+            <h2>
+                TIE BREAKER
+            </h2>
+
+            <p>
+                ${escapeHTML(
+                    getDisplayName(hoh)
+                )}
+                has broken the tie.
+            </p>
+
+            <p>
+                The deciding vote is:
+            </p>
+
+            <h2>
+                ${escapeHTML(
+                    getDisplayName(
+                        currentTieBreaker
+                    )
+                )}
+            </h2>
 
         </div>
 
     `;
-
 }
+
+
+
+/* =========================================================
+   RESOLVE EVICTION
+========================================================= */
+
+function resolveEviction() {
+
+    const totals =
+        calculateEvictionVoteTotals();
+
+
+    let evicted;
+
+
+    if (
+        currentTieBreaker
+    ) {
+
+        evicted =
+            currentTieBreaker;
+
+    } else {
+
+        evicted =
+            nominees
+                .slice()
+                .sort(
+                    (a, b) =>
+                        (
+                            totals[b.id] || 0
+                        ) -
+                        (
+                            totals[a.id] || 0
+                        )
+                )[0];
+
+    }
+
+
+    const result = {
+
+        week: currentWeek,
+
+        cycle: currentCycle,
+
+        nominees:
+            nominees.map(
+                nominee =>
+                    nominee.id
+            ),
+
+        votes:
+            currentEvictionVotes,
+
+        voteTotals:
+            totals,
+
+        tieBreaker:
+            currentTieBreaker
+                ? currentTieBreaker.id
+                : null,
+
+        evicted:
+            evicted.id
+
+    };
+
+
+    evictionHistory.push(
+        result
+    );
+
+    voteHistory.push(
+        result
+    );
+
+
+    evicted.status =
+        "Evicted";
+
+
+    /*
+       Remove them from active play.
+    */
+
+    /*
+       Jury begins after seven evictions
+       in a 16-player / 9-juror format.
+    */
+
+    const evictionNumber =
+        evictedHouseguests.length + 1;
+
+
+    evictedHouseguests.push(
+        evicted
+    );
+
+
+    if (
+        selectedSeasonTemplate ===
+        "bb20" &&
+        evictionNumber > 7
+    ) {
+
+        if (
+            !jury.some(
+                juror =>
+                    juror.id ===
+                    evicted.id
+            )
+        ) {
+
+            jury.push(
+                evicted
+            );
+
+        }
+
+    }
+
+
+    addEvent(
+        `${getDisplayName(evicted)} was evicted by a vote of ${totals[nominees[0].id] || 0}-${totals[nominees[1].id] || 0}.`
+    );
+
+
+    displayFinalEvictionResult(
+        result,
+        evicted,
+        totals
+    );
+
+
+    /*
+       Bonus Life.
+
+       This implementation automatically uses the power
+       when available because there is no human choice
+       prompt during the simulation.
+    */
+
+    const bonusHolder =
+        getActivePlayers()
+            .find(
+                player =>
+                    player.bonusLifeAvailable
+            );
+
+
+    if (
+        bonusHolder &&
+        evictionNumber <= 4
+    ) {
+
+        runBonusLife(
+            bonusHolder,
+            evicted
+        );
+
+        return;
+    }
+
+
+    /*
+       Fourth eviction automatically receives
+       the chance if the Bonus Life has not been used.
+    */
+
+    if (
+        !bonusHolder &&
+        evictionNumber === 4
+    ) {
+
+        /*
+           No active holder means there is no
+           available Bonus Life.
+        */
+
+    }
+
+
+    /*
+       Battle Back begins after the fourth jury
+       member has been reached.
+    */
+
+    if (
+        selectedSeasonTemplate ===
+        "bb20" &&
+        jury.length === 4 &&
+        !battleBackUsed
+    ) {
+
+        setStage("battleback");
+
+        return;
+    }
+
+
+    setStage("nextcycle");
+}
+
+
+function displayFinalEvictionResult(
+    result,
+    evicted,
+    totals
+) {
+
+    const container =
+        $("evictionResults");
+
+
+    container.classList.remove(
+        "hidden"
+    );
+
+
+    container.innerHTML = `
+
+        <h2>
+            Final Eviction Result
+        </h2>
+
+
+        <div class="vote-totals">
+
+            ${nominees
+                .map(nominee => `
+
+                    <div class="vote-total-card">
+
+                        <div>
+                            ${escapeHTML(
+                                getDisplayName(
+                                    nominee
+                                )
+                            )}
+                        </div>
+
+                        <div class="vote-total-number">
+
+                            ${
+                                totals[
+                                    nominee.id
+                                ] || 0
+                            }
+
+                        </div>
+
+                        <div>
+                            Votes
+                        </div>
+
+                    </div>
+
+                `)
+                .join("")}
+
+        </div>
+
+
+        <div class="evicted-result">
+
+            ${getPlayerImageHTML(
+                evicted,
+                ""
+            )}
+
+            <h2>
+                ${escapeHTML(
+                    getDisplayName(evicted)
+                )}
+                has been evicted.
+            </h2>
+
+            <p>
+                ${escapeHTML(
+                    getFullName(evicted)
+                )}
+            </p>
+
+        </div>
+
+    `;
+}
+
+
+
+/* =========================================================
+   BONUS LIFE
+========================================================= */
+
+function runBonusLife(
+    holder,
+    evicted
+) {
+
+    holder.bonusLifeAvailable =
+        false;
+
+
+    addEvent(
+        `${getDisplayName(holder)} used the Bonus Life on ${getDisplayName(evicted)}.`
+    );
+
+
+    const competitors =
+        getActivePlayers()
+            .slice()
+            .sort(
+                () =>
+                    Math.random() -
+                    0.5
+            )
+            .slice(
+                0,
+                Math.min(
+                    3,
+                    getActivePlayers().length
+                )
+            );
+
+
+    competitors.push(
+        evicted
+    );
+
+
+    const winner =
+        competitionWinner(
+            competitors,
+            "Bonus Life Competition"
+        );
+
+
+    if (
+        winner.id ===
+        evicted.id
+    ) {
+
+        evicted.status =
+            "Active";
+
+
+        evictedHouseguests =
+            evictedHouseguests.filter(
+                player =>
+                    player.id !==
+                    evicted.id
+            );
+
+
+        jury =
+            jury.filter(
+                player =>
+                    player.id !==
+                    evicted.id
+            );
+
+
+        addEvent(
+            `${getDisplayName(evicted)} won the Bonus Life competition and returned to the game!`
+        );
+
+    } else {
+
+        addEvent(
+            `${getDisplayName(evicted)} lost the Bonus Life competition and remains evicted.`
+        );
+
+    }
+
+
+    setStage("nextcycle");
+}
+
 
 
 /* =========================================================
@@ -3297,194 +4599,216 @@ function runBattleBack() {
 
     if (battleBackUsed) {
 
-        currentStage = "nextweek";
-
-        updateAllDisplays();
+        setStage("nextcycle");
 
         return;
-
     }
 
 
-    const eligible =
-        jury.slice(
-            0,
-            BB20.twists.juryBattleBack.jurors
-        );
+    const competitors =
+        jury.slice(0, 4);
 
 
-    if (!eligible.length) {
+    if (competitors.length < 4) {
 
-        currentStage = "nextweek";
-
-        updateAllDisplays();
+        setStage("nextcycle");
 
         return;
-
     }
 
 
     const winner =
         competitionWinner(
-            eligible,
-            "physical"
+            competitors,
+            "Big Top Drop"
         );
 
 
-    winner.status = "Active";
+    battleBackUsed =
+        true;
 
-    winner.returned = true;
 
-
-    /*
-       Remove from jury.
-    */
-
-    jury =
-        jury.filter(
-            p =>
-                p.id !==
-                winner.id
-        );
+    winner.status =
+        "Active";
 
 
     evictedHouseguests =
         evictedHouseguests.filter(
-            p =>
-                p.id !==
+            player =>
+                player.id !==
                 winner.id
         );
 
 
-    battleBackUsed = true;
+    jury =
+        jury.filter(
+            player =>
+                player.id !==
+                winner.id
+        );
 
 
     addEvent(
-        `${winner.name} won the ${BB20.twists.juryBattleBack.competition} Battle Back and returned to the game!`
+        `${getDisplayName(winner)} won Big Top Drop and returned to the game!`
     );
 
 
-    currentStage = "nextweek";
-
-    updateAllDisplays();
-
+    setStage("nextcycle");
 }
+
 
 
 /* =========================================================
-   NEXT WEEK
+   NEXT WEEK / DOUBLE EVICTION
 ========================================================= */
 
-function beginNextWeek() {
-
-    const active =
-        getActivePlayers();
-
+function beginNextCycleOrWeek() {
 
     /*
-       Final 3
+       Hide the previous eviction results.
     */
 
-    if (active.length === 3) {
-
-        finalThree =
-            [...active];
-
-        currentStage = "finalHOH1";
-
-        currentHOH = null;
-
-        addEvent(
-            "The game has reached the Final 3."
+    $("evictionResults")
+        .classList.add(
+            "hidden"
         );
-
-        updateAllDisplays();
-
-        return;
-
-    }
-
-
-    /*
-       Final 4
-    */
-
-    if (active.length === 4) {
-
-        currentWeek = 12;
-
-        cycleInWeek = 2;
-
-    }
-
-
-    else {
-
-        /*
-           Double eviction structure.
-        */
-
-        if (
-            currentWeek === 11 &&
-            cycleInWeek === 1
-        ) {
-
-            cycleInWeek = 2;
-
-            doubleEvictionActive = true;
-
-        }
-
-        else {
-
-            currentWeek++;
-
-            cycleInWeek = 1;
-
-        }
-
-    }
 
 
     currentHOH = null;
+
     nominees = [];
+
     povWinner = null;
+
     povPlayers = [];
 
     hackerWinner = null;
+
     hackerVoteNullified = null;
+
     hackerSelectedVetoPlayer = null;
 
-    vetoUsed = false;
+    currentEvictionVotes = {};
 
-    currentEvictionResult = null;
-    voteRevealIndex = 0;
-
-
-    houseguests.forEach(
-        player => {
-
-            player.safety = false;
-
-        }
-    );
+    currentTieBreaker = null;
 
 
     /*
-       If Week 11 second cycle, run HOH immediately.
+       BB20 double eviction.
     */
 
-    currentStage = "hoh";
+    const weekData =
+        getCurrentWeekData();
+
+
+    if (
+        weekData &&
+        weekData.doubleEviction &&
+        currentCycle === 1
+    ) {
+
+        currentCycle = 2;
+
+        addEvent(
+            `The ${currentWeek}th week has entered its Double Eviction second cycle!`
+        );
+
+
+        setStage("hoh");
+
+        return;
+    }
+
+
+    /*
+       Reset cycle.
+    */
+
+    currentCycle = 1;
+
+
+    /*
+       If four Houseguests remain, the next
+       regular cycle handles the final four.
+    */
+
+    const activeCount =
+        getActivePlayers().length;
+
+
+    if (activeCount === 3) {
+
+        startFinalThree();
+
+        return;
+    }
+
+
+    if (activeCount <= 2) {
+
+        showFinale();
+
+        return;
+    }
+
+
+    currentWeek++;
+
+
+    /*
+       Final 4 occurs after Week 12 cycle 2.
+    */
+
+    if (
+        activeCount === 4 &&
+        currentWeek > 12
+    ) {
+
+        currentWeek = 13;
+
+        startFinalThree();
+
+        return;
+    }
+
+
+    setStage("hoh");
+}
+
+
+
+/* =========================================================
+   FINAL THREE
+========================================================= */
+
+function startFinalThree() {
+
+    currentWeek = 13;
+
+    currentCycle = 1;
+
+
+    finalHOH = {
+
+        part1: null,
+
+        part2: null,
+
+        part3: null,
+
+        winner: null
+
+    };
 
 
     addEvent(
-        `Week ${currentWeek}${cycleInWeek === 2 ? " — Second Cycle" : ""} has begun.`
+        "The Final 3 phase has begun."
     );
 
 
-    updateAllDisplays();
-
+    setStage("finalHOH1");
 }
+
 
 
 /* =========================================================
@@ -3493,103 +4817,121 @@ function beginNextWeek() {
 
 function runFinalHOHPart(part) {
 
-    const active =
+    const finalists =
         getActivePlayers();
 
 
-    if (active.length !== 3) {
+    let competition;
 
-        return;
+
+    if (typeof BB20 !== "undefined") {
+
+        const finalData =
+            BB20.competitions[13];
+
+
+        competition =
+            finalData.finalHOH[
+                part - 1
+            ];
+
+    } else {
+
+        competition =
+            [
+                "Jetpack Attack",
+                "Mount Evictus",
+                "Jury Oddcasts"
+            ][part - 1];
 
     }
+
+
+    let players =
+        finalists;
+
+
+    /*
+       Part 2 should normally consist of
+       the Part 1 loser + third player.
+    */
+
+    if (
+        part === 2 &&
+        finalHOH.part1
+    ) {
+
+        players =
+            finalists.filter(
+                player =>
+                    player.id !==
+                    finalHOH.part1.id
+            );
+
+    }
+
+
+    if (
+        part === 3 &&
+        finalHOH.part1 &&
+        finalHOH.part2
+    ) {
+
+        players = [
+
+            finalHOH.part1,
+
+            finalHOH.part2
+
+        ];
+
+    }
+
+
+    const winner =
+        competitionWinner(
+            players,
+            competition
+        );
+
+
+    finalHOH[
+        `part${part}`
+    ] = winner;
+
+
+    addEvent(
+        `${getDisplayName(winner)} won Final HOH Part ${part}: ${competition}.`
+    );
 
 
     if (part === 1) {
 
-        finalHOHPart1Winner =
-            competitionWinner(
-                active,
-                "physical"
-            );
+        setStage("finalHOH2");
 
-
-        addEvent(
-            `${finalHOHPart1Winner.name} won Final HOH Part 1: Jetpack Attack.`
-        );
-
-
-        currentStage = "finalHOH2";
-
+        return;
     }
 
 
-    else if (part === 2) {
+    if (part === 2) {
 
-        const competitors =
-            active.filter(
-                p =>
-                    p.id !==
-                    finalHOHPart1Winner.id
-            );
+        setStage("finalHOH3");
 
-
-        finalHOHPart2Winner =
-            competitionWinner(
-                competitors,
-                "mental"
-            );
-
-
-        addEvent(
-            `${finalHOHPart2Winner.name} won Final HOH Part 2: Mount Evictus.`
-        );
-
-
-        currentStage = "finalHOH3";
-
+        return;
     }
 
 
-    else {
-
-        const competitors = [
-
-            finalHOHPart1Winner,
-
-            finalHOHPart2Winner
-
-        ];
+    finalHOH.winner =
+        winner;
 
 
-        finalHOHWinner =
-            competitionWinner(
-                competitors,
-                "mental"
-            );
-
-
-        currentHOH =
-            finalHOHWinner;
-
-
-        addEvent(
-            `${finalHOHWinner.name} won Final HOH Part 3: Jury Oddcasts and became the final HOH.`
-        );
-
-
-        currentStage =
-            "finalEviction";
-
-    }
-
-
-    updateAllDisplays();
-
+    setStage("finalEviction");
 }
 
 
+
 /* =========================================================
-   FINAL EVICTION
+   FINAL 3 EVICTION
 ========================================================= */
 
 function runFinalEviction() {
@@ -3599,374 +4941,35 @@ function runFinalEviction() {
 
 
     if (
-        finalists.length !== 3 ||
-        !finalHOHWinner
+        finalists.length !== 3
     ) {
 
-        return;
+        showFinale();
 
+        return;
     }
 
 
-    const eligible =
+    const hoh =
+        finalHOH.winner;
+
+
+    const options =
         finalists.filter(
-            p =>
-                p.id !==
-                finalHOHWinner.id
+            player =>
+                player.id !==
+                hoh.id
         );
 
 
-    const target =
+    const evicted =
         weightedRandomPlayer(
-            eligible,
+            options,
             player =>
                 player.strategy * 2 +
                 player.social +
                 Math.random() * 20
         );
-
-
-    target.status = "Evicted";
-
-    target.placement = 3;
-
-    target.evictionOrder =
-        evictedHouseguests.length + 1;
-
-
-    evictedHouseguests.push(
-        target
-    );
-
-
-    if (
-        !jury.some(
-            p =>
-                p.id ===
-                target.id
-        )
-    ) {
-
-        jury.push(target);
-
-    }
-
-
-    finalThree =
-        finalists.filter(
-            p =>
-                p.id !==
-                target.id
-        );
-
-
-    addEvent(
-        `${finalHOHWinner.name} evicted ${target.name}. ${target.name} finished in third place.`
-    );
-
-
-    currentStage = "juryVote";
-
-    updateAllDisplays();
-
-}
-
-
-/* =========================================================
-   FINAL JURY VOTE
-========================================================= */
-
-function runFinalJuryVote() {
-
-    const finalists =
-        getActivePlayers();
-
-
-    if (finalists.length !== 2) {
-
-        return;
-
-    }
-
-
-    finaleJuryVotes = {};
-
-
-    let voteTotals = {};
-
-
-    finalists.forEach(
-        finalist => {
-
-            voteTotals[finalist.id] = 0;
-
-        }
-    );
-
-
-    jury.forEach(
-        juror => {
-
-            const choice =
-                chooseFinalistVote(
-                    juror,
-                    finalists
-                );
-
-
-            finaleJuryVotes[juror.id] =
-                choice.id;
-
-
-            voteTotals[choice.id]++;
-
-        }
-    );
-
-
-    const winner =
-        finalists.sort(
-            (a, b) =>
-                voteTotals[b.id] -
-                voteTotals[a.id]
-        )[0];
-
-
-    seasonWinner =
-        winner;
-
-
-    winner.placement = 1;
-
-
-    finalists
-        .filter(
-            p =>
-                p.id !==
-                winner.id
-        )
-        .forEach(
-            p =>
-                p.placement = 2
-        );
-
-
-    addEvent(
-        `${winner.name} won Big Brother!`
-    );
-
-
-    currentStage = "finished";
-
-
-    updateAllDisplays();
-
-
-    showFinale();
-
-}
-
-
-/* =========================================================
-   FINAL VOTE AI
-========================================================= */
-
-function chooseFinalistVote(
-    juror,
-    finalists
-) {
-
-    const scores =
-        finalists.map(
-            finalist => ({
-
-                player: finalist,
-
-                score:
-
-                    finalist.social * 2 +
-
-                    finalist.strategy * 2 +
-
-                    finalist.mental +
-
-                    getRelationship(
-                        juror.id,
-                        finalist.id
-                    ) +
-
-                    Math.random() * 25
-
-            })
-        );
-
-
-    scores.sort(
-        (a, b) =>
-            b.score - a.score
-    );
-
-
-    return scores[0].player;
-
-}
-
-
-/* =========================================================
-   GENERIC SEASON
-========================================================= */
-
-function proceedGenericSeason() {
-
-    if (!seasonStarted) return;
-
-
-    if (!currentHOH) {
-
-        runGenericHOH();
-
-        return;
-
-    }
-
-
-    if (!nominees.length) {
-
-        makeGenericNominations();
-
-        return;
-
-    }
-
-
-    if (!povWinner) {
-
-        runGenericPOV();
-
-        return;
-
-    }
-
-
-    runGenericEviction();
-
-}
-
-
-function runGenericHOH() {
-
-    const winner =
-        competitionWinner(
-            getActivePlayers(),
-            "mixed"
-        );
-
-    currentHOH = winner;
-
-    addEvent(
-        `${winner.name} won HOH.`
-    );
-
-    updateAllDisplays();
-
-}
-
-
-function makeGenericNominations() {
-
-    nominees =
-        chooseNominees(
-            getActivePlayers()
-                .filter(
-                    p =>
-                        p.id !==
-                        currentHOH.id
-                ),
-            2
-        );
-
-    addEvent(
-        `${currentHOH.name} nominated ${nominees.map(p => p.name).join(" and ")}.`
-    );
-
-    updateAllDisplays();
-
-}
-
-
-function runGenericPOV() {
-
-    povPlayers =
-        getActivePlayers()
-            .slice(
-                0,
-                Math.min(
-                    6,
-                    getActivePlayers().length
-                )
-            );
-
-
-    povWinner =
-        competitionWinner(
-            povPlayers,
-            "mixed"
-        );
-
-
-    addEvent(
-        `${povWinner.name} won the Power of Veto.`
-    );
-
-
-    updateAllDisplays();
-
-}
-
-
-function runGenericEviction() {
-
-    const eligible =
-        getActivePlayers()
-            .filter(
-                p =>
-                    p.id !==
-                    currentHOH.id &&
-                    !nominees.some(
-                        n =>
-                            n.id ===
-                            p.id
-                    )
-            );
-
-
-    const votes =
-        nominees.map(
-            nominee => ({
-
-                nominee,
-
-                votes:
-                    eligible.filter(
-                        voter =>
-                            chooseEvictionVote(
-                                voter
-                            ).id ===
-                            nominee.id
-                    ).length
-
-            })
-        );
-
-
-    votes.sort(
-        (a, b) =>
-            b.votes - a.votes
-    );
-
-
-    const evicted =
-        votes[0].nominee;
 
 
     evicted.status =
@@ -3978,22 +4981,277 @@ function runGenericEviction() {
     );
 
 
+    if (
+        !jury.some(
+            juror =>
+                juror.id ===
+                evicted.id
+        )
+    ) {
+
+        jury.push(
+            evicted
+        );
+
+    }
+
+
     addEvent(
-        `${evicted.name} was evicted.`
+        `${getDisplayName(hoh)} evicted ${getDisplayName(evicted)} from the Final 3.`
     );
 
 
-    currentHOH = null;
-    nominees = [];
-    povWinner = null;
-    povPlayers = [];
-
-    currentWeek++;
-
-
-    updateAllDisplays();
-
+    setStage("juryVote");
 }
+
+
+
+/* =========================================================
+   JURY VOTE
+========================================================= */
+
+let finaleVotes = {};
+let finaleVoteRevealIndex = 0;
+
+
+function prepareJuryVotes() {
+
+    const finalists =
+        getActivePlayers();
+
+
+    finaleVotes = {};
+
+
+    finalists.forEach(
+        finalist => {
+            finaleVotes[
+                finalist.id
+            ] = 0;
+        }
+    );
+
+
+    jury.forEach(juror => {
+
+        const winner =
+            chooseJuryVote(
+                juror,
+                finalists
+            );
+
+
+        finaleVotes[
+            winner.id
+        ]++;
+
+    });
+
+
+    finaleVoteRevealIndex = 0;
+}
+
+
+function chooseJuryVote(
+    juror,
+    finalists
+) {
+
+    return weightedRandomPlayer(
+        finalists,
+        finalist => {
+
+            let score =
+                finalist.strategy * 2 +
+                finalist.social * 2 +
+                Math.random() * 30;
+
+
+            const relationship =
+                getRelationshipScore(
+                    juror.id,
+                    finalist.id
+                );
+
+
+            score +=
+                relationship;
+
+
+            if (
+                areAllied(
+                    juror,
+                    finalist
+                )
+            ) {
+
+                score += 30;
+
+            }
+
+
+            return Math.max(
+                1,
+                score
+            );
+
+        }
+    );
+}
+
+
+function revealNextJuryVote() {
+
+    if (
+        !Object.keys(finaleVotes).length
+    ) {
+
+        prepareJuryVotes();
+
+    }
+
+
+    if (
+        finaleVoteRevealIndex <
+        jury.length
+    ) {
+
+        finaleVoteRevealIndex++;
+
+        renderFinaleJuryVoteReveal();
+
+        return;
+    }
+
+
+    const winner =
+        Object.entries(
+            finaleVotes
+        )
+            .sort(
+                (a, b) =>
+                    b[1] - a[1]
+            )[0];
+
+
+    finaleWinner =
+        houseguests.find(
+            player =>
+                player.id ===
+                winner[0]
+        );
+
+
+    addEvent(
+        `${getDisplayName(finaleWinner)} won the season with ${winner[1]} jury votes.`
+    );
+
+
+    setStage("finished");
+
+    showFinale();
+}
+
+
+function renderFinaleJuryVoteReveal() {
+
+    const container =
+        $("finaleContent");
+
+
+    let html = `
+
+        <div class="panel">
+
+            <h2>
+                Final Jury Vote
+            </h2>
+
+            <p>
+                Jury votes revealed:
+                ${finaleVoteRevealIndex}
+                /
+                ${jury.length}
+            </p>
+
+        </div>
+
+    `;
+
+
+    jury
+        .slice(
+            0,
+            finaleVoteRevealIndex
+        )
+        .forEach(
+            (juror, index) => {
+
+                const finalists =
+                    getActivePlayers();
+
+
+                const winner =
+                    chooseJuryVote(
+                        juror,
+                        finalists
+                    );
+
+
+                html += `
+
+                    <div class="vote-row">
+
+                        <div class="vote-person">
+
+                            ${getPlayerImageHTML(
+                                juror,
+                                ""
+                            )}
+
+                            <strong>
+                                ${escapeHTML(
+                                    getDisplayName(
+                                        juror
+                                    )
+                                )}
+                            </strong>
+
+                        </div>
+
+                        <div class="vote-arrow">
+                            →
+                        </div>
+
+                        <div class="vote-person">
+
+                            ${getPlayerImageHTML(
+                                winner,
+                                ""
+                            )}
+
+                            <strong>
+                                ${escapeHTML(
+                                    getDisplayName(
+                                        winner
+                                    )
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+    container.innerHTML =
+        html;
+}
+
 
 
 /* =========================================================
@@ -4002,92 +5260,59 @@ function runGenericEviction() {
 
 function showFinale() {
 
-    const container =
-        document.getElementById(
-            "finaleContent"
-        );
-
-
-    if (!container) return;
-
-
-    const active =
-        getActivePlayers();
+    showSection("finale");
 
 
     const finalists =
-        active.length
-        ? active
-        : houseguests.filter(
-            p =>
-                p.placement === 1 ||
-                p.placement === 2
-        );
+        getActivePlayers();
 
 
-    let juryVotesHTML = "";
+    if (!finaleWinner) {
 
+        $("finaleContent").innerHTML = `
 
-    if (
-        seasonWinner &&
-        jury.length
-    ) {
+            <div class="panel">
 
-        juryVotesHTML = `
+                <h2>
+                    Finalists
+                </h2>
 
-            <div class="final-stage-box">
+                <div class="finalist-grid">
 
-                <h3>
-                    Jury Vote
-                </h3>
+                    ${finalists
+                        .map(player => `
 
-                <div class="final-vote-grid">
+                            <div class="finalist-card">
 
-                    ${
-                        jury.map(
-                            juror => {
+                                ${getPlayerImageHTML(
+                                    player,
+                                    ""
+                                )}
 
-                                const voteId =
-                                    finaleJuryVotes[
-                                        juror.id
-                                    ];
+                                <div class="finalist-card-info">
 
-                                const votedFor =
-                                    houseguests.find(
-                                        p =>
-                                            p.id ===
-                                            voteId
-                                    );
+                                    <h2>
+                                        ${escapeHTML(
+                                            getDisplayName(
+                                                player
+                                            )
+                                        )}
+                                    </h2>
 
+                                    <p>
+                                        ${escapeHTML(
+                                            getFullName(
+                                                player
+                                            )
+                                        )}
+                                    </p>
 
-                                return `
+                                </div>
 
-                                    <div class="final-juror-vote">
+                            </div>
 
-                                        ${getPlayerImageHTML(juror)}
-
-                                        <strong>
-                                            ${escapeHTML(juror.name)}
-                                        </strong>
-
-                                        <p>
-                                            Voted for
-                                            <strong>
-                                                ${
-                                                    votedFor
-                                                    ? escapeHTML(votedFor.name)
-                                                    : "—"
-                                                }
-                                            </strong>
-                                        </p>
-
-                                    </div>
-
-                                `;
-
-                            }
-                        ).join("")
-                    }
+                        `)
+                        .join("")}
 
                 </div>
 
@@ -4095,389 +5320,47 @@ function showFinale() {
 
         `;
 
+        return;
     }
 
 
-    container.innerHTML = `
+    $("finaleContent").innerHTML = `
 
-        <div class="finale-crown">
-            ★
-        </div>
+        <div class="hero-panel">
 
-        <div class="eyebrow">
-            BIG BROTHER
-        </div>
-
-        <h1>
-            FINALE
-        </h1>
-
-        <div class="finalists">
-
-            ${
-                finalists.map(
-                    finalist => `
-
-                        <div class="finalist-card">
-
-                            ${getPlayerImageHTML(finalist)}
-
-                            <strong>
-                                ${escapeHTML(finalist.name)}
-                            </strong>
-
-                            ${
-                                finalist === seasonWinner
-                                ? `<div class="player-status active">
-                                    WINNER
-                                   </div>`
-                                : ""
-                            }
-
-                        </div>
-
-                    `
-                ).join("")
-            }
-
-        </div>
-
-        ${
-            seasonWinner
-            ? `
-
-                <div class="winner-announcement">
-
-                    <span>
-                        THE WINNER OF BIG BROTHER IS
-                    </span>
-
-                    ${getPlayerImageHTML(seasonWinner)}
-
-                    <h2>
-                        ${escapeHTML(seasonWinner.name)}
-                    </h2>
-
-                    <p>
-                        Congratulations!
-                    </p>
-
-                </div>
-
-              `
-            : `
-
-                <div class="final-stage-box">
-
-                    <h3>
-                        The Finale Has Not Been Completed
-                    </h3>
-
-                    <p>
-                        Continue the game from the Game tab.
-                    </p>
-
-                </div>
-
-              `
-        }
-
-        ${juryVotesHTML}
-
-    `;
-
-}
+            <h1>
+                WINNER
+            </h1>
 
 
-/* =========================================================
-   GAME HOUSEGUESTS
-========================================================= */
-
-function renderGameHouseguests() {
-
-    const grid =
-        document.getElementById(
-            "gameHouseguestGrid"
-        );
+            ${getPlayerImageHTML(
+                finaleWinner,
+                ""
+            )}
 
 
-    if (!grid) return;
-
-
-    const active =
-        getActivePlayers();
-
-
-    grid.innerHTML =
-        active.map(
-            player => {
-
-                const badges = [];
-
-
-                if (
-                    currentHOH &&
-                    player.id ===
-                    currentHOH.id
-                ) {
-
-                    badges.push(
-                        `<span class="role-badge hoh">
-                            HOH
-                         </span>`
-                    );
-
-                }
-
-
-                if (
-                    nominees.some(
-                        n =>
-                            n.id ===
-                            player.id
+            <h2>
+                ${escapeHTML(
+                    getDisplayName(
+                        finaleWinner
                     )
-                ) {
-
-                    badges.push(
-                        `<span class="role-badge nominee">
-                            NOMINEE
-                         </span>`
-                    );
-
-                }
+                )}
+            </h2>
 
 
-                if (
-                    povPlayers.some(
-                        p =>
-                            p.id ===
-                            player.id
+            <p>
+                ${escapeHTML(
+                    getFullName(
+                        finaleWinner
                     )
-                ) {
-
-                    badges.push(
-                        `<span class="role-badge pov">
-                            POV
-                         </span>`
-                    );
-
-                }
-
-
-                if (player.safety) {
-
-                    badges.push(
-                        `<span class="role-badge safety">
-                            SAFE
-                         </span>`
-                    );
-
-                }
-
-
-                if (
-                    hackerWinner &&
-                    player.id ===
-                    hackerWinner.id
-                ) {
-
-                    badges.push(
-                        `<span class="role-badge hacker">
-                            HACKER
-                         </span>`
-                    );
-
-                }
-
-
-                return `
-
-                    <div class="game-player-card">
-
-                        <div class="game-player-photo">
-
-                            ${getPlayerImageHTML(player)}
-
-                        </div>
-
-                        <strong>
-                            ${escapeHTML(player.name)}
-                        </strong>
-
-                        <div>
-                            ${badges.join("")}
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        ).join("");
-
-}
-
-
-/* =========================================================
-   STATUS DISPLAY
-========================================================= */
-
-function updateGameStatus() {
-
-    const grid =
-        document.getElementById(
-            "gameStatusGrid"
-        );
-
-
-    if (!grid) return;
-
-
-    const hoh =
-        currentHOH
-        ? getPlayerStatusHTML(
-            currentHOH
-        )
-        : "—";
-
-
-    const nom =
-        nominees.length
-        ? nominees
-            .map(
-                p =>
-                    getPlayerStatusHTML(p)
-            )
-            .join("")
-        : "—";
-
-
-    const pov =
-        povWinner
-        ? getPlayerStatusHTML(
-            povWinner
-        )
-        : "—";
-
-
-    const format =
-        selectedSeasonTemplate === "bb20"
-        ? `BB20 — ${getCompetitionNameForDisplay()}`
-        : SEASON_TEMPLATES[selectedSeasonTemplate]?.name;
-
-
-    grid.innerHTML = `
-
-        <div class="game-status-card">
-
-            <span>
-                HOH
-            </span>
-
-            <strong>
-                ${hoh}
-            </strong>
-
-        </div>
-
-        <div class="game-status-card">
-
-            <span>
-                NOMINEES
-            </span>
-
-            <strong>
-                ${nom}
-            </strong>
-
-        </div>
-
-        <div class="game-status-card">
-
-            <span>
-                POV
-            </span>
-
-            <strong>
-                ${pov}
-            </strong>
-
-        </div>
-
-        <div class="game-status-card">
-
-            <span>
-                FORMAT
-            </span>
-
-            <strong>
-                ${escapeHTML(format || "Custom")}
-            </strong>
+                )}
+            </p>
 
         </div>
 
     `;
-
 }
 
-
-function getPlayerStatusHTML(player) {
-
-    return `
-
-        <span class="status-player">
-
-            ${getPlayerImageHTML(player)}
-
-            <span>
-                ${escapeHTML(player.name)}
-            </span>
-
-        </span>
-
-    `;
-
-}
-
-
-function getCompetitionNameForDisplay() {
-
-    if (currentStage === "hoh") {
-
-        return (
-            getCurrentHOHCompetition()?.name ||
-            "HOH"
-        );
-
-    }
-
-
-    if (
-        currentStage === "pov" ||
-        currentStage === "povDraw"
-    ) {
-
-        return (
-            getCurrentPOVCompetition()?.name ||
-            "POV"
-        );
-
-    }
-
-
-    if (currentStage === "hacker") {
-
-        return (
-            BB20.competitions[currentWeek]?.hacker ||
-            "Hacker"
-        );
-
-    }
-
-
-    return "Live Game";
-
-}
 
 
 /* =========================================================
@@ -4486,91 +5369,74 @@ function getCompetitionNameForDisplay() {
 
 function renderMemoryWall() {
 
-    const wall =
-        document.getElementById(
-            "memoryWall"
-        );
+    normalizeAllHouseguests();
 
 
-    if (!wall) return;
-
-
-    /*
-       Always render every original Houseguest.
-       This keeps the wall fixed at 16 positions.
-    */
-
-    wall.innerHTML =
-        houseguests.map(
-            player => {
+    $("memoryWall").innerHTML =
+        houseguests
+            .map(player => {
 
                 const active =
-                    player.status === "Active";
-
-
-                const returned =
-                    player.returned;
-
-
-                const classes =
-                    active
-                    ? (
-                        returned
-                        ? "memory-card returned-memory-card"
-                        : "memory-card"
-                      )
-                    : "memory-card evicted-memory-card";
+                    player.status ===
+                    "Active";
 
 
                 return `
 
-                    <div class="${classes}">
+                    <div class="
+                        memory-card
+                        ${
+                            active
+                                ? ""
+                                : "evicted-memory-card"
+                        }
+                    ">
 
-                        <div class="memory-photo">
+                        ${getPlayerImageHTML(
+                            player,
+                            "player-photo"
+                        )}
 
-                            ${getPlayerImageHTML(player)}
 
-                            ${
-                                active
+                        ${
+                            active
                                 ? ""
                                 : `
                                     <div class="evicted-overlay">
                                         EVICTED
                                     </div>
                                   `
-                            }
+                        }
+
+
+                        <div class="memory-name">
+
+                            ${escapeHTML(
+                                getDisplayName(
+                                    player
+                                )
+                            )}
+
+                            <span class="memory-full-name">
+
+                                ${escapeHTML(
+                                    getFullName(
+                                        player
+                                    )
+                                )}
+
+                            </span>
 
                         </div>
-
-                        <strong>
-                            ${escapeHTML(player.name)}
-                        </strong>
-
-                        <span class="
-                            memory-status
-                            ${active ? "" : "evicted"}
-                        ">
-
-                            ${
-                                active
-                                ? (
-                                    returned
-                                    ? "RETURNED"
-                                    : "ACTIVE"
-                                  )
-                                : "EVICTED"
-                            }
-
-                        </span>
 
                     </div>
 
                 `;
 
-            }
-        ).join("");
-
+            })
+            .join("");
 }
+
 
 
 /* =========================================================
@@ -4579,179 +5445,261 @@ function renderMemoryWall() {
 
 function renderJury() {
 
-    const list =
-        document.getElementById(
-            "juryList"
+    $("juryList").innerHTML =
+        jury.length
+            ? jury
+                .map(renderJuryCard)
+                .join("")
+            : `<p>No jury members yet.</p>`;
+
+
+    $("evictedPlayers").innerHTML =
+        evictedHouseguests.length
+            ? evictedHouseguests
+                .map(renderJuryCard)
+                .join("")
+            : `<p>No evicted Houseguests yet.</p>`;
+}
+
+
+function renderJuryCard(player) {
+
+    return `
+
+        <div class="jury-card">
+
+            ${getPlayerImageHTML(
+                player,
+                ""
+            )}
+
+            <div class="jury-card-info">
+
+                <div class="jury-name">
+
+                    ${escapeHTML(
+                        getDisplayName(
+                            player
+                        )
+                    )}
+
+                </div>
+
+                <div class="jury-full-name">
+
+                    ${escapeHTML(
+                        getFullName(
+                            player
+                        )
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+
+/* =========================================================
+   GAME DISPLAY
+========================================================= */
+
+function updateGameDisplay() {
+
+    $("weekBadge").textContent =
+        currentWeek <= 13
+            ? `WEEK ${currentWeek}`
+            : "FINALE";
+
+
+    $("weekTitle").textContent =
+        currentWeek <= 13
+            ? `Week ${currentWeek}`
+            : "Finale";
+
+
+    const hoh =
+        houseguests.find(
+            player =>
+                player.id ===
+                currentHOH
         );
 
 
-    const evicted =
-        document.getElementById(
-            "evictedPlayers"
-        );
+    $("hohStatus").innerHTML =
+        hoh
+            ? `
+                <strong>
+                    ${escapeHTML(
+                        getDisplayName(hoh)
+                    )}
+                </strong>
+              `
+            : "None";
 
 
-    if (list) {
+    $("nomineesStatus").innerHTML =
+        nominees.length
+            ? nominees
+                .map(
+                    nominee =>
+                        escapeHTML(
+                            getDisplayName(
+                                nominee
+                            )
+                        )
+                )
+                .join(" vs. ")
+            : "None";
 
-        list.innerHTML =
-            jury.length
-            ? jury.map(
-                (player, index) => `
 
-                    <div class="jury-player">
+    $("povStatus").innerHTML =
+        povWinner
+            ? escapeHTML(
+                getDisplayName(
+                    povWinner
+                )
+            )
+            : "None";
 
-                        ${getPlayerImageHTML(player)}
 
-                        <div>
+    const weekData =
+        getCurrentWeekData();
 
-                            <strong>
-                                ${escapeHTML(player.name)}
-                            </strong>
 
-                            <span>
-                                JUROR ${index + 1}
-                            </span>
+    if (
+        weekData &&
+        weekData.doubleEviction
+    ) {
+
+        $("formatStatus").textContent =
+            currentCycle === 2
+                ? "DOUBLE EVICTION — ROUND 2"
+                : "DOUBLE EVICTION";
+
+    } else {
+
+        $("formatStatus").textContent =
+            "Normal Week";
+
+    }
+
+
+    renderGameHouseguests();
+}
+
+
+function renderGameHouseguests() {
+
+    const active =
+        getActivePlayers();
+
+
+    $("gameHouseguests").innerHTML =
+        active
+            .map(player => {
+
+                const roles = [];
+
+
+                if (
+                    player.id ===
+                    currentHOH
+                ) {
+                    roles.push("HOH");
+                }
+
+
+                if (
+                    nominees.some(
+                        nominee =>
+                            nominee.id ===
+                            player.id
+                    )
+                ) {
+                    roles.push("NOMINEE");
+                }
+
+
+                if (
+                    povWinner &&
+                    povWinner.id ===
+                    player.id
+                ) {
+                    roles.push("POV");
+                }
+
+
+                if (
+                    hackerWinner &&
+                    hackerWinner.id ===
+                    player.id
+                ) {
+                    roles.push("HACKER");
+                }
+
+
+                return `
+
+                    <div class="game-player-card">
+
+                        ${getPlayerImageHTML(
+                            player,
+                            ""
+                        )}
+
+                        <div class="game-player-info">
+
+                            <div class="game-player-name">
+
+                                ${escapeHTML(
+                                    getDisplayName(
+                                        player
+                                    )
+                                )}
+
+                            </div>
+
+                            <div class="game-player-full-name">
+
+                                ${escapeHTML(
+                                    getFullName(
+                                        player
+                                    )
+                                )}
+
+                            </div>
+
+
+                            ${
+                                roles.length
+                                    ? roles
+                                        .map(
+                                            role =>
+                                                `
+                                                    <span class="role-badge">
+                                                        ${role}
+                                                    </span>
+                                                `
+                                        )
+                                        .join("")
+                                    : ""
+                            }
 
                         </div>
 
                     </div>
 
-                `
-            ).join("")
-            : "<p>No jury members yet.</p>";
+                `;
 
-    }
-
-
-    if (evicted) {
-
-        evicted.innerHTML =
-            evictedHouseguests.length
-            ? evictedHouseguests
-                .map(
-                    player => `
-
-                        <div class="jury-player">
-
-                            ${getPlayerImageHTML(player)}
-
-                            <div>
-
-                                <strong>
-                                    ${escapeHTML(player.name)}
-                                </strong>
-
-                                <span>
-                                    ${
-                                        player.returned
-                                        ? "RETURNED"
-                                        : "EVICTED"
-                                    }
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    `
-                ).join("")
-            : "<p>No evictions yet.</p>";
-
-    }
-
+            })
+            .join("");
 }
 
-
-/* =========================================================
-   SUMMARY
-========================================================= */
-
-function updateSummary() {
-
-    const summary =
-        document.getElementById(
-            "seasonSummary"
-        );
-
-
-    if (!summary) return;
-
-
-    summary.innerHTML = `
-
-        <div>
-            <span>CAST</span>
-            <strong>
-                ${houseguests.length}
-            </strong>
-        </div>
-
-        <div>
-            <span>ACTIVE</span>
-            <strong>
-                ${getActivePlayers().length}
-            </strong>
-        </div>
-
-        <div>
-            <span>EVICTED</span>
-            <strong>
-                ${evictedHouseguests.length}
-            </strong>
-        </div>
-
-        <div>
-            <span>JURY</span>
-            <strong>
-                ${jury.length}
-            </strong>
-        </div>
-
-        <div>
-            <span>WEEK</span>
-            <strong>
-                ${currentWeek}
-            </strong>
-        </div>
-
-        <div>
-            <span>STAGE</span>
-            <strong>
-                ${escapeHTML(currentStage)}
-            </strong>
-        </div>
-
-        <div>
-            <span>WINNER</span>
-            <strong>
-                ${
-                    seasonWinner
-                    ? escapeHTML(seasonWinner.name)
-                    : "—"
-                }
-            </strong>
-        </div>
-
-    `;
-
-
-    const homeSeason =
-        document.getElementById(
-            "homeSeasonName"
-        );
-
-
-    if (homeSeason) {
-
-        homeSeason.textContent =
-            SEASON_TEMPLATES[
-                selectedSeasonTemplate
-            ]?.name
-            || "Custom Season";
-
-    }
-
-}
 
 
 /* =========================================================
@@ -4760,61 +5708,161 @@ function updateSummary() {
 
 function addEvent(message) {
 
-    events.unshift({
-
-        message,
-
-        time:
-            new Date().toLocaleTimeString()
-
-    });
+    const timestamp =
+        new Date()
+            .toLocaleTimeString();
 
 
-    renderEvents();
+    const event =
+        `[${timestamp}] ${message}`;
 
+
+    /*
+       Keep newest events first.
+    */
+
+    if (
+        !window.gameEvents
+    ) {
+        window.gameEvents = [];
+    }
+
+
+    window.gameEvents.unshift(
+        event
+    );
+
+
+    if (
+        window.gameEvents.length >
+        250
+    ) {
+
+        window.gameEvents =
+            window.gameEvents.slice(
+                0,
+                250
+            );
+
+    }
+
+
+    renderEventLog();
 }
 
 
-function renderEvents() {
+function renderEventLog() {
 
-    const log =
-        document.getElementById(
-            "eventLog"
-        );
+    const events =
+        window.gameEvents || [];
 
 
-    if (!log) return;
-
-
-    log.innerHTML =
-        events.map(
-            event => `
-
-                <div class="event">
-
-                    <strong>
-                        ${escapeHTML(event.time)}
-                    </strong>
-
-                    <br>
-
-                    ${escapeHTML(event.message)}
-
-                </div>
-
-            `
-        ).join("");
-
+    $("eventLog").innerHTML =
+        events
+            .map(
+                event =>
+                    `
+                        <div class="event-entry">
+                            ${escapeHTML(event)}
+                        </div>
+                    `
+            )
+            .join("");
 }
+
 
 
 /* =========================================================
-   SAVE
+   HELPERS
 ========================================================= */
 
-function saveSeason() {
+function getActivePlayers() {
 
-    const saveData = {
+    normalizeAllHouseguests();
+
+
+    return houseguests.filter(
+        player =>
+            player.status ===
+            "Active"
+    );
+}
+
+
+function weightedRandomPlayer(
+    players,
+    weightFunction
+) {
+
+    if (!players.length) {
+        return null;
+    }
+
+
+    const weighted =
+        players.map(player => {
+
+            const weight =
+                Math.max(
+                    0.01,
+                    Number(
+                        weightFunction(
+                            player
+                        )
+                    ) || 0.01
+                );
+
+
+            return {
+                player,
+                weight
+            };
+
+        });
+
+
+    const total =
+        weighted.reduce(
+            (sum, item) =>
+                sum + item.weight,
+            0
+        );
+
+
+    let random =
+        Math.random() *
+        total;
+
+
+    for (
+        const item of weighted
+    ) {
+
+        random -=
+            item.weight;
+
+
+        if (random <= 0) {
+            return item.player;
+        }
+
+    }
+
+
+    return weighted[
+        weighted.length - 1
+    ].player;
+}
+
+
+
+/* =========================================================
+   SAVE / LOAD
+========================================================= */
+
+function getSaveData() {
+
+    return {
 
         houseguests,
 
@@ -4830,7 +5878,7 @@ function saveSeason() {
 
         currentWeek,
 
-        cycleInWeek,
+        currentCycle,
 
         currentHOH,
 
@@ -4864,259 +5912,247 @@ function saveSeason() {
 
         openingSafety,
 
-        vetoUsed,
+        finalHOH,
 
-        finalHOHWinner,
+        finaleWinner,
 
-        finalHOHPart1Winner,
-
-        finalHOHPart2Winner,
-
-        finalThree,
-
-        finaleJuryVotes,
-
-        seasonWinner,
-
-        currentEvictionResult,
-
-        voteRevealIndex,
-
-        doubleEvictionActive,
-
-        events
+        gameEvents:
+            window.gameEvents || []
 
     };
-
-
-    localStorage.setItem(
-        "bigBrotherSimulatorSave",
-        JSON.stringify(saveData)
-    );
-
-
-    alert("Season saved.");
-
 }
 
 
-/* =========================================================
-   LOAD
-========================================================= */
+function saveGame() {
 
-function loadSeason() {
+    localStorage.setItem(
+        "bigBrotherSimulatorSave",
+        JSON.stringify(
+            getSaveData()
+        )
+    );
 
-    const raw =
+
+    alert(
+        "Season saved successfully."
+    );
+}
+
+
+function saveGameSilently() {
+
+    localStorage.setItem(
+        "bigBrotherSimulatorSave",
+        JSON.stringify(
+            getSaveData()
+        )
+    );
+}
+
+
+function loadGame() {
+
+    const saved =
         localStorage.getItem(
             "bigBrotherSimulatorSave"
         );
 
 
-    if (!raw) {
+    if (!saved) {
 
-        alert("No saved season found.");
+        alert(
+            "No saved season found."
+        );
 
         return;
-
     }
 
 
     try {
 
         const data =
-            JSON.parse(raw);
+            JSON.parse(saved);
 
 
         houseguests =
             data.houseguests || [];
 
+        houseguests =
+            houseguests.map(
+                normalizeHouseguest
+            );
+
 
         evictedHouseguests =
-            data.evictedHouseguests || [];
-
+            data.evictedHouseguests ||
+            [];
 
         jury =
             data.jury || [];
 
-
         alliances =
             data.alliances || [];
-
 
         relationships =
             data.relationships || [];
 
-
         customTwists =
             data.customTwists || [];
 
-
         currentWeek =
-            data.currentWeek || 0;
+            data.currentWeek || 1;
 
-
-        cycleInWeek =
-            data.cycleInWeek || 1;
-
+        currentCycle =
+            data.currentCycle || 1;
 
         currentHOH =
             data.currentHOH || null;
 
-
         nominees =
             data.nominees || [];
-
 
         povWinner =
             data.povWinner || null;
 
-
         povPlayers =
             data.povPlayers || [];
-
 
         hackerWinner =
             data.hackerWinner || null;
 
-
         hackerVoteNullified =
-            data.hackerVoteNullified || null;
-
+            data.hackerVoteNullified ||
+            null;
 
         hackerSelectedVetoPlayer =
-            data.hackerSelectedVetoPlayer || null;
-
+            data.hackerSelectedVetoPlayer ||
+            null;
 
         seasonStarted =
-            data.seasonStarted || false;
-
+            Boolean(
+                data.seasonStarted
+            );
 
         selectedSeasonTemplate =
             data.selectedSeasonTemplate ||
             "bb20";
 
-
         currentStage =
             data.currentStage ||
-            "ready";
-
+            "idle";
 
         evictionHistory =
             data.evictionHistory || [];
 
-
         voteHistory =
             data.voteHistory || [];
-
 
         appStoreRecipients =
             data.appStoreRecipients || [];
 
-
         appStoreHistory =
             data.appStoreHistory || [];
 
-
         battleBackUsed =
-            data.battleBackUsed || false;
-
+            Boolean(
+                data.battleBackUsed
+            );
 
         openingSafety =
-            data.openingSafety || [];
+            data.openingSafety || {
+                completed: false,
+                protectedIds: []
+            };
 
+        finalHOH =
+            data.finalHOH || {
+                part1: null,
+                part2: null,
+                part3: null,
+                winner: null
+            };
 
-        vetoUsed =
-            data.vetoUsed || false;
-
-
-        finalHOHWinner =
-            data.finalHOHWinner || null;
-
-
-        finalHOHPart1Winner =
-            data.finalHOHPart1Winner || null;
-
-
-        finalHOHPart2Winner =
-            data.finalHOHPart2Winner || null;
-
-
-        finalThree =
-            data.finalThree || [];
-
-
-        finaleJuryVotes =
-            data.finaleJuryVotes || {};
-
-
-        seasonWinner =
-            data.seasonWinner || null;
-
-
-        currentEvictionResult =
-            data.currentEvictionResult || null;
-
-
-        voteRevealIndex =
-            data.voteRevealIndex || 0;
-
-
-        doubleEvictionActive =
-            data.doubleEvictionActive || false;
-
-
-        events =
-            data.events || [];
+        finaleWinner =
+            data.finaleWinner || null;
 
 
         /*
-           Migration defaults for older saves.
+           Compatibility for old saves.
         */
 
         houseguests.forEach(
-            player => {
-
-                player.safety =
-                    player.safety || false;
-
-                player.returned =
-                    player.returned || false;
-
-                player.hackerWins =
-                    player.hackerWins || 0;
-
-                player.cloudAvailable =
-                    player.cloudAvailable || false;
-
-                player.identityTheftAvailable =
-                    player.identityTheftAvailable || false;
-
-                player.bonusLifeAvailable =
-                    player.bonusLifeAvailable || false;
-
-            }
+            normalizeHouseguest
         );
 
 
-        const selector =
-            document.getElementById(
-                "seasonSelector"
+        /*
+           Convert old relationship objects
+           if necessary.
+        */
+
+        relationships =
+            relationships.map(
+                relationship => {
+
+                    if (
+                        relationship.type
+                    ) {
+                        return relationship;
+                    }
+
+
+                    const oldValue =
+                        Number(
+                            relationship.value
+                        ) || 0;
+
+
+                    let type =
+                        "neutral";
+
+
+                    if (
+                        oldValue >= 60
+                    ) {
+                        type = "love";
+                    } else if (
+                        oldValue >= 20
+                    ) {
+                        type = "like";
+                    } else if (
+                        oldValue <= -60
+                    ) {
+                        type = "hate";
+                    } else if (
+                        oldValue <= -20
+                    ) {
+                        type = "dislike";
+                    }
+
+
+                    return {
+                        ...relationship,
+                        type
+                    };
+
+                }
             );
 
 
-        if (selector) {
+        window.gameEvents =
+            data.gameEvents || [];
 
-            selector.value =
-                selectedSeasonTemplate;
 
-        }
+        $("seasonSelect").value =
+            selectedSeasonTemplate;
 
 
         updateAllDisplays();
 
 
-        alert("Season loaded.");
-
+        alert(
+            "Season loaded successfully."
+        );
 
     } catch (error) {
 
@@ -5127,23 +6163,104 @@ function loadSeason() {
         );
 
     }
-
 }
+
 
 
 /* =========================================================
    RESET
 ========================================================= */
 
-function resetSeason() {
+function resetGame() {
 
     const confirmed =
         confirm(
-            "Reset the entire simulator?"
+            "Reset the entire simulator? This will delete the current cast, relationships, alliances, season and saved game."
         );
 
 
-    if (!confirmed) return;
+    if (!confirmed) {
+        return;
+    }
+
+
+    houseguests = [];
+
+    evictedHouseguests = [];
+
+    jury = [];
+
+    alliances = [];
+
+    relationships = [];
+
+    customTwists = [];
+
+
+    currentWeek = 1;
+
+    currentCycle = 1;
+
+    currentHOH = null;
+
+    nominees = [];
+
+    povWinner = null;
+
+    povPlayers = [];
+
+
+    hackerWinner = null;
+
+    hackerVoteNullified = null;
+
+    hackerSelectedVetoPlayer = null;
+
+
+    seasonStarted = false;
+
+    currentStage = "idle";
+
+
+    evictionHistory = [];
+
+    voteHistory = [];
+
+
+    appStoreRecipients = [];
+
+    appStoreHistory = [];
+
+
+    battleBackUsed = false;
+
+
+    openingSafety = {
+
+        completed: false,
+
+        protectedIds: []
+
+    };
+
+
+    finalHOH = {
+
+        part1: null,
+
+        part2: null,
+
+        part3: null,
+
+        winner: null
+
+    };
+
+
+    finaleWinner = null;
+
+
+    window.gameEvents = [];
 
 
     localStorage.removeItem(
@@ -5151,332 +6268,34 @@ function resetSeason() {
     );
 
 
-    houseguests = [];
-    evictedHouseguests = [];
-    jury = [];
-
-    alliances = [];
-    relationships = [];
-    customTwists = [];
-
-    currentWeek = 0;
-    cycleInWeek = 1;
-
-    currentHOH = null;
-    nominees = [];
-    povWinner = null;
-    povPlayers = [];
-
-    hackerWinner = null;
-    hackerVoteNullified = null;
-    hackerSelectedVetoPlayer = null;
-
-    seasonStarted = false;
-    currentStage = "ready";
-
-    evictionHistory = [];
-    voteHistory = [];
-
-    appStoreRecipients = [];
-    appStoreHistory = [];
-
-    battleBackUsed = false;
-    openingSafety = [];
-
-    vetoUsed = false;
-
-    finalHOHWinner = null;
-    finalHOHPart1Winner = null;
-    finalHOHPart2Winner = null;
-
-    finalThree = [];
-
-    finaleJuryVotes = {};
-    seasonWinner = null;
-
-    currentEvictionResult = null;
-    voteRevealIndex = 0;
-
-    doubleEvictionActive = false;
-
-    events = [];
+    clearHouseguestEditor();
 
 
     updateAllDisplays();
 
+
     showSection("home");
-
 }
 
 
-/* =========================================================
-   COMPETITION ENGINE
-========================================================= */
-
-function competitionWinner(
-    players,
-    type = "mixed"
-) {
-
-    if (!players || !players.length) {
-        return null;
-    }
-
-
-    const scores =
-        players.map(
-            player => {
-
-                let score;
-
-
-                if (type === "physical") {
-
-                    score =
-                        player.physical * 6 +
-                        player.mental * 1 +
-                        Math.random() * 30;
-
-                }
-
-
-                else if (type === "mental") {
-
-                    score =
-                        player.mental * 6 +
-                        player.strategy * 2 +
-                        Math.random() * 30;
-
-                }
-
-
-                else if (type === "social") {
-
-                    score =
-                        player.social * 6 +
-                        player.strategy * 2 +
-                        Math.random() * 30;
-
-                }
-
-
-                else {
-
-                    score =
-                        (
-                            player.physical +
-                            player.mental +
-                            player.social +
-                            player.strategy
-                        ) * 2 +
-                        Math.random() * 35;
-
-                }
-
-
-                return {
-                    player,
-                    score
-                };
-
-            }
-        );
-
-
-    scores.sort(
-        (a, b) =>
-            b.score - a.score
-    );
-
-
-    return scores[0].player;
-
-}
-
 
 /* =========================================================
-   GENERAL COMPETITION TYPE
-========================================================= */
-
-function getCompetitionType(name) {
-
-    const physical = [
-
-        "Microchip Mayhem",
-        "Land a Job",
-        "Out on a Limb",
-        "Mamma Mia! Madness",
-        "Chop, Bonk, Spank",
-        "Glow & Flow",
-        "Zing Force",
-        "Sweet Shot",
-        "High in the Sky",
-        "Shell or Highwater",
-        "Block and Roll",
-        "Down to the Wires",
-        "Jetpack Attack"
-
-    ];
-
-
-    const mental = [
-
-        "Product Launch",
-        "HouseGuestsOnly.com",
-        "Perfect Timing",
-        "GIF That Keeps on Giving",
-        "Crack The Code",
-        "Hack the House",
-        "OTEV the Sneezy Skunk",
-        "Mission to Planet Veto",
-        "Control Your Emojis",
-        "BB Comics",
-        "Buffering",
-        "BBFlix & Chill",
-        "What the Bleep",
-        "Your Mazes are Numbered",
-        "Mount Evictus",
-        "Jury Oddcasts"
-
-    ];
-
-
-    if (
-        physical.includes(name)
-    ) {
-
-        return "physical";
-
-    }
-
-
-    if (
-        mental.includes(name)
-    ) {
-
-        return "mental";
-
-    }
-
-
-    return "mixed";
-
-}
-
-
-/* =========================================================
-   RANDOM HELPERS
-========================================================= */
-
-function weightedRandomPlayer(
-    players,
-    weightFunction
-) {
-
-    if (!players || !players.length) {
-        return null;
-    }
-
-
-    const weights =
-        players.map(
-            player =>
-                Math.max(
-                    .01,
-                    Number(
-                        weightFunction(player)
-                    ) || .01
-                )
-        );
-
-
-    const total =
-        weights.reduce(
-            (sum, value) =>
-                sum + value,
-            0
-        );
-
-
-    let random =
-        Math.random() * total;
-
-
-    for (
-        let i = 0;
-        i < players.length;
-        i++
-    ) {
-
-        random -= weights[i];
-
-
-        if (random <= 0) {
-
-            return players[i];
-
-        }
-
-    }
-
-
-    return players[
-        players.length - 1
-    ];
-
-}
-
-
-/* =========================================================
-   ALLIANCE CHECK
-========================================================= */
-
-function areAllied(
-    playerA,
-    playerB
-) {
-
-    return alliances.some(
-        alliance =>
-            alliance.members.includes(
-                playerA.id
-            ) &&
-            alliance.members.includes(
-                playerB.id
-            )
-    );
-
-}
-
-
-/* =========================================================
-   ACTIVE PLAYERS
-========================================================= */
-
-function getActivePlayers() {
-
-    return houseguests.filter(
-        player =>
-            player.status ===
-            "Active"
-    );
-
-}
-
-
-/* =========================================================
-   DISPLAY UPDATE
+   UPDATE ALL
 ========================================================= */
 
 function updateAllDisplays() {
+
+    normalizeAllHouseguests();
 
     renderCast();
 
     renderTwists();
 
-    updateRelationshipDropdowns();
-
     renderAlliances();
+
+    updateAllianceDropdown();
+
+    updateRelationshipDropdowns();
 
     renderRelationships();
 
@@ -5484,160 +6303,132 @@ function updateAllDisplays() {
 
     renderJury();
 
-    renderGameHouseguests();
-
-    updateGameStatus();
-
-    updateSummary();
-
-    renderEvents();
+    updateGameDisplay();
 
     updateStageDisplay();
 
-    updateGameHeader();
+    renderEventLog();
 
-    updateFinaleIfNeeded();
+    updateSeasonSummary();
 
+    updateSelectedSeasonInfo();
+
+    updateAllStatDisplays();
 }
 
 
+
 /* =========================================================
-   GAME HEADER
+   SEASON SUMMARY
 ========================================================= */
 
-function updateGameHeader() {
+function updateSeasonSummary() {
 
-    const week =
-        document.getElementById(
-            "gameWeek"
-        );
+    const active =
+        getActivePlayers();
 
 
-    const title =
-        document.getElementById(
-            "gameWeekTitle"
-        );
+    $("seasonSummary").innerHTML = `
+
+        <div class="summary-item">
+
+            <div class="summary-label">
+                Cast
+            </div>
+
+            <div class="summary-value">
+                ${houseguests.length}
+            </div>
+
+        </div>
 
 
-    const stage =
-        document.getElementById(
-            "gameStageTitle"
-        );
+        <div class="summary-item">
+
+            <div class="summary-label">
+                Active
+            </div>
+
+            <div class="summary-value">
+                ${active.length}
+            </div>
+
+        </div>
 
 
-    if (week) {
+        <div class="summary-item">
 
-        week.textContent =
-            currentWeek || "—";
+            <div class="summary-label">
+                Evicted
+            </div>
 
-    }
+            <div class="summary-value">
+                ${evictedHouseguests.length}
+            </div>
 
-
-    if (title) {
-
-        title.textContent =
-            SEASON_TEMPLATES[
-                selectedSeasonTemplate
-            ]?.name
-            || "Big Brother Simulator";
-
-    }
+        </div>
 
 
-    if (stage) {
+        <div class="summary-item">
 
-        stage.textContent =
-            currentStage
-                .replace(/([A-Z])/g, " $1")
-                .replace(/^./, c => c.toUpperCase());
+            <div class="summary-label">
+                Jury
+            </div>
 
-    }
+            <div class="summary-value">
+                ${jury.length}
+            </div>
 
+        </div>
+
+
+        <div class="summary-item">
+
+            <div class="summary-label">
+                Week
+            </div>
+
+            <div class="summary-value">
+                ${currentWeek}
+            </div>
+
+        </div>
+
+    `;
 }
 
-
-function updateFinaleIfNeeded() {
-
-    if (
-        currentStage === "finished" ||
-        seasonWinner
-    ) {
-
-        showFinale();
-
-    }
-
-}
 
 
 /* =========================================================
-   UTILITIES
-========================================================= */
-
-function clamp(
-    value,
-    min,
-    max
-) {
-
-    return Math.max(
-        min,
-        Math.min(
-            max,
-            value
-        )
-    );
-
-}
-
-
-function escapeHTML(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-function escapeAttribute(value) {
-
-    return escapeHTML(value);
-
-}
-
-
-/* =========================================================
-   INITIALIZATION
+   DOM EVENTS
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        const selector =
-            document.getElementById(
-                "seasonSelector"
+        $("seasonSelect").value =
+            "bb20";
+
+
+        /*
+           Relationship previews update
+           immediately when dropdowns change.
+        */
+
+        $("relationshipFrom")
+            .addEventListener(
+                "change",
+                updateRelationshipPreviews
             );
 
 
-        if (selector) {
+        $("relationshipTo")
+            .addEventListener(
+                "change",
+                updateRelationshipPreviews
+            );
 
-            selector.value =
-                "bb20";
-
-            selectedSeasonTemplate =
-                "bb20";
-
-        }
-
-
-        updateSelectedSeasonInfo();
 
         updateAllDisplays();
 
