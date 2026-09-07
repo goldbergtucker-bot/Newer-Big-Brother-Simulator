@@ -1,3 +1,4 @@
+let currentSeason = BB20;
 // ======================================================
 // BIG BROTHER SIMULATOR
 // CLEAN WORKING VERSION
