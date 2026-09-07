@@ -6433,4 +6433,564 @@ document.addEventListener(
         updateAllDisplays();
 
     }
-);
+);/* =========================================================
+   BIG BROTHER SIMULATOR — SOCIAL / MEMORY / POV ENHANCEMENTS
+   Added as a safe extension layer so the original simulator engine
+   remains intact.
+========================================================= */
+
+let showmances = [];
+
+const BB_ENHANCEMENT_STYLES = `
+/* Permanent Memory Wall */
+.bb-permanent-memory-wall {
+    position: sticky;
+    top: 56px;
+    z-index: 900;
+    background: rgba(10, 10, 14, .97);
+    border-bottom: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 8px 22px rgba(0,0,0,.35);
+    padding: 8px 12px 10px;
+}
+.bb-memory-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    opacity: .8;
+}
+.bb-memory-track {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 2px;
+}
+.bb-memory-mini {
+    flex: 0 0 70px;
+    position: relative;
+    text-align: center;
+}
+.bb-memory-mini img, .bb-memory-mini .bb-memory-placeholder {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 3px;
+    border: 2px solid rgba(255,255,255,.2);
+    background: #222;
+}
+.bb-memory-mini.evicted img, .bb-memory-mini.evicted .bb-memory-placeholder {
+    filter: grayscale(1) brightness(.45);
+}
+.bb-memory-mini-name {
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.bb-memory-mini-status {
+    font-size: 8px;
+    text-transform: uppercase;
+    opacity: .6;
+}
+
+/* POV Player Draw */
+.bb-pov-draw-panel {
+    margin: 14px 0;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.035);
+}
+.bb-pov-draw-panel h3 { margin-top: 0; }
+.bb-pov-draw-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(90px, 1fr));
+    gap: 10px;
+}
+.bb-pov-player {
+    position: relative;
+    padding: 8px;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.22);
+}
+.bb-pov-player.hoh-role { border-color: rgba(255,215,0,.65); }
+.bb-pov-player.nominee-role { border-color: rgba(255,80,80,.7); }
+.bb-pov-player.drawn-role { border-color: rgba(80,170,255,.65); }
+.bb-pov-player img, .bb-pov-player .bb-pov-placeholder {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 7px;
+}
+.bb-pov-role {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .75;
+}
+.bb-pov-name { font-weight: 800; font-size: 12px; }
+
+/* Social systems */
+.bb-social-section {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+.bb-strength-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: rgba(255,255,255,.09);
+}
+.bb-showmance-card {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.03);
+}
+.bb-showmance-person { text-align: center; }
+.bb-showmance-person img, .bb-showmance-person .bb-showmance-placeholder {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 5px;
+}
+.bb-showmance-heart { font-size: 22px; }
+.bb-direction-note {
+    font-size: 11px;
+    opacity: .65;
+    margin: 5px 0 12px;
+}
+@media (max-width: 900px) {
+    .bb-pov-draw-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+    .bb-pov-draw-grid { grid-template-columns: repeat(2, 1fr); }
+    .bb-showmance-card { grid-template-columns: 1fr; }
+}
+`;
+
+function bbInjectStyles() {
+    if (document.getElementById("bb-enhancement-styles")) return;
+    const style = document.createElement("style");
+    style.id = "bb-enhancement-styles";
+    style.textContent = BB_ENHANCEMENT_STYLES;
+    document.head.appendChild(style);
+}
+
+function bbFindSection(id) {
+    return document.getElementById(id) || document.querySelector(`[data-section="${id}"]`);
+}
+
+function bbEnsurePermanentMemoryWall() {
+    if (document.getElementById("permanentMemoryWall")) return;
+    const wall = document.createElement("div");
+    wall.id = "permanentMemoryWall";
+    wall.className = "bb-permanent-memory-wall";
+    wall.innerHTML = `<div class="bb-memory-title">Memory Wall</div><div id="permanentMemoryTrack" class="bb-memory-track"></div>`;
+    const header = document.querySelector("header");
+    if (header) header.insertAdjacentElement("afterend", wall);
+    else document.body.insertAdjacentElement("afterbegin", wall);
+}
+
+function bbMiniImage(player) {
+    if (player && player.image) {
+        return `<img src="${escapeAttribute(player.image)}" alt="${escapeAttribute(getDisplayName(player))}" loading="lazy">`;
+    }
+    return `<div class="bb-memory-placeholder">${escapeHTML(getInitials(getDisplayName(player)))}</div>`;
+}
+
+function renderPermanentMemoryWall() {
+    const track = document.getElementById("permanentMemoryTrack");
+    if (!track) return;
+    normalizeAllHouseguests();
+    track.innerHTML = houseguests.map(player => {
+        const active = player.status === "Active";
+        return `<div class="bb-memory-mini ${active ? "" : "evicted"}">
+            ${bbMiniImage(player)}
+            <div class="bb-memory-mini-name">${escapeHTML(getDisplayName(player))}</div>
+            <div class="bb-memory-mini-status">${active ? "Active" : "Evicted"}</div>
+        </div>`;
+    }).join("");
+}
+
+function bbEnsurePOVPanel() {
+    if (document.getElementById("povDrawDisplay")) return;
+    const game = document.getElementById("game") || document.querySelector("section[id*='game']");
+    if (!game) return;
+    const panel = document.createElement("div");
+    panel.id = "povDrawDisplay";
+    panel.className = "bb-pov-draw-panel";
+    panel.innerHTML = `<h3>POV Player Draw</h3><p>Six Houseguests compete: the HOH, both nominees, and three drawn players.</p><div id="povDrawGrid" class="bb-pov-draw-grid"></div>`;
+    const anchor = document.getElementById("gameHouseguests");
+    if (anchor) anchor.parentElement.insertBefore(panel, anchor);
+    else game.appendChild(panel);
+}
+
+function renderPOVPlayerDraw() {
+    const grid = document.getElementById("povDrawGrid");
+    if (!grid) return;
+    const players = (povPlayers || []).filter(Boolean);
+    grid.innerHTML = players.map(player => {
+        let role = "DRAWN";
+        let cls = "drawn-role";
+        if (player.id === currentHOH) { role = "HOH"; cls = "hoh-role"; }
+        else if (nominees.some(n => n && n.id === player.id)) { role = "NOMINEE"; cls = "nominee-role"; }
+        return `<div class="bb-pov-player ${cls}">
+            ${player.image ? `<img src="${escapeAttribute(player.image)}" alt="${escapeAttribute(getDisplayName(player))}">` : `<div class="bb-pov-placeholder">${escapeHTML(getInitials(getDisplayName(player)))}</div>`}
+            <div class="bb-pov-name">${escapeHTML(getDisplayName(player))}</div>
+            <div class="bb-pov-role">${role}</div>
+        </div>`;
+    }).join("");
+}
+
+function bbEnsureAllianceStrengthField() {
+    const members = document.getElementById("allianceMembers");
+    if (!members || document.getElementById("allianceStrength")) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-group bb-alliance-strength-field";
+    wrapper.innerHTML = `<label for="allianceStrength">Alliance Strength</label>
+        <select id="allianceStrength">
+            <option value="casual">Casual</option>
+            <option value="weak">Weak</option>
+            <option value="moderate" selected>Moderate</option>
+            <option value="strong">Strong</option>
+            <option value="unbreakable">Unbreakable</option>
+        </select>`;
+    members.insertAdjacentElement("afterend", wrapper);
+}
+
+const BB_ALLIANCE_STRENGTHS = {
+    casual: { label: "Casual", protection: 10 },
+    weak: { label: "Weak", protection: 22 },
+    moderate: { label: "Moderate", protection: 34 },
+    strong: { label: "Strong", protection: 48 },
+    unbreakable: { label: "Unbreakable", protection: 65 }
+};
+
+function getAllianceStrength(alliance) {
+    return BB_ALLIANCE_STRENGTHS[alliance?.strength] || BB_ALLIANCE_STRENGTHS.moderate;
+}
+
+function getAllianceBetween(playerA, playerB) {
+    if (!playerA || !playerB) return null;
+    return alliances.find(a => a.members.includes(playerA.id) && a.members.includes(playerB.id)) || null;
+}
+
+function getShowmanceBetween(playerA, playerB) {
+    if (!playerA || !playerB) return null;
+    return showmances.find(s =>
+        (s.player1 === playerA.id && s.player2 === playerB.id) ||
+        (s.player1 === playerB.id && s.player2 === playerA.id)
+    ) || null;
+}
+
+function getShowmanceStrength(showmance) {
+    const values = {
+        new: { label: "New", protection: 35 },
+        developing: { label: "Developing", protection: 50 },
+        serious: { label: "Serious", protection: 70 },
+        unbreakable: { label: "Unbreakable", protection: 90 }
+    };
+    return values[showmance?.strength] || values.developing;
+}
+
+function bbCreateAlliance() {
+    const name = $("allianceName")?.value.trim();
+    const members = Array.from($("allianceMembers")?.selectedOptions || []).map(o => o.value);
+    const strength = $("allianceStrength")?.value || "moderate";
+    if (!name) return alert("Enter an alliance name.");
+    if (members.length < 2) return alert("An alliance needs at least two Houseguests.");
+    alliances.push({ id: "alliance_" + Date.now() + "_" + Math.random().toString(36).slice(2), name, members, strength });
+    $("allianceName").value = "";
+    if ($("allianceStrength")) $("allianceStrength").value = "moderate";
+    updateAllDisplays();
+    saveGameSilently();
+}
+
+function bbRenderAlliances() {
+    const container = $("allianceList");
+    if (!container) return;
+    if (!alliances.length) {
+        container.innerHTML = `<div class="panel">No alliances created yet.</div>`;
+        return;
+    }
+    container.innerHTML = alliances.map(alliance => {
+        const members = alliance.members.map(id => houseguests.find(p => p.id === id)).filter(Boolean);
+        const strength = getAllianceStrength(alliance);
+        return `<div class="alliance-card">
+            <h3>${escapeHTML(alliance.name)}</h3>
+            <div class="bb-strength-badge">${escapeHTML(strength.label)}</div>
+            <div class="alliance-members">${members.map(player => `<div class="alliance-member">
+                ${getPlayerImageHTML(player, "")}
+                <div class="alliance-member-name">${escapeHTML(getDisplayName(player))}</div>
+            </div>`).join("")}</div>
+        </div>`;
+    }).join("");
+}
+
+function bbEnsureShowmanceSection() {
+    if (document.getElementById("showmanceSection")) return;
+    const house = document.getElementById("house") || document.querySelector("section[id*='house']");
+    if (!house) return;
+    const section = document.createElement("div");
+    section.id = "showmanceSection";
+    section.className = "bb-social-section";
+    section.innerHTML = `<h2>Showmances</h2>
+        <p class="bb-direction-note">Showmances are separate from one-way relationships. A showmance represents a mutual romantic bond and affects nominations, votes, and jury decisions.</p>
+        <div class="form-grid">
+            <div class="form-group"><label for="showmancePlayer1">Houseguest 1</label><select id="showmancePlayer1"></select></div>
+            <div class="form-group"><label for="showmancePlayer2">Houseguest 2</label><select id="showmancePlayer2"></select></div>
+            <div class="form-group"><label for="showmanceStrength">Strength</label><select id="showmanceStrength"><option value="new">New</option><option value="developing" selected>Developing</option><option value="serious">Serious</option><option value="unbreakable">Unbreakable</option></select></div>
+        </div>
+        <div class="form-actions"><button type="button" onclick="createShowmance()">CREATE SHOWMANCE</button></div>
+        <div id="showmanceList"></div>`;
+    const relationshipEditor = house.querySelector(".relationship-editor");
+    if (relationshipEditor) relationshipEditor.insertAdjacentElement("afterend", section);
+    else house.appendChild(section);
+    updateShowmanceDropdowns();
+}
+
+function updateShowmanceDropdowns() {
+    ["showmancePlayer1", "showmancePlayer2"].forEach(id => {
+        const select = $(id);
+        if (!select) return;
+        const old = select.value;
+        select.innerHTML = houseguests.map(p => `<option value="${escapeAttribute(p.id)}">${escapeHTML(getDisplayName(p))}</option>`).join("");
+        if (houseguests.some(p => p.id === old)) select.value = old;
+    });
+}
+
+function createShowmance() {
+    const player1 = $("showmancePlayer1")?.value;
+    const player2 = $("showmancePlayer2")?.value;
+    const strength = $("showmanceStrength")?.value || "developing";
+    if (!player1 || !player2) return alert("Select both Houseguests.");
+    if (player1 === player2) return alert("A showmance needs two different Houseguests.");
+    const existing = getShowmanceBetween({id: player1}, {id: player2});
+    if (existing) existing.strength = strength;
+    else showmances.push({ id: "showmance_" + Date.now() + "_" + Math.random().toString(36).slice(2), player1, player2, strength });
+    renderShowmances();
+    saveGameSilently();
+}
+
+function deleteShowmance(id) {
+    showmances = showmances.filter(s => s.id !== id);
+    renderShowmances();
+    saveGameSilently();
+}
+
+function renderShowmances() {
+    const container = $("showmanceList");
+    if (!container) return;
+    if (!showmances.length) {
+        container.innerHTML = `<p>No showmances created yet.</p>`;
+        return;
+    }
+    container.innerHTML = showmances.map(showmance => {
+        const a = houseguests.find(p => p.id === showmance.player1);
+        const b = houseguests.find(p => p.id === showmance.player2);
+        if (!a || !b) return "";
+        const strength = getShowmanceStrength(showmance);
+        return `<div class="bb-showmance-card">
+            <div class="bb-showmance-person">${a.image ? `<img src="${escapeAttribute(a.image)}" alt="">` : `<div class="bb-showmance-placeholder">${escapeHTML(getInitials(getDisplayName(a)))}</div>`}<strong>${escapeHTML(getDisplayName(a))}</strong></div>
+            <div class="bb-showmance-heart">❤️</div>
+            <div class="bb-showmance-person">${b.image ? `<img src="${escapeAttribute(b.image)}" alt="">` : `<div class="bb-showmance-placeholder">${escapeHTML(getInitials(getDisplayName(b)))}</div>`}<strong>${escapeHTML(getDisplayName(b))}</strong></div>
+            <div style="grid-column:1/-1;text-align:center"><span class="bb-strength-badge">${escapeHTML(strength.label)}</span> <button type="button" onclick="deleteShowmance('${escapeAttribute(showmance.id)}')">DELETE</button></div>
+        </div>`;
+    }).join("");
+}
+
+/* Explicitly directional relationship AI: A -> B does not imply B -> A. */
+function getRelationshipValue(fromId, toId) {
+    const relationship = relationships.find(r => r.from === fromId && r.to === toId);
+    if (!relationship) return 0;
+    return relationshipValues[relationship.type] ?? 0;
+}
+
+function getRelationshipScore(fromId, toId) {
+    return getRelationshipValue(fromId, toId);
+}
+
+function areAllied(playerA, playerB) {
+    return Boolean(getAllianceBetween(playerA, playerB));
+}
+
+function evictionTargetScore(voter, target) {
+    if (!voter || !target) return 1;
+    let score = 10 + target.strategy + target.social;
+    score -= getRelationshipScore(voter.id, target.id) * 0.5;
+
+    const alliance = getAllianceBetween(voter, target);
+    if (alliance) score -= getAllianceStrength(alliance).protection;
+
+    const showmance = getShowmanceBetween(voter, target);
+    if (showmance) score -= getShowmanceStrength(showmance).protection;
+
+    if (target.strategy >= 8) score += target.strategy * 2;
+    score += Math.random() * 25;
+    return Math.max(1, score);
+}
+
+function chooseJuryVote(juror, finalists) {
+    return weightedRandomPlayer(finalists, finalist => {
+        let score = finalist.strategy * 2 + finalist.social * 2 + Math.random() * 30;
+        score += getRelationshipScore(juror.id, finalist.id);
+        const alliance = getAllianceBetween(juror, finalist);
+        if (alliance) score += getAllianceStrength(alliance).protection * 0.65;
+        const showmance = getShowmanceBetween(juror, finalist);
+        if (showmance) score += getShowmanceStrength(showmance).protection;
+        return Math.max(1, score);
+    });
+}
+
+function getSaveData() {
+    return {
+        houseguests,
+        evictedHouseguests,
+        jury,
+        alliances,
+        relationships,
+        showmances,
+        customTwists,
+        currentWeek,
+        currentCycle,
+        currentHOH,
+        nominees,
+        povWinner,
+        povPlayers,
+        hackerWinner,
+        hackerVoteNullified,
+        hackerSelectedVetoPlayer,
+        seasonStarted,
+        selectedSeasonTemplate,
+        currentStage,
+        evictionHistory,
+        voteHistory,
+        appStoreRecipients,
+        appStoreHistory,
+        battleBackUsed,
+        openingSafety,
+        finalHOH,
+        finaleWinner,
+        gameEvents: window.gameEvents || []
+    };
+}
+
+function bbNormalizeAlliances() {
+    alliances = (alliances || []).map(a => ({ ...a, strength: a.strength || "moderate" }));
+}
+
+function bbLoadSocialDataFromSave() {
+    try {
+        const saved = localStorage.getItem("bigBrotherSimulatorSave");
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        showmances = data.showmances || [];
+        bbNormalizeAlliances();
+    } catch (e) {
+        console.warn("Could not restore enhanced social data", e);
+    }
+}
+
+/* Wrap the existing draw so the six selected POV players are immediately visible. */
+const bbOriginalDrawPOVPlayers = drawPOVPlayers;
+drawPOVPlayers = function() {
+    bbOriginalDrawPOVPlayers();
+    bbEnsurePOVPanel();
+    renderPOVPlayerDraw();
+    renderPermanentMemoryWall();
+};
+
+const bbOriginalUpdateGameDisplay = updateGameDisplay;
+updateGameDisplay = function() {
+    bbOriginalUpdateGameDisplay();
+    bbEnsurePOVPanel();
+    renderPOVPlayerDraw();
+    renderPermanentMemoryWall();
+};
+
+const bbOriginalUpdateAllDisplays = updateAllDisplays;
+updateAllDisplays = function() {
+    bbNormalizeAlliances();
+    bbOriginalUpdateAllDisplays();
+    bbEnsurePermanentMemoryWall();
+    bbEnsureAllianceStrengthField();
+    bbEnsureShowmanceSection();
+    updateShowmanceDropdowns();
+    renderShowmances();
+    renderPermanentMemoryWall();
+    renderPOVPlayerDraw();
+};
+
+const bbOriginalResetGame = resetGame;
+resetGame = function() {
+    bbOriginalResetGame();
+    showmances = [];
+};
+
+/* Rebind the original alliance creator to the enhanced version. */
+createAlliance = bbCreateAlliance;
+renderAlliances = bbRenderAlliances;
+
+/* Extend the existing saved-game loader without replacing its engine. */
+const bbOriginalLoadGame = loadGame;
+loadGame = function() {
+    bbOriginalLoadGame();
+    bbLoadSocialDataFromSave();
+    bbNormalizeAlliances();
+    updateAllDisplays();
+};
+
+/* Keep social data current when cast members are changed. */
+const bbOriginalDeleteHouseguest = typeof deleteHouseguest === "function" ? deleteHouseguest : null;
+if (bbOriginalDeleteHouseguest) {
+    deleteHouseguest = function(id) {
+        bbOriginalDeleteHouseguest(id);
+        showmances = showmances.filter(s => s.player1 !== id && s.player2 !== id);
+        alliances = alliances.map(a => ({ ...a, members: a.members.filter(memberId => memberId !== id) })).filter(a => a.members.length >= 2);
+        updateAllDisplays();
+        saveGameSilently();
+    };
+}
+
+function bbInitializeEnhancements() {
+    bbInjectStyles();
+    bbEnsurePermanentMemoryWall();
+    bbEnsureAllianceStrengthField();
+    bbEnsureShowmanceSection();
+    bbEnsurePOVPanel();
+    bbLoadSocialDataFromSave();
+    bbNormalizeAlliances();
+    updateShowmanceDropdowns();
+    renderShowmances();
+    renderPermanentMemoryWall();
+    renderPOVPlayerDraw();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bbInitializeEnhancements);
+} else {
+    bbInitializeEnhancements();
+}
