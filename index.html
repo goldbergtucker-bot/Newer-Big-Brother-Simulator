@@ -12,11 +12,21 @@
 <body>
 
 <header class="site-header">
+
     <div class="header-overlay">
-        <div class="bb-logo">BIG BROTHER</div>
+
+        <div class="bb-logo">
+            BIG BROTHER
+        </div>
+
         <h1>SIMULATOR</h1>
-        <p>Create your own houseguests. Play the game. Make history.</p>
+
+        <p>
+            Create your own houseguests. Play a complete Big Brother season.
+        </p>
+
     </div>
+
 </header>
 
 
@@ -26,7 +36,7 @@
     <button onclick="showSection('cast')">CAST</button>
     <button onclick="showSection('twists')">TWISTS</button>
     <button onclick="showSection('house')">HOUSE</button>
-    <button onclick="showSection('week')">GAME</button>
+    <button onclick="showSection('game')">GAME</button>
     <button onclick="showSection('memory')">MEMORY WALL</button>
     <button onclick="showSection('jury')">JURY</button>
     <button onclick="showSection('finale')">FINALE</button>
@@ -46,19 +56,34 @@
     <div class="hero-panel">
 
         <div>
-            <div class="eyebrow">WELCOME TO THE HOUSE</div>
 
-            <h2>YOUR BIG BROTHER SIMULATOR</h2>
+            <div class="eyebrow">
+                CUSTOM BIG BROTHER SIMULATOR
+            </div>
+
+            <h2>
+                Your Season.
+                Your Cast.
+                Your Game.
+            </h2>
 
             <p>
-                Build your own cast and simulate a season using
-                the Big Brother 20 format.
+                Build and simulate a complete Big Brother season
+                using your own houseguests and photographs.
             </p>
+
         </div>
 
         <div class="hero-stat">
-            <span>FORMAT</span>
-            <strong id="heroFormat">CUSTOM</strong>
+
+            <span>
+                CURRENT SEASON
+            </span>
+
+            <strong id="homeSeasonName">
+                Big Brother 20
+            </strong>
+
         </div>
 
     </div>
@@ -66,12 +91,16 @@
 
     <div class="panel">
 
-        <h2>Select Your Season Format</h2>
+        <div class="eyebrow">
+            SEASON FORMAT
+        </div>
 
-        <select id="seasonTemplate">
+        <h2>Select a Season</h2>
+
+        <select id="seasonSelector" onchange="selectSeasonTemplate()">
 
             <option value="custom">
-                Custom Big Brother
+                Custom Season
             </option>
 
             <option value="bb19">
@@ -100,48 +129,51 @@
 
         </select>
 
-        <button class="primary-button"
-                onclick="selectSeasonTemplate()">
 
+        <button
+            class="primary-button"
+            onclick="selectSeasonTemplate()"
+        >
             SELECT SEASON FORMAT
-
         </button>
 
 
-        <div id="selectedSeasonInfo"
-             class="selected-season-info">
-
-        </div>
+        <div
+            id="selectedSeasonInfo"
+            class="selected-season-info"
+        ></div>
 
     </div>
 
 
     <div class="panel">
 
-        <h2>Season Controls</h2>
+        <div class="eyebrow">
+            SEASON CONTROL
+        </div>
 
         <div class="button-row">
 
-            <button class="primary-button"
-                    onclick="startNewSeason()">
-
+            <button
+                class="primary-button"
+                onclick="startNewSeason()"
+            >
                 START NEW SEASON
-
             </button>
 
-            <button onclick="saveGame()">
-                SAVE SEASON
+            <button onclick="saveSeason()">
+                SAVE
             </button>
 
-            <button onclick="loadGame()">
-                LOAD SEASON
+            <button onclick="loadSeason()">
+                LOAD
             </button>
 
-            <button class="danger"
-                    onclick="resetGame()">
-
-                RESET EVERYTHING
-
+            <button
+                class="danger"
+                onclick="resetSeason()"
+            >
+                RESET
             </button>
 
         </div>
@@ -151,16 +183,18 @@
 
     <div class="panel">
 
-        <h2>Season Status</h2>
-
-        <div id="seasonSummary">
-            Your season has not started yet.
+        <div class="eyebrow">
+            SEASON SUMMARY
         </div>
+
+        <div
+            id="seasonSummary"
+            class="summary-grid"
+        ></div>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -174,78 +208,90 @@
         <div class="section-heading">
 
             <div>
-                <div class="eyebrow">HOUSEGUEST MANAGEMENT</div>
-                <h2>Create Your Cast</h2>
+
+                <div class="eyebrow">
+                    HOUSEGUESTS
+                </div>
+
+                <h2>
+                    Build Your Cast
+                </h2>
+
             </div>
 
             <div class="cast-count">
-                <span id="castCount">0</span>
-                <small>HOUSEGUESTS</small>
+
+                <span id="castCount">
+                    0
+                </span>
+
+                <small>
+                    HOUSEGUESTS
+                </small>
+
             </div>
 
         </div>
-
-
-        <p>
-            Add your own houseguests. Use an Imgur direct image URL
-            or another publicly accessible image URL.
-        </p>
 
 
         <div class="form-grid">
 
             <input
+                id="playerName"
                 type="text"
-                id="nameInput"
                 placeholder="Houseguest Name"
             >
 
             <input
+                id="playerImage"
                 type="text"
-                id="imageInput"
-                placeholder="Image URL"
+                placeholder="Image URL (Imgur, etc.)"
             >
 
             <input
+                id="playerPhysical"
                 type="number"
-                id="physicalInput"
-                placeholder="Physical 1-10"
                 min="1"
                 max="10"
+                value="5"
+                placeholder="Physical"
             >
 
             <input
+                id="playerMental"
                 type="number"
-                id="mentalInput"
-                placeholder="Mental 1-10"
                 min="1"
                 max="10"
+                value="5"
+                placeholder="Mental"
             >
 
             <input
+                id="playerSocial"
                 type="number"
-                id="socialInput"
-                placeholder="Social 1-10"
                 min="1"
                 max="10"
+                value="5"
+                placeholder="Social"
             >
 
             <input
+                id="playerStrategy"
                 type="number"
-                id="strategyInput"
-                placeholder="Strategy 1-10"
                 min="1"
                 max="10"
+                value="5"
+                placeholder="Strategy"
             >
 
         </div>
 
 
-        <button class="primary-button"
-                onclick="addHouseguest()">
-
-            + ADD HOUSEGUEST
-
+        <button
+            class="primary-button"
+            onclick="addHouseguest()"
+        >
+            ADD HOUSEGUEST
         </button>
 
     </div>
@@ -253,21 +299,11 @@
 
     <div class="panel">
 
-        <div class="section-heading">
-
-            <div>
-                <div class="eyebrow">THE HOUSE</div>
-                <h2>Your Cast</h2>
-            </div>
-
-        </div>
-
         <div id="castGrid" class="cast-grid"></div>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -278,23 +314,27 @@
 
     <div class="panel">
 
-        <div class="eyebrow">CUSTOMIZATION</div>
+        <div class="eyebrow">
+            TWISTS
+        </div>
 
-        <h2>Create Custom Twists</h2>
+        <h2>
+            Custom Twists
+        </h2>
 
         <input
+            id="twistName"
             type="text"
-            id="twistNameInput"
             placeholder="Twist Name"
         >
 
         <textarea
-            id="twistDescriptionInput"
-            placeholder="Describe what your twist does..."
+            id="twistDescription"
+            placeholder="Describe the twist..."
         ></textarea>
 
         <button onclick="createTwist()">
-            + CREATE TWIST
+            ADD TWIST
         </button>
 
     </div>
@@ -302,14 +342,11 @@
 
     <div class="panel">
 
-        <h2>Active Twists</h2>
-
         <div id="twistList"></div>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -320,22 +357,34 @@
 
     <div class="panel">
 
-        <h2>Alliances</h2>
+        <div class="eyebrow">
+            SOCIAL GAME
+        </div>
+
+        <h2>
+            Alliances
+        </h2>
 
         <input
+            id="allianceName"
             type="text"
-            id="allianceNameInput"
             placeholder="Alliance Name"
         >
 
-        <textarea
-            id="allianceMembersInput"
-            placeholder="Enter houseguest names separated by commas"
-        ></textarea>
+        <select
+            id="allianceMembers"
+            multiple
+            size="8"
+        ></select>
 
         <button onclick="createAlliance()">
-            + CREATE ALLIANCE
+            CREATE ALLIANCE
         </button>
+
+    </div>
+
+
+    <div class="panel">
 
         <div id="allianceList"></div>
 
@@ -344,28 +393,35 @@
 
     <div class="panel">
 
-        <h2>Relationships</h2>
+        <div class="eyebrow">
+            RELATIONSHIPS
+        </div>
 
         <div class="two-column">
 
-            <select id="relationshipPlayer1"></select>
+            <select id="relationshipA"></select>
 
-            <select id="relationshipPlayer2"></select>
+            <select id="relationshipB"></select>
 
         </div>
 
-
         <input
+            id="relationshipValue"
             type="number"
-            id="relationshipScore"
-            placeholder="Relationship Score 0-100"
-            min="0"
+            min="-100"
             max="100"
+            value="0"
+            placeholder="Relationship (-100 to 100)"
         >
 
         <button onclick="createRelationship()">
-            SAVE RELATIONSHIP
+            SET RELATIONSHIP
         </button>
+
+    </div>
+
+
+    <div class="panel">
 
         <div id="relationshipList"></div>
 
@@ -374,25 +430,26 @@
 </section>
 
 
-
 <!-- =====================================================
      GAME
 ===================================================== -->
 
-<section id="week" class="page-section">
+<section id="game" class="page-section">
 
     <div class="game-header">
 
         <div>
 
-            <div class="eyebrow">LIVE SIMULATION</div>
+            <div class="eyebrow">
+                LIVE GAME
+            </div>
 
-            <h2 id="weekTitle">
-                WEEK 1
+            <h2 id="gameWeekTitle">
+                Big Brother 20
             </h2>
 
-            <p id="stageTitle">
-                Ready to begin.
+            <p id="gameStageTitle">
+                Start the season to begin.
             </p>
 
         </div>
@@ -401,7 +458,10 @@
         <div class="game-week-badge">
 
             WEEK
-            <strong id="weekDisplay">1</strong>
+
+            <strong id="gameWeek">
+                0
+            </strong>
 
         </div>
 
@@ -410,73 +470,31 @@
 
     <div class="game-grid">
 
-        <div class="panel">
+        <div>
 
-            <h2>Current Week</h2>
-
-            <div class="game-status-grid">
-
-                <div class="game-status-card">
-
-                    <span>HOH</span>
-
-                    <strong id="hohDisplay">
-                        Not Played
-                    </strong>
-
-                </div>
+            <div
+                id="gameStatusGrid"
+                class="game-status-grid"
+            ></div>
 
 
-                <div class="game-status-card">
+            <div class="stage-panel">
 
-                    <span>NOMINEES</span>
-
-                    <strong id="nomineesDisplay">
-                        None
-                    </strong>
-
-                </div>
-
-
-                <div class="game-status-card">
-
-                    <span>POV</span>
-
-                    <strong id="povDisplay">
-                        Not Played
-                    </strong>
-
-                </div>
-
-
-                <div class="game-status-card">
-
-                    <span>FORMAT</span>
-
-                    <strong id="formatDisplay">
-                        Big Brother 20
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div id="stagePanel"
-                 class="stage-panel">
-
-                <div class="stage-icon">
+                <div
+                    id="stageIcon"
+                    class="stage-icon"
+                >
                     ▶
                 </div>
 
                 <div>
 
-                    <h3 id="stagePanelTitle">
+                    <h3 id="stageTitle">
                         Ready
                     </h3>
 
-                    <p id="stagePanelDescription">
-                        Press Proceed to begin the simulation.
+                    <p id="stageDescription">
+                        Start the season from the Home tab.
                     </p>
 
                 </div>
@@ -489,57 +507,56 @@
                 <button
                     id="proceedButton"
                     class="proceed-button"
-                    onclick="proceedGame()">
-
-                    PROCEED
-
+                    onclick="proceedGame()"
+                >
+                    START SEASON
                 </button>
 
             </div>
 
+
+            <div class="panel">
+
+                <div class="eyebrow">
+                    HOUSEGUESTS
+                </div>
+
+                <div
+                    id="gameHouseguestGrid"
+                    class="game-houseguest-grid"
+                ></div>
+
+            </div>
+
+
+            <div
+                id="evictionResults"
+                class="panel hidden"
+            ></div>
+
         </div>
 
 
-        <div class="panel">
+        <div>
 
-            <h2>Houseguests</h2>
+            <div class="panel">
 
-            <div id="gameHouseguests"
-                 class="game-houseguest-grid">
+                <div class="eyebrow">
+                    EVENT LOG
+                </div>
+
+                <div
+                    id="eventLog"
+                    class="event-log"
+                ></div>
+
             </div>
 
         </div>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Event Log</h2>
-
-        <div id="eventLog"
-             class="event-log">
-
-            <div class="event">
-                Your simulator is ready.
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div id="evictionResultsPanel"
-         class="panel hidden">
-
-        <h2>Eviction Vote</h2>
-
-        <div id="evictionResults"></div>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -548,29 +565,31 @@
 
 <section id="memory" class="page-section">
 
-    <div class="panel memory-panel">
+    <div class="panel">
 
         <div class="eyebrow">
-            THE HOUSE
+            MEMORY WALL
         </div>
 
-        <h2>Memory Wall</h2>
+        <h2>
+            Houseguest Memory Wall
+        </h2>
 
         <p>
-            The current houseguests appear below. Evicted players
-            remain visible as eliminated houseguests.
+            Evicted Houseguests remain on the wall and are
+            automatically grayed out. Returning Houseguests
+            return to full color.
         </p>
-
-
-        <div id="memoryWall"
-             class="memory-wall">
-
-        </div>
 
     </div>
 
-</section>
 
+    <div
+        id="memoryWall"
+        class="memory-wall"
+    ></div>
+
+</section>
 
 
 <!-- =====================================================
@@ -582,69 +601,74 @@
     <div class="panel">
 
         <div class="eyebrow">
-            JURY HOUSE
+            JURY
         </div>
 
-        <h2>Jury Members</h2>
+        <h2>
+            Jury
+        </h2>
 
-        <div id="juryList"
-             class="player-photo-list">
-
-        </div>
+        <div
+            id="juryList"
+            class="player-photo-list"
+        ></div>
 
     </div>
 
 
     <div class="panel">
 
-        <h2>Evicted Houseguests</h2>
-
-        <div id="evictedPlayers"
-             class="player-photo-list">
-
+        <div class="eyebrow">
+            EVICTED
         </div>
+
+        <h2>
+            Evicted Houseguests
+        </h2>
+
+        <div
+            id="evictedPlayers"
+            class="player-photo-list"
+        ></div>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
      FINALE
 ===================================================== -->
 
-<section id="finale"
-         class="page-section">
+<section id="finale" class="page-section">
 
-    <div class="panel finale">
+    <div
+        id="finaleContent"
+        class="panel finale"
+    >
 
-        <div class="eyebrow">
-            FINALE NIGHT
+        <div class="finale-crown">
+            ★
         </div>
 
-        <h2>👑 THE FINALE</h2>
+        <h2>
+            The Finale
+        </h2>
 
-        <div id="finaleContent">
-
-            The finale will appear here when your season reaches
-            the end.
-
-        </div>
+        <p>
+            The final stage of the season will appear here.
+        </p>
 
     </div>
 
 </section>
-
 
 </main>
 
 
 <footer>
 
-    <p>
-        Custom Big Brother Simulator
-    </p>
+    BIG BROTHER SIMULATOR
 
 </footer>
 
