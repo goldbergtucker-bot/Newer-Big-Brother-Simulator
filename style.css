@@ -1,250 +1,2223 @@
+/* =========================================================
+   GLOBAL
+========================================================= */
+
 * {
     box-sizing: border-box;
 }
 
+
+:root {
+
+    --bg:
+        #07070b;
+
+    --panel:
+        #12121a;
+
+    --panel-light:
+        #191923;
+
+    --border:
+        #343442;
+
+    --text:
+        #ffffff;
+
+    --muted:
+        #a7a7b5;
+
+    --accent:
+        #ffffff;
+
+    --danger:
+        #c62828;
+
+}
+
+
 body {
+
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0b0b0f;
-    color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #20202e 0%,
+            #09090d 45%,
+            #050507 100%
+        );
+
+    color:
+        var(--text);
+
+    min-height:
+        100vh;
+
 }
 
-header {
-    text-align: center;
-    padding: 30px 20px;
-    background: linear-gradient(135deg, #15151d, #25253a);
-    border-bottom: 3px solid #ffffff;
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.site-header {
+
+    background:
+
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,.15),
+            rgba(0,0,0,.75)
+        ),
+
+        linear-gradient(
+            135deg,
+            #272733,
+            #0b0b11
+        );
+
+    border-bottom:
+        2px solid #ffffff;
+
 }
 
-header h1 {
-    margin: 0;
-    font-size: 42px;
-    letter-spacing: 4px;
+
+.header-overlay {
+
+    max-width:
+        1250px;
+
+    margin:
+        auto;
+
+    padding:
+        45px 25px;
+
+    text-align:
+        center;
+
 }
 
-header p {
-    margin-top: 10px;
-    font-size: 17px;
+
+.bb-logo {
+
+    font-size:
+        15px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        8px;
+
+    margin-bottom:
+        5px;
+
 }
 
-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    padding: 15px;
-    background: #111116;
-    border-bottom: 1px solid #444;
+
+.site-header h1 {
+
+    margin:
+        0;
+
+    font-size:
+        clamp(
+            38px,
+            7vw,
+            75px
+        );
+
+    letter-spacing:
+        8px;
+
+    font-weight:
+        900;
+
 }
 
-button {
-    border: none;
-    padding: 12px 18px;
-    margin: 5px;
-    background: #ffffff;
-    color: #111;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 6px;
+
+.site-header p {
+
+    color:
+        #c6c6d0;
+
+    font-size:
+        16px;
+
 }
 
-button:hover {
-    transform: translateY(-1px);
-    opacity: 0.85;
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.main-nav {
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        100;
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        6px;
+
+    padding:
+        10px;
+
+    background:
+        rgba(
+            10,
+            10,
+            15,
+            .95
+        );
+
+    backdrop-filter:
+        blur(12px);
+
+    border-bottom:
+        1px solid var(--border);
+
 }
 
-button.danger {
-    background: #c62828;
-    color: white;
+
+.main-nav button {
+
+    background:
+        transparent;
+
+    color:
+        #cfcfd8;
+
+    border:
+        1px solid transparent;
+
+    margin:
+        0;
+
+    padding:
+        10px 16px;
+
+    border-radius:
+        4px;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1px;
+
 }
+
+
+.main-nav button:hover {
+
+    color:
+        white;
+
+    border-color:
+        #555563;
+
+    background:
+        #1b1b25;
+
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
 
 main {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
+
+    width:
+        min(
+            1250px,
+            calc(
+                100% - 30px
+            )
+        );
+
+    margin:
+        auto;
+
+    padding:
+        30px 0 60px;
+
 }
+
 
 .page-section {
-    display: none;
+
+    display:
+        none;
+
 }
+
 
 .page-section.active {
-    display: block;
+
+    display:
+        block;
+
 }
+
+
+/* =========================================================
+   PANELS
+========================================================= */
 
 .panel {
-    background: #17171e;
-    border: 1px solid #3a3a48;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #171720,
+            #101016
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        12px;
+
+    padding:
+        25px;
+
+    margin-bottom:
+        20px;
+
+    box-shadow:
+        0 15px 45px
+        rgba(
+            0,
+            0,
+            0,
+            .25
+        );
+
 }
+
 
 .panel h2 {
-    margin-top: 0;
+
+    margin-top:
+        0;
+
 }
 
-.season-selector {
-    text-align: center;
+
+.eyebrow {
+
+    color:
+        #9e9eac;
+
+    font-size:
+        11px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        3px;
+
+    margin-bottom:
+        8px;
+
 }
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero-panel {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        20px;
+
+    padding:
+        40px;
+
+    margin-bottom:
+        20px;
+
+    border:
+        1px solid #3c3c4b;
+
+    border-radius:
+        14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #22222e,
+            #101016
+        );
+
+}
+
+
+.hero-panel h2 {
+
+    font-size:
+        clamp(
+            28px,
+            5vw,
+            48px
+        );
+
+    margin:
+        0 0 10px;
+
+}
+
+
+.hero-panel p {
+
+    color:
+        var(--muted);
+
+}
+
+
+.hero-stat {
+
+    min-width:
+        170px;
+
+    padding:
+        20px;
+
+    text-align:
+        center;
+
+    border:
+        1px solid #4a4a58;
+
+    border-radius:
+        10px;
+
+    background:
+        #0d0d12;
+
+}
+
+
+.hero-stat span {
+
+    display:
+        block;
+
+    font-size:
+        10px;
+
+    color:
+        #888894;
+
+    letter-spacing:
+        2px;
+
+}
+
+
+.hero-stat strong {
+
+    display:
+        block;
+
+    margin-top:
+        8px;
+
+    font-size:
+        17px;
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+button {
+
+    border:
+        none;
+
+    padding:
+        12px 18px;
+
+    margin:
+        5px;
+
+    border-radius:
+        5px;
+
+    background:
+        #eeeeee;
+
+    color:
+        #111111;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    transition:
+        .15s ease;
+
+}
+
+
+button:hover {
+
+    transform:
+        translateY(-1px);
+
+    filter:
+        brightness(
+            .88
+        );
+
+}
+
+
+.primary-button {
+
+    background:
+        #ffffff;
+
+    color:
+        #08080a;
+
+}
+
+
+.danger {
+
+    background:
+        var(--danger);
+
+    color:
+        white;
+
+}
+
+
+.button-row {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        5px;
+
+}
+
+
+/* =========================================================
+   FORMS
+========================================================= */
 
 select,
 input,
 textarea {
-    width: 100%;
-    padding: 12px;
-    margin: 7px 0;
-    border: 1px solid #555;
-    border-radius: 6px;
-    background: #0f0f14;
-    color: white;
-    font-size: 15px;
+
+    width:
+        100%;
+
+    padding:
+        13px;
+
+    margin:
+        6px 0;
+
+    border:
+        1px solid #464653;
+
+    border-radius:
+        6px;
+
+    background:
+        #09090e;
+
+    color:
+        white;
+
+    font-size:
+        14px;
+
 }
+
 
 textarea {
-    min-height: 100px;
-    resize: vertical;
+
+    min-height:
+        100px;
+
+    resize:
+        vertical;
+
 }
 
-.selected-season-info {
-    margin-top: 20px;
-    padding: 20px;
-    background: #0e0e13;
-    border-radius: 8px;
-    border: 1px solid #444;
-}
-
-.template-twist {
-    display: inline-block;
-    padding: 7px 10px;
-    margin: 4px;
-    background: #292936;
-    border-radius: 5px;
-}
 
 .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            1fr
+        );
+
+    gap:
+        10px;
+
 }
+
+
+.two-column {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        10px;
+
+}
+
+
+/* =========================================================
+   SEASON INFORMATION
+========================================================= */
+
+.selected-season-info {
+
+    margin-top:
+        20px;
+
+    padding:
+        20px;
+
+    border:
+        1px solid #3d3d49;
+
+    border-radius:
+        8px;
+
+    background:
+        #0b0b10;
+
+}
+
+
+.template-twist-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                200px,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.competition-chip {
+
+    padding:
+        13px;
+
+    background:
+        #171720;
+
+    border:
+        1px solid #3b3b48;
+
+    border-radius:
+        7px;
+
+}
+
+
+.competition-chip strong {
+
+    display:
+        block;
+
+    font-size:
+        11px;
+
+    color:
+        #9999a5;
+
+}
+
+
+.competition-chip span {
+
+    display:
+        block;
+
+    margin-top:
+        5px;
+
+}
+
+
+.competition-chip small {
+
+    display:
+        block;
+
+    color:
+        #888894;
+
+    margin-top:
+        4px;
+
+}
+
+
+/* =========================================================
+   CAST
+========================================================= */
+
+.section-heading {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+}
+
+
+.cast-count {
+
+    text-align:
+        center;
+
+}
+
+
+.cast-count span {
+
+    display:
+        block;
+
+    font-size:
+        30px;
+
+    font-weight:
+        900;
+
+}
+
+
+.cast-count small {
+
+    color:
+        #888894;
+
+    letter-spacing:
+        2px;
+
+}
+
 
 .cast-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 15px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                190px,
+                1fr
+            )
+        );
+
+    gap:
+        16px;
+
 }
+
 
 .cast-card {
-    background: #101016;
-    border: 1px solid #444;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
+
+    padding:
+        15px;
+
+    text-align:
+        center;
+
+    background:
+        #0c0c11;
+
+    border:
+        1px solid #383844;
+
+    border-radius:
+        10px;
+
 }
 
-.cast-card img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 3px solid white;
+
+.cast-image-wrapper {
+
+    width:
+        135px;
+
+    height:
+        135px;
+
+    margin:
+        auto;
+
 }
+
+
+.player-photo {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+    border-radius:
+        8px;
+
+}
+
+
+.image-placeholder {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #252530;
+
+    border:
+        1px solid #555563;
+
+    border-radius:
+        8px;
+
+    font-size:
+        30px;
+
+    font-weight:
+        900;
+
+    color:
+        #aaaaaf;
+
+}
+
 
 .cast-card h3 {
-    margin: 10px 0 5px;
+
+    margin:
+        12px 0 8px;
+
 }
+
 
 .player-stats {
-    font-size: 13px;
-    line-height: 1.6;
+
+    display:
+        grid;
+
+    gap:
+        3px;
+
+    font-size:
+        12px;
+
+    color:
+        #aaaab5;
+
 }
 
-.game-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+
+.player-status {
+
+    margin-top:
+        10px;
+
+    padding:
+        5px;
+
+    border-radius:
+        4px;
+
+    font-size:
+        10px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        1px;
+
 }
 
-.status-box {
-    background: #0d0d12;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
+
+.player-status.active {
+
+    background:
+        #1f3325;
+
+    color:
+        #b8e5c2;
+
 }
 
-.status-box p {
-    margin: 8px 0;
+
+.player-status.evicted {
+
+    background:
+        #3b1d1d;
+
+    color:
+        #efaaaa;
+
 }
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+.game-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    margin-bottom:
+        20px;
+
+}
+
+
+.game-header h2 {
+
+    margin:
+        0;
+
+    font-size:
+        42px;
+
+}
+
+
+.game-header p {
+
+    color:
+        #aaaab5;
+
+}
+
+
+.game-week-badge {
+
+    text-align:
+        center;
+
+    padding:
+        15px 25px;
+
+    border:
+        1px solid #4a4a56;
+
+    background:
+        #111119;
+
+    border-radius:
+        8px;
+
+    font-size:
+        10px;
+
+    letter-spacing:
+        2px;
+
+}
+
+
+.game-week-badge strong {
+
+    display:
+        block;
+
+    font-size:
+        32px;
+
+    margin-top:
+        5px;
+
+}
+
+
+.game-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1.5fr 1fr;
+
+    gap:
+        20px;
+
+}
+
+
+.game-status-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            1fr
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.game-status-card {
+
+    background:
+        #0b0b10;
+
+    border:
+        1px solid #373743;
+
+    padding:
+        15px;
+
+    border-radius:
+        7px;
+
+}
+
+
+.game-status-card span {
+
+    display:
+        block;
+
+    font-size:
+        10px;
+
+    color:
+        #8c8c98;
+
+    letter-spacing:
+        2px;
+
+}
+
+
+.game-status-card strong {
+
+    display:
+        block;
+
+    margin-top:
+        6px;
+
+    font-size:
+        16px;
+
+}
+
+
+.stage-panel {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        15px;
+
+    margin-top:
+        20px;
+
+    padding:
+        20px;
+
+    border:
+        1px solid #484854;
+
+    border-radius:
+        9px;
+
+    background:
+        #0c0c12;
+
+}
+
+
+.stage-icon {
+
+    width:
+        50px;
+
+    height:
+        50px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border:
+        1px solid white;
+
+    border-radius:
+        50%;
+
+    font-size:
+        18px;
+
+}
+
+
+.stage-panel h3 {
+
+    margin:
+        0 0 5px;
+
+}
+
+
+.stage-panel p {
+
+    margin:
+        0;
+
+    color:
+        #a2a2ad;
+
+    font-size:
+        13px;
+
+}
+
+
+.proceed-container {
+
+    text-align:
+        center;
+
+    padding-top:
+        20px;
+
+}
+
+
+.proceed-button {
+
+    min-width:
+        300px;
+
+    padding:
+        17px 25px;
+
+    font-size:
+        14px;
+
+    letter-spacing:
+        2px;
+
+    background:
+        white;
+
+    color:
+        black;
+
+}
+
+
+/* =========================================================
+   GAME HOUSEGUESTS
+========================================================= */
+
+.game-houseguest-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.game-player-card {
+
+    position:
+        relative;
+
+    padding:
+        8px;
+
+    text-align:
+        center;
+
+    background:
+        #0b0b10;
+
+    border:
+        1px solid #373743;
+
+    border-radius:
+        7px;
+
+}
+
+
+.game-player-photo {
+
+    width:
+        70px;
+
+    height:
+        70px;
+
+    margin:
+        auto auto 8px;
+
+}
+
+
+.game-player-card strong {
+
+    display:
+        block;
+
+    font-size:
+        11px;
+
+}
+
+
+.role-badge {
+
+    display:
+        inline-block;
+
+    margin-top:
+        5px;
+
+    padding:
+        3px 6px;
+
+    border-radius:
+        3px;
+
+    font-size:
+        8px;
+
+    font-weight:
+        900;
+
+}
+
+
+.role-badge.hoh {
+
+    background:
+        #8b6f20;
+
+}
+
+
+.role-badge.nominee {
+
+    background:
+        #7e2020;
+
+}
+
+
+.role-badge.pov {
+
+    background:
+        #244e76;
+
+}
+
+
+/* =========================================================
+   EVENT LOG
+========================================================= */
 
 .event-log {
-    max-height: 500px;
-    overflow-y: auto;
+
+    max-height:
+        500px;
+
+    overflow-y:
+        auto;
+
 }
+
 
 .event {
-    background: #0d0d12;
-    border-left: 4px solid white;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 4px;
+
+    padding:
+        12px;
+
+    margin-bottom:
+        7px;
+
+    background:
+        #0b0b10;
+
+    border-left:
+        3px solid white;
+
+    border-radius:
+        3px;
+
+    font-size:
+        13px;
+
 }
+
+
+/* =========================================================
+   MEMORY WALL
+========================================================= */
 
 .memory-wall {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
+    gap:
+        18px;
+
 }
+
 
 .memory-card {
-    text-align: center;
-    background: #101016;
-    border: 1px solid #444;
-    border-radius: 10px;
-    padding: 10px;
+
+    position:
+        relative;
+
+    text-align:
+        center;
+
+    padding:
+        10px;
+
+    background:
+        #0a0a0f;
+
+    border:
+        1px solid #3b3b47;
+
+    border-radius:
+        8px;
+
+    overflow:
+        hidden;
+
 }
 
-.memory-card img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 6px;
+
+.memory-photo {
+
+    position:
+        relative;
+
+    width:
+        100%;
+
+    aspect-ratio:
+        1 / 1;
+
 }
 
-.player-list {
-    display: grid;
-    gap: 8px;
+
+.memory-photo .player-photo,
+.memory-photo .image-placeholder {
+
+    border-radius:
+        5px;
+
 }
 
-.player-item {
-    padding: 12px;
-    background: #0f0f14;
-    border: 1px solid #444;
-    border-radius: 6px;
+
+.memory-card strong {
+
+    display:
+        block;
+
+    margin-top:
+        10px;
+
+    font-size:
+        15px;
+
 }
+
+
+.memory-status {
+
+    display:
+        block;
+
+    margin-top:
+        5px;
+
+    font-size:
+        9px;
+
+    color:
+        #9d9da8;
+
+    letter-spacing:
+        1px;
+
+}
+
+
+.memory-status.evicted {
+
+    color:
+        #e88888;
+
+}
+
+
+.evicted-overlay {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .6
+        );
+
+    color:
+        white;
+
+    font-size:
+        18px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        3px;
+
+}
+
+
+/* =========================================================
+   JURY
+========================================================= */
+
+.player-photo-list {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                230px,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.jury-player {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    padding:
+        10px;
+
+    background:
+        #0c0c11;
+
+    border:
+        1px solid #373743;
+
+    border-radius:
+        7px;
+
+}
+
+
+.jury-player .player-photo,
+.jury-player .image-placeholder {
+
+    width:
+        55px;
+
+    height:
+        55px;
+
+}
+
+
+.jury-player strong {
+
+    display:
+        block;
+
+}
+
+
+.jury-player span {
+
+    display:
+        block;
+
+    margin-top:
+        4px;
+
+    color:
+        #888894;
+
+    font-size:
+        9px;
+
+    letter-spacing:
+        1px;
+
+}
+
+
+/* =========================================================
+   EVICTION RESULTS
+========================================================= */
+
+.vote-total-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                220px,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+    margin:
+        15px 0 25px;
+
+}
+
+
+.vote-total {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    padding:
+        12px;
+
+    background:
+        #0a0a0f;
+
+    border:
+        1px solid #393945;
+
+    border-radius:
+        7px;
+
+}
+
+
+.vote-total .player-photo,
+.vote-total .image-placeholder {
+
+    width:
+        50px;
+
+    height:
+        50px;
+
+}
+
+
+.vote-total span {
+
+    display:
+        block;
+
+    margin-top:
+        4px;
+
+    color:
+        #a5a5af;
+
+    font-size:
+        11px;
+
+}
+
+
+.vote-breakdown {
+
+    display:
+        grid;
+
+    gap:
+        6px;
+
+}
+
+
+.vote-row {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 50px 1fr;
+
+    align-items:
+        center;
+
+    padding:
+        10px;
+
+    background:
+        #0b0b10;
+
+    border:
+        1px solid #33333f;
+
+    border-radius:
+        6px;
+
+}
+
+
+.vote-person,
+.vote-choice {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+}
+
+
+.vote-person .player-photo,
+.vote-person .image-placeholder,
+.vote-choice .player-photo,
+.vote-choice .image-placeholder {
+
+    width:
+        40px;
+
+    height:
+        40px;
+
+}
+
+
+.vote-arrow {
+
+    text-align:
+        center;
+
+    font-size:
+        20px;
+
+}
+
+
+.nullified-vote {
+
+    color:
+        #ed8a8a;
+
+    font-weight:
+        900;
+
+    font-size:
+        10px;
+
+    letter-spacing:
+        1px;
+
+}
+
+
+/* =========================================================
+   FINALE
+========================================================= */
 
 .finale {
-    text-align: center;
-    min-height: 300px;
+
+    text-align:
+        center;
+
+    padding:
+        50px 25px;
+
 }
+
+
+.finale-crown {
+
+    font-size:
+        60px;
+
+}
+
+
+.finalists {
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        20px;
+
+    margin:
+        30px 0;
+
+}
+
+
+.finalist-card {
+
+    width:
+        180px;
+
+    padding:
+        15px;
+
+    background:
+        #0b0b10;
+
+    border:
+        1px solid #40404b;
+
+    border-radius:
+        8px;
+
+}
+
+
+.finalist-card .player-photo,
+.finalist-card .image-placeholder {
+
+    width:
+        150px;
+
+    height:
+        150px;
+
+}
+
+
+.finalist-card strong {
+
+    display:
+        block;
+
+    margin-top:
+        10px;
+
+}
+
+
+.winner-announcement {
+
+    max-width:
+        450px;
+
+    margin:
+        40px auto 0;
+
+    padding:
+        30px;
+
+    border:
+        1px solid #ffffff;
+
+    background:
+        #111119;
+
+    border-radius:
+        10px;
+
+}
+
+
+.winner-announcement > span {
+
+    display:
+        block;
+
+    font-size:
+        11px;
+
+    letter-spacing:
+        4px;
+
+    color:
+        #a7a7b3;
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.winner-announcement .player-photo,
+.winner-announcement .image-placeholder {
+
+    width:
+        180px;
+
+    height:
+        180px;
+
+    margin:
+        auto;
+
+}
+
+
+.winner-announcement h2 {
+
+    font-size:
+        32px;
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                130px,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.summary-grid div {
+
+    padding:
+        15px;
+
+    background:
+        #0b0b10;
+
+    border:
+        1px solid #353540;
+
+    border-radius:
+        7px;
+
+}
+
+
+.summary-grid span {
+
+    display:
+        block;
+
+    font-size:
+        9px;
+
+    color:
+        #858591;
+
+    letter-spacing:
+        1px;
+
+}
+
+
+.summary-grid strong {
+
+    display:
+        block;
+
+    margin-top:
+        6px;
+
+}
+
+
+/* =========================================================
+   GENERIC PLAYER ITEMS
+========================================================= */
+
+.player-item {
+
+    padding:
+        12px;
+
+    margin-bottom:
+        7px;
+
+    background:
+        #0c0c11;
+
+    border:
+        1px solid #363642;
+
+    border-radius:
+        6px;
+
+}
+
+
+.hidden {
+
+    display:
+        none !important;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
 
 footer {
-    text-align: center;
-    padding: 25px;
-    color: #aaa;
+
+    text-align:
+        center;
+
+    padding:
+        30px;
+
+    color:
+        #777783;
+
+    border-top:
+        1px solid #22222c;
+
 }
 
-@media (max-width: 700px) {
 
-    header h1 {
-        font-size: 28px;
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+    max-width: 900px
+) {
+
+    .game-grid {
+
+        grid-template-columns:
+            1fr;
+
     }
 
-    .form-grid {
-        grid-template-columns: 1fr;
+
+    .memory-wall {
+
+        grid-template-columns:
+            repeat(
+                3,
+                1fr
+            );
+
     }
 
-    nav button {
-        width: 100%;
+}
+
+
+@media (
+    max-width: 650px
+) {
+
+    main {
+
+        width:
+            min(
+                100% - 20px,
+                1250px
+            );
+
     }
+
+
+    .hero-panel {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+    }
+
+
+    .form-grid,
+    .two-column {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .game-status-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .game-houseguest-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+
+    .memory-wall {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+
+    .vote-row {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            10px;
+
+    }
+
+
+    .vote-arrow {
+
+        transform:
+            rotate(
+                90deg
+            );
+
+    }
+
+
+    .proceed-button {
+
+        width:
+            100%;
+
+        min-width:
+            0;
+
+    }
+
+
+    .game-header {
+
+        align-items:
+            flex-start;
+
+    }
+
+
+    .game-header h2 {
+
+        font-size:
+            30px;
+
+    }
+
 }
