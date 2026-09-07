@@ -16,7 +16,37 @@ const BB20 = {
 
     jurySize: 9,
 
-    juryStartAfterEvictions: 6,
+    juryStartAfterEvictions: 7,
+
+
+    /* =====================================================
+       PREMIERE
+    ===================================================== */
+
+    premiere: {
+
+        safetyCompetitions: [
+
+            {
+                name: "The Trash Folder",
+                type: "mental"
+            },
+
+            {
+                name: "HouseGuest CAPTCHA",
+                type: "mental"
+            },
+
+            {
+                name: "Surfing the BB Web",
+                type: "mixed"
+            }
+
+        ],
+
+        safetySpots: 8
+
+    },
 
 
     /* =====================================================
@@ -27,86 +57,144 @@ const BB20 = {
 
         1: {
             hoh: "Microchip Mayhem",
-            pov: "Going Viral"
+            hohType: "physical",
+            pov: "Going Viral",
+            povType: "mixed"
         },
 
         2: {
             hoh: "Land a Job",
-            pov: "HouseGuestsOnly.com"
+            hohType: "physical",
+            pov: "HouseGuestsOnly.com",
+            povType: "mental"
         },
 
         3: {
             hoh: "Product Launch",
-            pov: "Mamma Mia! Madness"
+            hohType: "mental",
+            pov: "Mamma Mia! Madness",
+            povType: "physical"
         },
 
         4: {
             hoh: "Out on a Limb",
-            pov: "Chop, Bonk, Spank"
+            hohType: "physical",
+            pov: "Chop, Bonk, Spank",
+            povType: "physical"
         },
 
         5: {
             hoh: "Perfect Timing",
-            pov: "Goober Driver"
+            hohType: "mental",
+            pov: "Goober Driver",
+            povType: "mixed"
         },
 
         6: {
             hoh: "GIF That Keeps on Giving",
+            hohType: "mental",
+
             hacker: "Crack The Code",
-            pov: "Boom Power Trip"
+            hackerType: "mental",
+
+            pov: "Boom Power Trip",
+            povType: "mixed"
         },
 
         7: {
             hoh: "#HashtagTooLong",
+            hohType: "mental",
+
             hacker: "Hack the House",
-            pov: "OTEV the Sneezy Skunk"
+            hackerType: "mixed",
+
+            pov: "OTEV the Sneezy Skunk",
+            povType: "mental"
         },
 
         8: {
             hoh: "Glow & Flow",
-            pov: "Zing Force"
+            hohType: "physical",
+            pov: "Zing Force",
+            povType: "physical"
         },
 
         9: {
             hoh: "Sweet Shot",
-            pov: "Mission to Planet Veto"
+            hohType: "physical",
+            pov: "Mission to Planet Veto",
+            povType: "mental"
         },
 
         10: {
             hoh: "High in the Sky",
-            pov: "Control Your Emojis"
+            hohType: "physical",
+            pov: "Control Your Emojis",
+            povType: "mental"
         },
 
         11: {
+
             hoh: "Shell or Highwater",
+            hohType: "physical",
+
             pov: "BB Comics",
+            povType: "mental",
 
             doubleEviction: true,
 
             secondHOH: "Buffering",
-            secondPOV: "Block and Roll"
+            secondHOHType: "mental",
+
+            secondPOV: "Block and Roll",
+            secondPOVType: "physical"
+
         },
 
         12: {
-            hoh: "BBFlix & Chill",
-            pov: "Your Mazes are Numbered",
 
-            secondHOH: "What the Bleep"
+            hoh: "BBFlix & Chill",
+            hohType: "mental",
+
+            pov: "Your Mazes are Numbered",
+            povType: "mental",
+
+            secondHOH: "What the Bleep",
+            secondHOHType: "mental",
+
+            secondPOV: "Down to the Wires",
+            secondPOVType: "physical"
+
         },
 
         13: {
+
             finalHOH: [
-                "Jetpack Attack",
-                "Mount Evictus",
-                "Jury Oddcasts"
+
+                {
+                    name: "Jetpack Attack",
+                    type: "physical"
+                },
+
+                {
+                    name: "Mount Evictus",
+                    type: "mental"
+                },
+
+                {
+                    name: "Jury Oddcasts",
+                    type: "mental"
+                }
+
             ]
+
         }
 
     },
 
 
     /* =====================================================
-       BB20 TWISTS
+       APP STORE
     ===================================================== */
 
     twists: {
@@ -119,7 +207,6 @@ const BB20 = {
 
                 {
                     name: "Bonus Life",
-
                     type: "bonusLife",
 
                     description:
@@ -128,7 +215,6 @@ const BB20 = {
 
                 {
                     name: "The Cloud",
-
                     type: "cloud",
 
                     description:
@@ -137,7 +223,6 @@ const BB20 = {
 
                 {
                     name: "Identity Theft",
-
                     type: "identityTheft",
 
                     description:
@@ -159,7 +244,7 @@ const BB20 = {
                     name: "Yell!",
 
                     description:
-                        "An angry reviewer periodically gives the Houseguest feedback."
+                        "The Houseguest receives an annoying review-based punishment."
                 },
 
                 {
@@ -173,6 +258,10 @@ const BB20 = {
 
         },
 
+
+        /* =================================================
+           HACKER
+        ================================================= */
 
         hacker: {
 
@@ -191,11 +280,17 @@ const BB20 = {
         },
 
 
+        /* =================================================
+           BATTLE BACK
+        ================================================= */
+
         juryBattleBack: {
 
             jurors: 4,
 
-            competition: "Big Top Drop"
+            competition: "Big Top Drop",
+
+            type: "physical"
 
         }
 
