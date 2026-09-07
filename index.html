@@ -151,33 +151,65 @@
     </div>
 
     <nav class="main-nav">
-        <button onclick="showSection('home')">HOME</button>
-        <button onclick="showSection('cast')">CAST</button>
-        <button onclick="showSection('twists')">TWISTS</button>
-        <button onclick="showSection('house')">HOUSE</button>
-        <button onclick="showSection('game')">GAME</button>
-        <button onclick="showSection('memory')">MEMORY WALL</button>
-        <button onclick="showSection('jury')">JURY</button>
-        <button onclick="showSection('finale')">FINALE</button>
+
+        <button onclick="showSection('home')">
+            HOME
+        </button>
+
+        <button onclick="showSection('cast')">
+            CAST
+        </button>
+
+        <button onclick="showSection('twists')">
+            TWISTS
+        </button>
+
+        <button onclick="showSection('house')">
+            HOUSE
+        </button>
+
+        <button onclick="showSection('game')">
+            GAME
+        </button>
+
+        <button onclick="showSection('memory')">
+            MEMORY WALL
+        </button>
+
+        <button onclick="showSection('jury')">
+            JURY
+        </button>
+
+        <button onclick="showSection('finale')">
+            FINALE
+        </button>
+
     </nav>
 
 </header>
 
+
 <main>
 
+    <!-- ========================= -->
     <!-- HOME -->
+    <!-- ========================= -->
 
     <section id="home" class="page-section active-section">
 
         <div class="hero-panel">
+
             <h1>BIG BROTHER</h1>
+
             <h2>SIMULATOR</h2>
 
             <p>
                 Create your own Big Brother season with custom Houseguests,
                 relationships, alliances, twists and season formats.
             </p>
+
         </div>
+
 
         <div class="panel">
 
@@ -223,6 +255,7 @@
 
             </div>
 
+
             <button
                 id="selectSeasonButton"
                 class="primary-button"
@@ -231,12 +264,14 @@
                 SELECT SEASON
             </button>
 
+
             <div
                 id="selectedSeasonInfo"
                 class="season-info"
             ></div>
 
         </div>
+
 
         <div class="panel">
 
@@ -252,6 +287,7 @@
                     START NEW SEASON
                 </button>
 
+
                 <button
                     class="secondary-button"
                     onclick="saveGame()"
@@ -259,12 +295,14 @@
                     SAVE
                 </button>
 
+
                 <button
                     class="secondary-button"
                     onclick="loadGame()"
                 >
                     LOAD
                 </button>
+
 
                 <button
                     class="danger-button"
@@ -276,6 +314,7 @@
             </div>
 
         </div>
+
 
         <div class="panel">
 
@@ -291,7 +330,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- CAST -->
+    <!-- ========================= -->
 
     <section id="cast" class="page-section">
 
@@ -305,17 +346,20 @@
 
         </div>
 
+
         <div class="panel">
 
             <h2 id="castEditorTitle">
                 Add Houseguest
             </h2>
 
+
             <input
                 type="hidden"
                 id="editingHouseguestId"
                 value=""
             >
+
 
             <div class="form-section">
 
@@ -395,7 +439,9 @@
                     Set each Houseguest's ability from 1 to 10.
                 </p>
 
+
                 <div class="stats-editor">
+
 
                     <div class="stat-control">
 
@@ -421,6 +467,7 @@
                         >
 
                     </div>
+
 
 
                     <div class="stat-control">
@@ -449,6 +496,7 @@
                     </div>
 
 
+
                     <div class="stat-control">
 
                         <div class="stat-header">
@@ -473,6 +521,7 @@
                         >
 
                     </div>
+
 
 
                     <div class="stat-control">
@@ -515,6 +564,7 @@
                     ADD HOUSEGUEST
                 </button>
 
+
                 <button
                     id="cancelEditButton"
                     class="secondary-button hidden"
@@ -543,6 +593,7 @@
 
             </div>
 
+
             <div
                 id="castGrid"
                 class="cast-grid"
@@ -553,7 +604,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- TWISTS -->
+    <!-- ========================= -->
 
     <section id="twists" class="page-section">
 
@@ -562,8 +615,8 @@
             <h1>TWISTS</h1>
 
             <p>
-                Built-in BB20 twists are shown automatically when the BB20
-                format is selected.
+                Built-in BB20 twists are shown automatically when
+                the BB20 format is selected.
             </p>
 
         </div>
@@ -583,7 +636,9 @@
 
             <h2>Create Custom Twist</h2>
 
+
             <div class="form-grid">
+
 
                 <div class="form-group">
 
@@ -615,6 +670,7 @@
 
             </div>
 
+
             <button
                 class="primary-button"
                 onclick="createTwist()"
@@ -633,7 +689,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- HOUSE -->
+    <!-- ========================= -->
 
     <section id="house" class="page-section">
 
@@ -651,6 +709,7 @@
         <div class="panel">
 
             <h2>Create Alliance</h2>
+
 
             <div class="form-group">
 
@@ -673,14 +732,19 @@
                     Members
                 </label>
 
+
                 <select
                     id="allianceMembers"
                     multiple
                     size="8"
                 ></select>
 
+
                 <div class="form-help">
-                    Check the Houseguests below to add them to the alliance.
+
+                    Check the Houseguests below to add them
+                    to the alliance.
+
                 </div>
 
             </div>
@@ -740,12 +804,13 @@
             <h2>Houseguest Relationships</h2>
 
             <p class="form-help">
-                Relationships are directional: A liking B does not
-                automatically mean B likes A.
+                Relationships are directional:
+                A liking B does not automatically mean B likes A.
             </p>
 
 
             <div class="relationship-editor">
+
 
                 <div class="relationship-person">
 
@@ -843,12 +908,14 @@
                     SAVE RELATIONSHIP
                 </button>
 
+
                 <button
                     class="secondary-button"
                     onclick="loadSelectedRelationship()"
                 >
                     LOAD EXISTING
                 </button>
+
 
                 <button
                     class="danger-button"
@@ -876,7 +943,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- GAME -->
+    <!-- ========================= -->
 
     <section id="game" class="page-section">
 
@@ -929,6 +998,7 @@
 
 
         <div class="status-grid">
+
 
             <div class="status-card">
 
@@ -986,6 +1056,7 @@
                 PROCEED
             </button>
 
+
             <button
                 id="skipEndButton"
                 class="secondary-button skip-end-button"
@@ -1029,7 +1100,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- MEMORY WALL -->
+    <!-- ========================= -->
 
     <section id="memory" class="page-section">
 
@@ -1044,6 +1117,7 @@
 
         </div>
 
+
         <div
             id="memoryWall"
             class="memory-wall"
@@ -1052,7 +1126,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- JURY -->
+    <!-- ========================= -->
 
     <section id="jury" class="page-section">
 
@@ -1089,7 +1165,9 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- FINALE -->
+    <!-- ========================= -->
 
     <section id="finale" class="page-section">
 
@@ -1098,6 +1176,7 @@
             <h1>FINALE</h1>
 
         </div>
+
 
         <div
             id="finaleContent"
@@ -1109,11 +1188,14 @@
 </main>
 
 
+<!-- ========================= -->
 <!-- JAVASCRIPT -->
+<!-- ========================= -->
 
 <script src="seasons/bb20.js?v=20260907-1"></script>
 
 <script src="script.js?v=20260907-1"></script>
+
 
 </body>
 </html>
