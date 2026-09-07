@@ -1,7 +1,3 @@
-/* =========================================================
-   BIG BROTHER 20 SEASON FORMAT
-========================================================= */
-
 const BB20 = {
 
     id: "bb20",
@@ -19,151 +15,83 @@ const BB20 = {
     juryStartAfterEvictions: 7,
 
 
-    /* =====================================================
-       PREMIERE
-    ===================================================== */
-
-    premiere: {
-
-        safetyCompetitions: [
-
-            {
-                name: "The Trash Folder",
-                type: "mental"
-            },
-
-            {
-                name: "HouseGuest CAPTCHA",
-                type: "mental"
-            },
-
-            {
-                name: "Surfing the BB Web",
-                type: "mixed"
-            }
-
-        ],
-
-        safetySpots: 8
-
-    },
-
-
-    /* =====================================================
-       WEEKLY COMPETITIONS
-    ===================================================== */
-
     competitions: {
 
         1: {
             hoh: "Microchip Mayhem",
-            hohType: "physical",
-            pov: "Going Viral",
-            povType: "mixed"
+            pov: "Going Viral"
         },
 
         2: {
             hoh: "Land a Job",
-            hohType: "physical",
-            pov: "HouseGuestsOnly.com",
-            povType: "mental"
+            pov: "HouseGuestsOnly.com"
         },
 
         3: {
             hoh: "Product Launch",
-            hohType: "mental",
-            pov: "Mamma Mia! Madness",
-            povType: "physical"
+            pov: "Mamma Mia! Madness"
         },
 
         4: {
             hoh: "Out on a Limb",
-            hohType: "physical",
-            pov: "Chop, Bonk, Spank",
-            povType: "physical"
+            pov: "Chop, Bonk, Spank"
         },
 
         5: {
             hoh: "Perfect Timing",
-            hohType: "mental",
-            pov: "Goober Driver",
-            povType: "mixed"
+            pov: "Goober Driver"
         },
 
         6: {
             hoh: "GIF That Keeps on Giving",
-            hohType: "mental",
-
             hacker: "Crack The Code",
-            hackerType: "mental",
-
-            pov: "Boom Power Trip",
-            povType: "mixed"
+            pov: "Boom Power Trip"
         },
 
         7: {
             hoh: "#HashtagTooLong",
-            hohType: "mental",
-
             hacker: "Hack the House",
-            hackerType: "mixed",
-
-            pov: "OTEV the Sneezy Skunk",
-            povType: "mental"
+            pov: "OTEV the Sneezy Skunk"
         },
 
         8: {
             hoh: "Glow & Flow",
-            hohType: "physical",
-            pov: "Zing Force",
-            povType: "physical"
+            pov: "Zing Force"
         },
 
         9: {
             hoh: "Sweet Shot",
-            hohType: "physical",
-            pov: "Mission to Planet Veto",
-            povType: "mental"
+            pov: "Mission to Planet Veto"
         },
 
         10: {
             hoh: "High in the Sky",
-            hohType: "physical",
-            pov: "Control Your Emojis",
-            povType: "mental"
+            pov: "Control Your Emojis"
         },
 
         11: {
 
             hoh: "Shell or Highwater",
-            hohType: "physical",
 
             pov: "BB Comics",
-            povType: "mental",
 
             doubleEviction: true,
 
             secondHOH: "Buffering",
-            secondHOHType: "mental",
 
-            secondPOV: "Block and Roll",
-            secondPOVType: "physical"
+            secondPOV: "Block and Roll"
 
         },
 
         12: {
 
             hoh: "BBFlix & Chill",
-            hohType: "mental",
 
             pov: "Your Mazes are Numbered",
-            povType: "mental",
 
             secondHOH: "What the Bleep",
-            secondHOHType: "mental",
 
-            secondPOV: "Down to the Wires",
-            secondPOVType: "physical"
+            secondPOV: "Down to the Wires"
 
         },
 
@@ -171,20 +99,11 @@ const BB20 = {
 
             finalHOH: [
 
-                {
-                    name: "Jetpack Attack",
-                    type: "physical"
-                },
+                "Jetpack Attack",
 
-                {
-                    name: "Mount Evictus",
-                    type: "mental"
-                },
+                "Mount Evictus",
 
-                {
-                    name: "Jury Oddcasts",
-                    type: "mental"
-                }
+                "Jury Oddcasts"
 
             ]
 
@@ -192,10 +111,6 @@ const BB20 = {
 
     },
 
-
-    /* =====================================================
-       APP STORE
-    ===================================================== */
 
     twists: {
 
@@ -207,6 +122,7 @@ const BB20 = {
 
                 {
                     name: "Bonus Life",
+
                     type: "bonusLife",
 
                     description:
@@ -215,6 +131,7 @@ const BB20 = {
 
                 {
                     name: "The Cloud",
+
                     type: "cloud",
 
                     description:
@@ -223,6 +140,7 @@ const BB20 = {
 
                 {
                     name: "Identity Theft",
+
                     type: "identityTheft",
 
                     description:
@@ -244,7 +162,7 @@ const BB20 = {
                     name: "Yell!",
 
                     description:
-                        "The Houseguest receives an annoying review-based punishment."
+                        "An angry reviewer periodically gives the Houseguest feedback."
                 },
 
                 {
@@ -258,10 +176,6 @@ const BB20 = {
 
         },
 
-
-        /* =================================================
-           HACKER
-        ================================================= */
 
         hacker: {
 
@@ -280,17 +194,11 @@ const BB20 = {
         },
 
 
-        /* =================================================
-           BATTLE BACK
-        ================================================= */
-
         juryBattleBack: {
 
             jurors: 4,
 
-            competition: "Big Top Drop",
-
-            type: "physical"
+            competition: "Big Top Drop"
 
         }
 
