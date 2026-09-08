@@ -35,7 +35,7 @@ const RELATIONSHIP_LABELS = {
     hate: "😡 Hate"
 };
 
-const STORAGE_KEY = "bb-simulator-stage1-v1";
+const STORAGE_KEY = "bb-simulator-stage4-v1";
 
 let houseguests = [];
 let evictedHouseguests = [];
@@ -66,6 +66,12 @@ let finaleWinner = null;
 let finalHOH = { part1: null, part2: null, part3: null, winner: null };
 let juryVotes = {};
 let juryVoteRevealIndex = 0;
+let outgoingHOH = null;
+let hackerPower = { replacementUsed: false, vetoPickUsed: false, voteNullified: false };
+let appStoreHistory = [];
+let bonusLifeEligible = null;
+let battleBackCompleted = false;
+let pendingSecondCycle = false;
 
 function $(id) { return document.getElementById(id); }
 
@@ -249,6 +255,7 @@ function resetPlayerSeasonStats(player) {
     player.safety = false;
     player.appUsed = false;
     player.app = null;
+    player.strategyProfile = player.strategyProfile || { alliance: 0, threat: 0, target: 0 };
 }
 
 function validateSeasonStart() {
@@ -291,6 +298,8 @@ function startNewSeason() {
     finalHOH = { part1: null, part2: null, part3: null, winner: null };
     juryVotes = {};
     juryVoteRevealIndex = 0;
+    outgoingHOH = null; hackerPower = { replacementUsed:false, vetoPickUsed:false, voteNullified:false };
+    appStoreHistory = []; bonusLifeEligible = null; battleBackCompleted = false; pendingSecondCycle = false;
     evictedHouseguests = [];
     jury = [];
     eventLog = [];
@@ -610,9 +619,16 @@ function updateGameStageDisplay() {
         opening: { name: "Season Ready", title: "Opening", icon: "★", description: "The season has started. Proceed to the first event." },
         hoh: { name: "Head of Household", title: "HOH Competition", icon: "👑", description: "The Houseguests compete for Head of Household." },
         nominations: { name: "Nomination Ceremony", title: "Nominations", icon: "🎯", description: "The HOH selects the two nominees." },
+        hacker: { name: "H@cker Competition", title: "H@cker", icon: "💻", description: "The anonymous hacker can alter one nomination, choose a Veto player, and nullify one eviction vote." },
         pov: { name: "Power of Veto", title: "POV Competition", icon: "🏆", description: "Six eligible Houseguests compete for the Power of Veto." },
         veto: { name: "Veto Ceremony", title: "Veto Ceremony", icon: "🛡️", description: "The POV winner decides whether to use the Veto." },
-        eviction: { name: "Eviction", title: "Eviction", icon: "🚪", description: "The House votes to evict one nominee." },
+        eviction: { name: "Eviction", title: "Eviction Vote", icon: "🗳️", description: "Houseguests cast their secret votes to evict." },
+        evictionReveal: { name: "Eviction", title: "Eviction Reveal", icon: "🚪", description: "The eviction result is revealed." },
+        finalHOH1: { name: "Final HOH Part 1", title: "Final HOH", icon: "👑", description: "The final three compete in the endurance portion." },
+        finalHOH2: { name: "Final HOH Part 2", title: "Final HOH", icon: "🧠", description: "The two non-winners of Part 1 compete in the mental portion." },
+        finalHOH3: { name: "Final HOH Part 3", title: "Final HOH", icon: "🏆", description: "The Part 1 and Part 2 winners face off to determine the final HOH." },
+        finalVote: { name: "Final Eviction", title: "Final 3", icon: "🚪", description: "The final HOH chooses which finalist to evict." },
+        finale: { name: "Jury Vote", title: "Finale", icon: "🏆", description: "The jury determines the winner." },
         nextWeek: { name: "Next Week", title: "Week Complete", icon: "➡️", description: "Advance to the next cycle." },
         finished: { name: "Finished", title: "Finale", icon: "🏆", description: "The season is complete." }
     };
@@ -651,205 +667,476 @@ function renderGameStatus() {
     const format = $("formatStatus");
     if (format) {
         const data = getWeekData();
-        format.textContent = data?.doubleEviction ? "DOUBLE EVICTION" : "NORMAL WEEK";
+        format.textContent = data?.doubleEviction ? "DOUBLE EVICTION" : currentCycle === 2 ? "SECOND CYCLE" : "NORMAL WEEK";
     }
 }
 
-/* Stage 1 simulation pipeline.  This is deliberately simple: the engine is
-   stable and stat-aware now; Stage 2 will replace each event with the exact
-   BB20 competition/twist mechanics without changing the UI state model. */
-function scoreCompetition(player, category = "overall") {
-    const weights = {
-        general: { general: 0.55, mental: 0.15, physical: 0.10, endurance: 0.10, strategic: 0.10 },
-        physical: { physical: 0.55, endurance: 0.25, general: 0.10, mental: 0.10 },
-        endurance: { endurance: 0.65, physical: 0.20, general: 0.10, temperament: 0.05 },
-        mental: { mental: 0.60, strategic: 0.20, general: 0.15, temperament: 0.05 },
-        strategic: { strategic: 0.60, mental: 0.20, social: 0.10, general: 0.10 },
-        overall: { general: 0.25, physical: 0.10, endurance: 0.10, mental: 0.15, strategic: 0.15, social: 0.10, loyalty: 0.05, temperament: 0.10 }
-    };
-    const map = weights[category] || weights.overall;
-    let score = 0;
-    let total = 0;
-    for (const [key, weight] of Object.entries(map)) { score += player[key] * weight; total += weight; }
-    return (score / total) * 10 + randomFloat(-8, 8);
+/* Stage 3 — BB20 fidelity, detailed competition scoring, social evolution, and finale presentation. */
+function getCompetitionEvent(kind, week = currentWeek, cycle = currentCycle) {
+    const data = getCurrentSeasonTemplate()?.competitions?.[week];
+    if (!data) return null;
+    if (kind === "hoh") return cycle === 2 && data.secondHOH ? data.secondHOH : data.hoh;
+    if (kind === "pov") return cycle === 2 && data.secondPOV ? data.secondPOV : data.pov;
+    if (kind === "hacker") return data.hacker;
+    return null;
 }
 
-function determineCompetitionWinner(players, category = "overall") {
-    return players.map(p => ({ player: p, score: scoreCompetition(p, category) })).sort((a, b) => b.score - a.score)[0]?.player || null;
+function getCompetitionWeights(category = "overall") {
+    return {
+        general: { general: .45, mental: .15, physical: .10, endurance: .10, strategic: .10, temperament: .10 },
+        physical: { physical: .55, endurance: .25, general: .10, temperament: .10 },
+        endurance: { endurance: .60, physical: .20, temperament: .10, general: .10 },
+        mental: { mental: .60, strategic: .20, general: .10, temperament: .10 },
+        strategic: { strategic: .55, mental: .20, social: .10, general: .10, loyalty: .05 },
+        overall: { general: .20, physical: .12, endurance: .10, mental: .16, strategic: .16, social: .10, loyalty: .06, temperament: .10 }
+    }[category] || null;
+}
+
+function scoreCompetition(player, category = "overall", luck = true) {
+    const weights = getCompetitionWeights(category) || getCompetitionWeights("overall");
+    let score = 0;
+    let total = 0;
+    for (const [key, weight] of Object.entries(weights)) {
+        score += normalizeStat(player[key] ?? 5) * weight;
+        total += weight;
+    }
+    const base = (score / total) * 10;
+    return base + (luck ? randomFloat(-6, 6) : 0);
+}
+
+function getCompetitionBreakdown(player, category = "overall") {
+    const weights = getCompetitionWeights(category) || getCompetitionWeights("overall");
+    return Object.entries(weights).map(([key, weight]) => ({ key, value: normalizeStat(player[key] ?? 5), weight, contribution: normalizeStat(player[key] ?? 5) * weight }));
+}
+
+function determineCompetitionWinner(players, category = "overall", eventName = "Competition") {
+    if (!players.length) return null;
+    const results = players.map(player => ({
+        player,
+        score: scoreCompetition(player, category),
+        baseScore: scoreCompetition(player, category, false),
+        breakdown: getCompetitionBreakdown(player, category)
+    })).sort((a, b) => b.score - a.score);
+    const winner = results[0]?.player || null;
+    if (winner) {
+        const detail = results.slice(0, 3).map((r, i) => `${i + 1}. ${getDisplayName(r.player)} (${r.score.toFixed(1)})`).join(" • ");
+        addEvent(`${eventName} results: ${detail}.`, "competition-detail");
+    }
+    return winner;
+}
+
+function evolveRelationshipsAfterEvent() {
+    const active = getActiveHouseguests();
+    active.forEach(a => active.forEach(b => {
+        if (a.id === b.id) return;
+        let r = relationships.find(x => x.from === a.id && x.to === b.id);
+        if (!r) {
+            if (Math.random() < .18) relationships.push({ id: makeId("rel"), from: a.id, to: b.id, type: "neutral", score: 0, note: "Naturally evolving" });
+            return;
+        }
+        const alliance = alliances.some(x => x.active !== false && x.members.includes(a.id) && x.members.includes(b.id));
+        let delta = randomInt(-5, 5);
+        if (alliance) delta += 2;
+        if (a.id === currentHOH) delta += randomInt(-2, 3);
+        r.score = Math.max(-100, Math.min(100, Number(r.score || 0) + delta));
+        r.type = r.score >= 75 ? "love" : r.score >= 25 ? "like" : r.score <= -75 ? "hate" : r.score <= -25 ? "dislike" : "neutral";
+    }));
+}
+
+function getHOHEligible() {
+    return getActiveHouseguests().filter(p => p.id !== outgoingHOH);
 }
 
 function runHOH() {
-    const players = getActiveHouseguests();
+    const players = getHOHEligible();
     if (players.length < 2) return finishSeason();
-    const data = getWeekData();
-    const category = data?.hohCategory || "overall";
-    const winner = determineCompetitionWinner(players, category);
+    const event = getCompetitionEvent("hoh");
+    const winner = determineCompetitionWinner(players, event?.category || "overall", event?.name || "HOH Competition");
     currentHOH = winner.id;
     winner.hohWins++;
     winner.competitionWins++;
     winner.safety = true;
-    addEvent(`${getDisplayName(winner)} won HOH${data?.hoh ? ` (${data.hoh})` : ""}.`, "competition");
+    addEvent(`${getDisplayName(winner)} won HOH${event?.name ? ` (${event.name})` : ""}.`, "competition");
     currentStage = "nominations";
+}
+
+function getAllianceBetween(a, b) {
+    return alliances.find(x => x.active !== false && x.members.includes(a.id) && x.members.includes(b.id)) || null;
+}
+
+function getThreatScore(player) {
+    if (!player) return 0;
+    return (player.competitionWins * 5) + (player.hohWins * 7) + (player.povWins * 5) +
+        (player.strategic * 2.6) + (player.social * 1.8) + (player.physical * 1.4) + (player.mental * 1.2);
+}
+
+function getSocialSafetyScore(player) {
+    if (!player) return 0;
+    const active = getActiveHouseguests().filter(p => p.id !== player.id);
+    if (!active.length) return 0;
+    const positive = active.reduce((sum, other) => Math.max(0, getRelationshipScore(other.id, player.id)), 0);
+    return positive / active.length;
+}
+
+function getAllianceCohesion(player) {
+    const memberIds = new Set();
+    alliances.filter(a => a.active !== false && a.members.includes(player.id)).forEach(a => a.members.forEach(id => memberIds.add(id)));
+    return Math.min(100, memberIds.size * 12 + player.loyalty * 3);
 }
 
 function calculateNominationScore(hoh, target) {
     const relationship = getRelationshipScore(hoh.id, target.id);
-    const alliancePenalty = alliances.some(a => a.members.includes(hoh.id) && a.members.includes(target.id)) ? -35 : 0;
-    const threat = target.strategic * 5 + target.physical * 2 + target.mental * 2;
-    const loyalty = target.loyalty * 2;
-    const temperament = target.temperament;
-    return -relationship + alliancePenalty + threat + (10 - loyalty) * 2 + (10 - temperament) + randomFloat(-15, 15);
+    const reverseRelationship = getRelationshipScore(target.id, hoh.id);
+    const alliance = getAllianceBetween(hoh, target);
+    const threat = getThreatScore(target);
+    const socialSafety = getSocialSafetyScore(target);
+    const strategic = target.strategic * 2.5;
+    const volatility = (10 - target.temperament) * 2.2;
+    const revenge = Math.max(0, -reverseRelationship) * 0.35;
+    const alliancePenalty = alliance ? (alliance.strength === 'unbreakable' ? 85 : alliance.strength === 'strong' ? 65 : 45) : 0;
+    const targetability = threat * 0.65 + strategic + volatility + revenge - relationship * 0.7 - socialSafety * 0.4 - alliancePenalty;
+    return targetability + randomFloat(-7, 7);
+}
+
+function rankNominationTargets(hoh, candidates) {
+    return candidates.map(player => ({ player, score: calculateNominationScore(hoh, player) }))
+        .sort((a, b) => b.score - a.score);
+}
+
+function isProtectedFromNomination(player) {
+    return player.safety || (player.app === "The Cloud" && !player.appUsed);
 }
 
 function makeNominations() {
     const hoh = findPlayer(currentHOH);
-    const candidates = getActiveHouseguests().filter(p => p.id !== currentHOH);
-    if (!hoh || candidates.length < 2) return;
-    const ranked = candidates.map(p => ({ player: p, score: calculateNominationScore(hoh, p) })).sort((a, b) => b.score - a.score);
+    if (!hoh) return;
+    const candidates = getActiveHouseguests().filter(p => p.id !== hoh.id && !isProtectedFromNomination(p));
+    if (candidates.length < 2) return;
+    const ranked = rankNominationTargets(hoh, candidates);
     nominees = ranked.slice(0, 2).map(x => x.player);
     nominees.forEach(p => p.safety = false);
     addEvent(`${getDisplayName(hoh)} nominated ${getDisplayName(nominees[0])} and ${getDisplayName(nominees[1])}.`, "nomination");
+
+    if (getCurrentSeasonTemplate()?.twists?.appStore && currentWeek <= 3) resolveAppStore();
+
+    const identity = getActiveHouseguests().find(p => p.app === "Identity Theft" && !p.appUsed && p.id !== hoh.id);
+    if (identity) {
+        const currentThreat = nominees.reduce((sum, p) => sum + getThreatScore(p), 0);
+        const alternativePool = getActiveHouseguests().filter(p => p.id !== hoh.id && p.id !== identity.id && !nominees.some(n => n.id === p.id) && !isProtectedFromNomination(p));
+        const alternatives = rankNominationTargets(hoh, alternativePool);
+        if (alternativePool.length >= 2 && identity.strategic + identity.social + identity.temperament >= 20 && currentThreat < (alternatives[0].score + alternatives[1].score) * 0.9 && randomFloat() < 0.72) {
+            nominees = alternatives.slice(0, 2).map(x => x.player);
+            identity.appUsed = true;
+            addEvent(`${getDisplayName(identity)} secretly used Identity Theft to replace the HOH's nominations with ${getDisplayName(nominees[0])} and ${getDisplayName(nominees[1])}.`, "twist");
+        }
+    }
+    currentStage = currentWeek >= 6 && currentWeek <= 7 ? "hacker" : "pov";
+}
+
+function resolveAppStore() {
+    const eligible = getActiveHouseguests().filter(p => !p.app);
+    if (!eligible.length) return;
+    const top = eligible.slice().sort((a,b) => (b.social + b.general + b.loyalty) - (a.social + a.general + a.loyalty))[0];
+    const unusedPowerApps = getCurrentSeasonTemplate().twists.appStore.powerApps.filter(app => !appStoreHistory.some(h => h.name === app.name));
+    const power = unusedPowerApps[0];
+    if (power) {
+        top.app = power.name;
+        appStoreHistory.push({ week: currentWeek, player: top.id, name: power.name });
+        addEvent(`${getDisplayName(top)} received the BB App Store Power App: ${power.name}.`, "twist");
+        if (power.type === "bonusLife") bonusLifeEligible = top.id;
+    }
+    const crapEligible = eligible.filter(p => p.id !== top.id);
+    const unusedCrap = getCurrentSeasonTemplate().twists.appStore.crapApps.filter(app => !appStoreHistory.some(h => h.name === app.name));
+    if (crapEligible.length && unusedCrap.length) {
+        const low = crapEligible.slice().sort((a,b) => (a.social+a.general) - (b.social+b.general))[0];
+        const crap = unusedCrap[0];
+        low.app = crap.name;
+        appStoreHistory.push({ week: currentWeek, player: low.id, name: crap.name });
+        addEvent(`${getDisplayName(low)} received the BB App Store Crap App: ${crap.name}.`, "twist");
+    }
+}
+
+function runHacker() {
+    const eligible = getActiveHouseguests().filter(p => !nominees.some(n => n.id === p.id));
+    if (eligible.length < 2) { currentStage = "pov"; return; }
+    const event = getCompetitionEvent("hacker");
+    const winner = determineCompetitionWinner(eligible, event?.category || "mental", event?.name || "H@cker Competition");
+    if (!winner) { currentStage = "pov"; return; }
+    hackerWinner = winner.id;
+    hackerPower = { replacementUsed: false, vetoPickUsed: false, voteNullified: false };
+    winner.competitionWins++;
+    addEvent(`${getDisplayName(winner)} secretly won the H@cker Competition (${event?.name || "H@cker Competition"}).`, "twist");
+
+    const hoh = findPlayer(currentHOH);
+    const replacementPool = getActiveHouseguests().filter(p => p.id !== currentHOH && p.id !== winner.id && !nominees.some(n => n.id === p.id) && !isProtectedFromNomination(p));
+    if (hoh && replacementPool.length) {
+        const ranked = replacementPool.map(p => ({ player: p, score: calculateNominationScore(hoh, p) + getThreatScore(p) * 0.45 }))
+            .sort((a, b) => b.score - a.score);
+        const replacement = ranked[0]?.player;
+        const saved = nominees.slice().sort((a, b) => getThreatScore(a) - getThreatScore(b))[0];
+        if (replacement && saved && (getThreatScore(replacement) > getThreatScore(saved) || getRelationshipScore(winner.id, replacement.id) < getRelationshipScore(winner.id, saved.id))) {
+            nominees = nominees.map(n => n.id === saved.id ? replacement : n);
+            replacementNominee = replacement;
+            hackerPower.replacementUsed = true;
+            addEvent(`The H@cker anonymously replaced ${getDisplayName(saved)} with ${getDisplayName(replacement)}.`, "twist");
+        }
+    }
     currentStage = "pov";
 }
 
 function runPOV() {
-    const eligible = getActiveHouseguests();
-    const data = getWeekData();
-    const count = Math.min(6, eligible.length);
-    const pool = eligible.slice().sort(() => Math.random() - 0.5).slice(0, count);
-    if (currentHOH && !pool.some(p => p.id === currentHOH)) pool[0] = findPlayer(currentHOH);
-    povPlayers = pool;
-    povWinner = determineCompetitionWinner(pool, data?.povCategory || "overall");
+    const active = getActiveHouseguests();
+    const event = getCompetitionEvent("pov");
+    const guaranteed = [findPlayer(currentHOH), ...nominees].filter(Boolean);
+    const randomPool = active.filter(p => !guaranteed.some(g => g.id === p.id));
+    const extras = randomPool.slice().sort(() => Math.random() - 0.5).slice(0, Math.max(0, 6 - guaranteed.length));
+    povPlayers = [...guaranteed, ...extras];
+
+    if (hackerWinner && !hackerPower.vetoPickUsed && currentWeek >= 6 && currentWeek <= 7) {
+        const hacker = findPlayer(hackerWinner);
+        const hackerEligible = randomPool.filter(p => !povPlayers.some(v => v.id === p.id));
+        if (hacker && hackerEligible.length && povPlayers.length >= 6) {
+            const weakest = povPlayers.slice(3).sort((a, b) => scoreCompetition(a, event?.category || "overall", false) - scoreCompetition(b, event?.category || "overall", false))[0];
+            const selected = hackerEligible.slice().sort((a, b) => scoreCompetition(b, event?.category || "overall") - scoreCompetition(a, event?.category || "overall"))[0];
+            if (weakest && selected && selected.id !== weakest.id) {
+                povPlayers[povPlayers.indexOf(weakest)] = selected;
+                hackerPower.vetoPickUsed = true;
+                addEvent(`${getDisplayName(hacker)} used the H@cker power to select ${getDisplayName(selected)} as a Veto player.`, "twist");
+            }
+        }
+    }
+    const names = povPlayers.map(getDisplayName).join(", ");
+    addEvent(`Veto players: ${names}.`, "veto-draw");
+    povWinner = determineCompetitionWinner(povPlayers, event?.category || "overall", event?.name || "Power of Veto");
+    if (!povWinner) return;
     povWinner.povWins++;
     povWinner.competitionWins++;
-    addEvent(`${getDisplayName(povWinner)} won the Power of Veto${data?.pov ? ` (${data.pov})` : ""}.`, "competition");
+    addEvent(`${getDisplayName(povWinner)} won the Power of Veto${event?.name ? ` (${event.name})` : ""}.`, "competition");
     currentStage = "veto";
 }
 
 function usePOV() {
-    if (!nominees.length) { currentStage = "eviction"; return; }
-    if (povWinner && nominees.some(p => p.id === povWinner.id)) {
-        const candidates = getActiveHouseguests().filter(p => p.id !== currentHOH && !nominees.some(n => n.id === p.id));
-        if (candidates.length) {
-            candidates.sort((a, b) => calculateNominationScore(findPlayer(currentHOH), b) - calculateNominationScore(findPlayer(currentHOH), a));
-            replacementNominee = candidates[0];
-            nominees = [nominees.find(n => n.id !== povWinner.id), replacementNominee];
-            addEvent(`${getDisplayName(povWinner)} used the Power of Veto. ${getDisplayName(replacementNominee)} became the replacement nominee.`, "veto");
-        } else {
-            addEvent(`${getDisplayName(povWinner)} won the Veto but did not change the nominees.`, "veto");
-        }
+    if (!nominees.length || !povWinner) { currentStage = "eviction"; return; }
+    const nomineeWinner = nominees.find(n => n.id === povWinner.id);
+    if (!nomineeWinner) {
+        addEvent(`${getDisplayName(povWinner)} won the Power of Veto and kept nominations the same.`, "veto");
+        currentStage = "eviction";
+        return;
+    }
+    const hoh = findPlayer(currentHOH);
+    const savedThreat = getThreatScore(nomineeWinner);
+    const replacementCandidates = getActiveHouseguests().filter(p => p.id !== currentHOH && p.id !== povWinner.id && !nominees.some(n => n.id === p.id) && !isProtectedFromNomination(p));
+    const replacement = rankNominationTargets(hoh, replacementCandidates)[0]?.player;
+    const usesVeto = replacement && (povWinner.loyalty + povWinner.social + povWinner.strategic >= 20 || savedThreat > getThreatScore(replacement) + 8 || getRelationshipScore(povWinner.id, nomineeWinner.id) > 30);
+    if (usesVeto) {
+        nominees = nominees.map(n => n.id === nomineeWinner.id ? replacement : n);
+        replacementNominee = replacement;
+        addEvent(`${getDisplayName(povWinner)} used the Power of Veto on ${getDisplayName(nomineeWinner)}. ${getDisplayName(replacement)} is the replacement nominee.`, "veto");
     } else {
-        addEvent(`${getDisplayName(povWinner)} did not use the Power of Veto.`, "veto");
+        addEvent(`${getDisplayName(povWinner)} chose not to use the Power of Veto.`, "veto");
     }
     currentStage = "eviction";
 }
 
+function voteScore(voter, target) {
+    const relationship = getRelationshipScore(voter.id, target.id);
+    const targetToVoter = getRelationshipScore(target.id, voter.id);
+    const alliance = getAllianceBetween(voter, target);
+    const threat = getThreatScore(target);
+    const targetSocial = getSocialSafetyScore(target);
+    const targetLoyalty = target.loyalty;
+    const fear = voter.temperament < 5 ? Math.max(0, threat - 45) * 0.45 : Math.max(0, threat - 60) * 0.25;
+    const betrayal = Math.max(0, -relationship) * 0.8 + Math.max(0, -targetToVoter) * 0.25;
+    const allianceBonus = alliance ? (alliance.strength === 'unbreakable' ? 75 : alliance.strength === 'strong' ? 55 : 35) : 0;
+    const loyaltyBonus = targetLoyalty * 1.3;
+    const socialPenalty = targetSocial * 0.25;
+    return betrayal + fear + socialPenalty - allianceBonus - loyaltyBonus + relationship * 0.2 + randomFloat(-8, 8);
+}
+
 function prepareEvictionVotes() {
+    if (nominees.length < 2) { currentStage = "evictionReveal"; return; }
     const voters = getActiveHouseguests().filter(p => p.id !== currentHOH && !nominees.some(n => n.id === p.id));
-    const scores = {};
-    nominees.forEach(target => {
-        scores[target.id] = 0;
-        voters.forEach(voter => {
-            const relationship = getRelationshipScore(voter.id, target.id);
-            const alliance = alliances.some(a => a.members.includes(voter.id) && a.members.includes(target.id));
-            scores[target.id] += relationship + (alliance ? 40 : 0) + randomFloat(-20, 20);
-        });
-    });
-    const target = nominees.slice().sort((a, b) => scores[a.id] - scores[b.id])[0];
-    currentEvictionTarget = target?.id || null;
+    const counts = Object.fromEntries(nominees.map(n => [n.id, 0]));
     evictionVotes = {};
-    voters.forEach(voter => { evictionVotes[voter.id] = currentEvictionTarget; });
-    currentStage = "eviction";
+    voters.forEach(voter => {
+        const ranked = nominees.map(target => ({ target, score: voteScore(voter, target) })).sort((a, b) => b.score - a.score);
+        const target = ranked[0]?.target;
+        if (target) {
+            evictionVotes[voter.id] = target.id;
+            counts[target.id]++;
+            voter.votesReceived = voter.votesReceived || 0;
+            addEvent(`${getDisplayName(voter)} voted to evict ${getDisplayName(target)}.`, "vote-detail");
+        }
+    });
+
+    if (hackerWinner && !hackerPower.voteNullified && currentWeek >= 6 && currentWeek <= 7) {
+        const hacker = findPlayer(hackerWinner);
+        const hackerVote = hacker && evictionVotes[hacker.id];
+        if (hackerVote) {
+            counts[hackerVote] = Math.max(0, counts[hackerVote] - 1);
+            delete evictionVotes[hacker.id];
+            hackerPower.voteNullified = true;
+            addEvent(`${getDisplayName(hacker)} nullified one eviction vote with the H@cker power.`, "twist");
+        }
+    }
+    const first = counts[nominees[0].id] || 0;
+    const second = counts[nominees[1].id] || 0;
+    let target;
+    if (first === second) {
+        const hoh = findPlayer(currentHOH);
+        target = [nominees[0], nominees[1]].sort((a,b) => voteScore(hoh, b) - voteScore(hoh, a))[0];
+        addEvent(`The vote is tied ${first}-${second}. ${getDisplayName(hoh)} must break the tie.`, "eviction");
+        addEvent(`${getDisplayName(hoh)} cast the deciding vote to evict ${getDisplayName(target)}.`, "vote");
+    } else {
+        target = first > second ? nominees[0] : nominees[1];
+    }
+    target.votesReceived = Number(target.votesReceived || 0) + (counts[target.id] || 0);
+    currentEvictionTarget = target?.id || null;
+    addEvent(`Eviction vote: ${getDisplayName(nominees[0])} received ${first} vote(s); ${getDisplayName(nominees[1])} received ${second} vote(s).`, "vote-summary");
+    addEvent(`${getDisplayName(target)} is evicted.`, "vote-result");
+    currentStage = "evictionReveal";
 }
 
 function executeEviction() {
     const target = findPlayer(currentEvictionTarget);
     if (!target) return;
-    target.status = "Evicted";
-    target.inGame = false;
-    target.evicted = true;
-    target.evictionWeek = currentWeek;
-    target.placement = getActiveHouseguests().length + 1;
+    const remainingBefore = getActiveHouseguests().length;
+    target.status = "Evicted"; target.inGame = false; target.evicted = true; target.evictionWeek = currentWeek; target.placement = remainingBefore;
     evictedHouseguests.push(target);
     const template = getCurrentSeasonTemplate();
     const juryThreshold = Number(template?.juryStartAfterEvictions ?? 7);
-    if (evictedHouseguests.length <= juryThreshold && jury.length < Number(template?.jurySize || 9)) {
-        target.juryMember = true;
-        jury.push(target);
+    if (evictedHouseguests.length > juryThreshold && jury.length < Number(template?.jurySize || 9)) {
+        target.juryMember = true; jury.push(target);
+        addEvent(`${getDisplayName(target)} joined the jury.`, "jury");
+        maybeRunBattleBack();
     }
     addEvent(`${getDisplayName(target)} was evicted from the Big Brother house.`, "eviction");
     currentEvictedPlayer = target;
-    nominees = [];
-    povPlayers = [];
-    povWinner = null;
-    replacementNominee = null;
-    currentHOH = null;
-    if (getActiveHouseguests().length <= 2) finishSeason();
-    else currentStage = "nextWeek";
+    evolveRelationshipsAfterEvent();
+    if (bonusLifeEligible === target.id && evictedHouseguests.length <= 4) {
+        const returnScore = scoreCompetition(target, "overall") + randomFloat(-5,5);
+        const best = [target, ...evictedHouseguests.filter(p => p.id !== target.id).slice(-3)].sort((a,b)=>scoreCompetition(b,"overall")-scoreCompetition(a,"overall"))[0];
+        if (best?.id === target.id || returnScore > 65) {
+            target.status = "Active"; target.inGame = true; target.evicted = false; target.placement = null;
+            evictedHouseguests.splice(evictedHouseguests.indexOf(target),1);
+            addEvent(`${getDisplayName(target)} used the Bonus Life and returned to the game!`, "twist");
+        }
+        bonusLifeEligible = null;
+    }
+    nominees=[]; povPlayers=[]; povWinner=null; replacementNominee=null; currentEvictionTarget=null;
+    outgoingHOH = currentHOH; currentHOH=null;
+    if (getActiveHouseguests().length === 2) { currentStage="finale"; return finishSeason(); }
+    if (getActiveHouseguests().length === 3) { currentStage="finalHOH1"; return; }
+    if (template?.competitions?.[currentWeek]?.doubleEviction || template?.competitions?.[currentWeek]?.secondHOH) {
+        if (currentCycle === 1) { pendingSecondCycle=true; currentCycle=2; currentStage="hoh"; addEvent("The double eviction continues with a second HOH competition.", "season"); return; }
+    }
+    currentCycle=1; pendingSecondCycle=false; currentWeek++; currentStage="hoh"; outgoingHOH=null;
+    addEvent(`Week ${currentWeek} begins.`, "season");
+}
+
+function runFinalHOHPart(part) {
+    const finalists = getActiveHouseguests();
+    if (finalists.length !== 3 && part < 3) return;
+    const event = getCurrentSeasonTemplate()?.competitions?.[13]?.finalHOH?.[part-1];
+    if (part === 1) finalHOH.part1 = determineCompetitionWinner(finalists, event?.category || "endurance", event?.name || "Final HOH Part 1");
+    if (part === 2) {
+        const players = finalists.filter(p => p.id !== finalHOH.part1?.id);
+        finalHOH.part2 = determineCompetitionWinner(players, event?.category || "mental", event?.name || "Final HOH Part 2");
+    }
+    if (part === 3) {
+        const players = finalists.filter(p => p.id !== finalHOH.part2?.id);
+        finalHOH.part3 = determineCompetitionWinner(players, event?.category || "strategic", event?.name || "Final HOH Part 3");
+        finalHOH.winner = finalHOH.part3;
+        addEvent(`${getDisplayName(finalHOH.winner)} won Final HOH Part 3 and controls the final eviction.`, "finale");
+        currentStage="finalVote"; return;
+    }
+    addEvent(`${getDisplayName(part === 1 ? finalHOH.part1 : finalHOH.part2)} won Final HOH Part ${part} (${event?.name || "Final HOH"}).`, "finale");
+    currentStage = part === 1 ? "finalHOH2" : "finalHOH3";
+}
+
+function finishSeason() {
+    const finalists = getActiveHouseguests();
+    if (finalists.length > 3) return;
+    if (finalists.length === 3 && !finalHOH.winner) { currentStage="finalHOH1"; return; }
+    if (finalists.length <= 2 && !finaleWinner) {
+        const ordered = finalists.slice().sort((a,b)=>(b.strategic+b.social+b.loyalty)-(a.strategic+a.social+a.loyalty));
+        finaleWinner = ordered[0];
+        if (finaleWinner) { finaleWinner.status="Winner"; finaleWinner.inGame=false; finaleWinner.placement=1; }
+    }
+    if (finaleWinner) {
+        const others = houseguests.filter(p => p.id !== finaleWinner.id && p.status === "Active");
+        others.forEach((p,i)=>{ p.status="Finalist"; p.inGame=false; p.placement=i+2; });
+        const juryPool = jury.filter(p=>p.id !== finaleWinner.id && p.status !== "Winner");
+        juryVotes={};
+        const candidates = [finaleWinner, ...others];
+        juryPool.forEach(j => {
+            const ranked=candidates.slice().sort((a,b)=>{
+                const scoreA = getRelationshipScore(j.id,a.id)*0.65 + getRelationshipScore(a.id,j.id)*0.25 + a.strategic*1.5 + a.social*1.4 + a.loyalty*0.7 + getThreatScore(a)*0.12 + randomFloat(-5,5);
+                const scoreB = getRelationshipScore(j.id,b.id)*0.65 + getRelationshipScore(b.id,j.id)*0.25 + b.strategic*1.5 + b.social*1.4 + b.loyalty*0.7 + getThreatScore(b)*0.12 + randomFloat(-5,5);
+                return scoreB-scoreA;
+            });
+            juryVotes[j.id]=ranked[0]?.id;
+        });
+        const counts={}; Object.values(juryVotes).forEach(id=>counts[id]=(counts[id]||0)+1);
+        const winnerId=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0];
+        if (winnerId) {
+            finaleWinner=findPlayer(winnerId); finaleWinner.status="Winner"; finaleWinner.placement=1;
+            finalists.filter(p=>p.id!==winnerId).forEach((p,i)=>{p.status="Finalist";p.inGame=false;p.placement=i+2;});
+        }
+        seasonFinished=true; seasonStarted=true; currentStage="finished";
+        addEvent(`${getDisplayName(finaleWinner)} won ${seasonName} by a jury vote.`, "finale");
+    }
+}
+
+function maybeRunBattleBack() {
+    const template=getCurrentSeasonTemplate();
+    if (battleBackCompleted || jury.length !== Number(template?.juryBattleBackAfterJurors || 4)) return;
+    const candidates=jury.slice(0,4).filter(p=>p.status === "Evicted");
+    if (candidates.length < 4) return;
+    const winner=determineCompetitionWinner(candidates,"physical");
+    winner.status="Active"; winner.inGame=true; winner.juryMember=false; winner.placement=null;
+    const idx=evictedHouseguests.indexOf(winner); if(idx>=0) evictedHouseguests.splice(idx,1);
+    jury=jury.filter(p=>p.id!==winner.id);
+    battleBackCompleted=true;
+    addEvent(`${getDisplayName(winner)} won the Jury Battle Back (${template.twists.juryBattleBack.competition}) and returned to the game.`, "twist");
 }
 
 function proceedGame() {
     if (!seasonStarted) { alert("Start a season first."); return; }
     if (seasonFinished) { showSection("finale"); return; }
-    switch (currentStage) {
-        case "opening": currentStage = "hoh"; addEvent("The first HOH competition begins.", "competition"); break;
+    switch(currentStage) {
+        case "opening": currentStage="hoh"; addEvent("The first HOH competition begins.","competition"); break;
         case "hoh": runHOH(); break;
         case "nominations": makeNominations(); break;
+        case "hacker": runHacker(); break;
         case "pov": runPOV(); break;
         case "veto": usePOV(); break;
-        case "eviction": if (!currentEvictionTarget) prepareEvictionVotes(); else executeEviction(); break;
-        case "nextWeek": currentWeek++; currentCycle = 1; currentHOH = null; nominees = []; povPlayers = []; povWinner = null; currentEvictionTarget = null; currentStage = "hoh"; addEvent(`Week ${currentWeek} begins.`, "season"); break;
-        default: currentStage = "hoh";
+        case "eviction": prepareEvictionVotes(); break;
+        case "evictionReveal": executeEviction(); break;
+        case "finalHOH1": runFinalHOHPart(1); break;
+        case "finalHOH2": runFinalHOHPart(2); break;
+        case "finalHOH3": runFinalHOHPart(3); break;
+        case "finalVote": {
+            const winner=finalHOH.winner;
+            const others=getActiveHouseguests().filter(p=>p.id!==winner.id);
+            if(others.length) { const evict=others.slice().sort((a,b)=>voteScore(winner,b)-voteScore(winner,a))[0]; evict.status="Evicted"; evict.inGame=false; evict.placement=3; addEvent(`${getDisplayName(winner)} evicted ${getDisplayName(evict)} at the Final 3.`,"finale"); }
+            currentStage="finale"; break;
+        }
+        case "finale": finishSeason(); break;
+        default: currentStage="hoh";
     }
-    updateAllDisplays();
-    saveGameSilently();
+    updateAllDisplays(); saveGameSilently();
 }
 
 function skipToEnd() {
     if (!seasonStarted) { alert("Start a season first."); return; }
-    let guard = 0;
-    while (!seasonFinished && guard++ < 500) {
-        switch (currentStage) {
-            case "opening": currentStage = "hoh"; break;
-            case "hoh": runHOH(); break;
-            case "nominations": makeNominations(); break;
-            case "pov": runPOV(); break;
-            case "veto": usePOV(); break;
-            case "eviction": if (!currentEvictionTarget) prepareEvictionVotes(); else executeEviction(); break;
-            case "nextWeek": currentWeek++; currentHOH = null; currentEvictionTarget = null; currentStage = "hoh"; break;
-            default: finishSeason(); break;
-        }
+    let guard=0;
+    while(!seasonFinished && guard++<500) {
+        const before=currentStage;
+        proceedGame();
+        if (currentStage===before && before!=="finished") currentStage="hoh";
     }
-    updateAllDisplays();
-    saveGameSilently();
-    showSection("finale");
-}
-
-function finishSeason() {
-    const remaining = getActiveHouseguests();
-    if (remaining.length) {
-        remaining.forEach(p => { p.status = "Evicted"; p.inGame = false; });
-        const ordered = remaining.slice().sort((a, b) => (b.strategic + b.social + b.loyalty) - (a.strategic + a.social + a.loyalty));
-        finaleWinner = ordered[0] || remaining[0];
-        finaleWinner.status = "Winner";
-        finaleWinner.inGame = false;
-        finaleWinner.placement = 1;
-        ordered.slice(1).forEach((p, i) => p.placement = i + 2);
-    }
-    seasonFinished = true;
-    seasonStarted = true;
-    currentStage = "finished";
-    addEvent(`${getDisplayName(finaleWinner)} won ${seasonName}!`, "finale");
-}
-
-function showFinale() {
-    const container = $("finaleContent");
-    if (!container) return;
-    if (!finaleWinner) {
-        container.innerHTML = `<div class="empty-state">The finale has not been reached yet.</div>`;
-        return;
-    }
-    container.innerHTML = `<div class="final-stage-card panel"><h2>${escapeHTML(seasonName)} Winner</h2><div class="final-winner">${getPlayerImageHTML(finaleWinner, "final-winner-image")}<h1>${escapeHTML(getDisplayName(finaleWinner))}</h1></div></div>`;
+    updateAllDisplays(); saveGameSilently(); showSection("finale");
 }
 
 function updateSeasonSummary() {
@@ -867,13 +1154,13 @@ function updateSeasonSummary() {
 
 function getSaveState() {
     return {
-        version: 1,
+        version: 4,
         houseguests, evictedHouseguests, jury, alliances, relationships, customTwists, eventLog,
         selectedSeasonTemplate, seasonName, seasonFormat, seasonStarted, seasonFinished,
         currentWeek, currentCycle, currentStage, currentHOH, nominees: nominees.map(p => p.id),
         povPlayers: povPlayers.map(p => p.id), povWinner: povWinner?.id || null, hackerWinner,
         replacementNominee: replacementNominee?.id || null, evictionVotes, currentEvictionTarget,
-        currentEvictedPlayer: currentEvictedPlayer?.id || null, finaleWinner: finaleWinner?.id || null,
+        currentEvictedPlayer: currentEvictedPlayer?.id || null, outgoingHOH, hackerPower, appStoreHistory, bonusLifeEligible, battleBackCompleted, pendingSecondCycle, finaleWinner: finaleWinner?.id || null,
         finalHOH, juryVotes, juryVoteRevealIndex
     };
 }
@@ -894,6 +1181,8 @@ function restoreReferences(state) {
     replacementNominee = findPlayer(state.replacementNominee);
     currentEvictedPlayer = findPlayer(state.currentEvictedPlayer);
     finaleWinner = findPlayer(state.finaleWinner);
+    outgoingHOH = state.outgoingHOH || null; hackerPower = state.hackerPower || {replacementUsed:false,vetoPickUsed:false,voteNullified:false};
+    appStoreHistory = state.appStoreHistory || []; bonusLifeEligible = state.bonusLifeEligible || null; battleBackCompleted = Boolean(state.battleBackCompleted); pendingSecondCycle = Boolean(state.pendingSecondCycle);
 }
 
 function loadGame() {
