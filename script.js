@@ -614,7 +614,63 @@ function renderGameHouseguests() {
 function renderEventLog() {
     const container = $("eventLog");
     if (!container) return;
-    container.innerHTML = eventLog.length ? eventLog.slice().reverse().map((e, i) => `<div class="event-log-item"><span class="event-week">W${e.week || ""}</span><span class="event-text">${escapeHTML(e.text || e.message || e)}</span></div>`).join("") : `<div class="empty-state">No events yet.</div>`;
+
+    const stages = [];
+    if (currentWeek === 1 && currentCycle === 1) {
+        stages.push({ id: "safetyTrash", label: "Safety Competition", name: "Trash Folder", type: "competition" });
+        stages.push({ id: "safetyCyber", label: "Safety Competition", name: "Cyber Security", type: "competition" });
+        stages.push({ id: "safetySurfing", label: "Safety Competition", name: "Surfing the BB Web", type: "competition" });
+    }
+    stages.push({ id: "hoh", label: "HOH", name: getCompetitionEvent("hoh")?.name || "Head of Household", type: "competition" });
+    stages.push({ id: "nominations", label: "Nominations", name: "Nomination Ceremony", type: "nomination" });
+    if (currentWeek >= 6 && currentWeek <= 7 && currentCycle === 1) {
+        stages.push({ id: "hacker", label: "H@cker", name: getCompetitionEvent("hacker")?.name || "H@cker Competition", type: "twist" });
+    }
+    stages.push({ id: "pov", label: "POV Picked Players", name: getCompetitionEvent("pov")?.name || "Power of Veto", type: "veto-draw" });
+    stages.push({ id: "povWinner", label: "POV", name: getCompetitionEvent("pov")?.name || "Power of Veto", type: "competition" });
+    stages.push({ id: "veto", label: "Veto Ceremony", name: "Veto Ceremony", type: "veto" });
+    stages.push({ id: "eviction", label: "Eviction Vote", name: "Eviction Vote", type: "vote" });
+    stages.push({ id: "evictionReveal", label: "Eviction", name: "Eviction", type: "eviction" });
+
+    const order = stages.map(x => x.id);
+    const currentIndex = order.indexOf(currentStage);
+    const relevant = eventLog.filter(e => e.week === currentWeek && (e.cycle || 1) === currentCycle);
+
+    function stageEvent(stage) {
+        if (stage.id === "povWinner") {
+            return relevant.find(e => e.type === "competition" && /won the Power of Veto/i.test(e.text));
+        }
+        if (stage.id === "pov") return relevant.find(e => e.type === "veto-draw");
+        return relevant.find(e => {
+            if (stage.id === "hoh") return e.type === "competition" && /won HOH/i.test(e.text);
+            if (stage.id === "nominations") return e.type === "nomination";
+            if (stage.id === "hacker") return e.type === "twist" && /H@cker/i.test(e.text);
+            if (stage.id === "veto") return e.type === "veto";
+            if (stage.id === "eviction") return e.type === "vote-summary" || e.type === "vote";
+            if (stage.id === "evictionReveal") return e.type === "vote-result" || e.type === "eviction";
+            if (stage.id.startsWith("safety")) return e.type === "competition" && (e.text.includes(stage.name) || e.text.includes("Surfing the BB Web"));
+            return false;
+        });
+    }
+
+    const cards = stages.map((stage, i) => {
+        const event = stageEvent(stage);
+        let status = "upcoming";
+        if (event || (currentIndex > i && currentIndex !== -1)) status = "complete";
+        if (stage.id === currentStage || (stage.id === "povWinner" && currentStage === "veto")) status = "current";
+        const icon = status === "complete" ? "✓" : status === "current" ? "▶" : "○";
+        const detail = event?.text || (status === "current" ? `Next: ${stage.name}` : "Waiting");
+        return `<article class="weekly-chain-step ${status}">
+            <div class="weekly-chain-step-marker">${icon}</div>
+            <div class="weekly-chain-step-body">
+                <div class="weekly-chain-step-label">${escapeHTML(stage.label)}</div>
+                <div class="weekly-chain-step-name">${escapeHTML(stage.name)}</div>
+                <div class="weekly-chain-step-detail">${escapeHTML(detail)}</div>
+            </div>
+        </article>`;
+    }).join("");
+
+    container.innerHTML = `<div class="weekly-chain-sequence">${cards}</div>`;
 }
 
 function renderStatusPeople(containerId, players, empty = "None") {
@@ -752,6 +808,7 @@ function runSafetyCompetition(id) {
             winner.competitionWins++;
             safetyCompetitionResults.surfingBBWeb = winner.id;
             const immune = chooseWeek1ImmunePlayers(winner);
+            getActiveHouseguests().forEach(p => { p.safety = false; });
             week1ImmunityIds = immune.map(p => p.id);
             immune.forEach(p => p.safety = true);
             addEvent(`${getDisplayName(winner)} won Surfing the BB Web and reprogrammed Week 1. Safe from the first eviction: ${immune.map(getDisplayName).join(", ")}.`, "twist");
@@ -1019,6 +1076,7 @@ function runPOV() {
     povWinner.povWins++;
     povWinner.competitionWins++;
     addEvent(`${getDisplayName(povWinner)} won the Power of Veto${event?.name ? ` (${event.name})` : ""}.`, "competition");
+    addEvent(`Veto Ceremony: ${getDisplayName(povWinner)} will decide whether to use the Veto.`, "veto");
     currentStage = "veto";
 }
 
@@ -1510,6 +1568,24 @@ document.addEventListener("DOMContentLoaded", initialize);
     updateGameStageDisplay = function() {
         baseUpdateGameStageDisplay();
         ensureTimelineHeader();
+        const displayLabel = $("competitionDisplayLabel");
+        const displayName = $("competitionDisplayName");
+        const displayDescription = $("competitionDisplayDescription");
+        const stageEvent = competitionForStage();
+        if (displayLabel && displayName && displayDescription) {
+            let label = "CURRENT STAGE";
+            if (currentStage.startsWith("safety")) label = "WEEK 1 IMMUNITY / SAFETY COMPETITION";
+            else if (currentStage === "hoh") label = "HEAD OF HOUSEHOLD COMPETITION";
+            else if (currentStage === "hacker") label = "H@CKER COMPETITION";
+            else if (currentStage === "pov") label = "POWER OF VETO — PLAYERS";
+            else if (currentStage === "veto") label = "VETO CEREMONY";
+            else if (currentStage === "eviction") label = "EVICTION VOTE";
+            else if (currentStage === "evictionReveal") label = "EVICTION";
+            displayLabel.textContent = label;
+            displayName.textContent = currentStage === "veto" ? "Veto Ceremony" : (stageEvent?.name || (currentStage === "nominations" ? "Nomination Ceremony" : (currentStage === "opening" ? "Season Ready" : "Current Stage")));
+            displayDescription.textContent = stageEvent?.description || (currentStage === "veto" ? "The Power of Veto winner decides whether to use the Veto and whether the nominations change." : "Proceed to advance the simulation.");
+        }
+        ensureTimelineHeader();
         const intro = $("weeklyPresentationIntro");
         if (!intro) return;
         const event = competitionForStage();
@@ -1528,4 +1604,3 @@ document.addEventListener("DOMContentLoaded", initialize);
 
     window.__BBWeeklyPresentation = { competitionForStage, ensureTimelineHeader };
 })();
-
