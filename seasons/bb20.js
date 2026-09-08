@@ -6,7 +6,7 @@ const BB20 = {
     startingPlayers: 16,
     nominationCount: 2,
     jurySize: 9,
-    juryStartAfterEvictions: 6,
+    juryStartAfterEvictions: 7,
     juryBattleBackAfterJurors: 4,
     competitionCategories: { hoh: "overall", pov: "overall" },
     competitions: {
