@@ -1543,26 +1543,63 @@ document.addEventListener("DOMContentLoaded", initialize);
     renderEventLog = function() {
         const container = $("eventLog");
         if (!container) return;
-        const order = { season: 1, twist: 2, competition: 3, "competition-detail": 4, nomination: 5, "veto-draw": 6, veto: 7, vote: 8, "vote-detail": 9, "vote-summary": 10, "vote-result": 11, eviction: 12, jury: 13, finale: 14 };
-        const currentEvents = eventLog.filter(e => Number(e.week || 0) === Number(currentWeek) && Number(e.cycle || 1) === Number(currentCycle));
-        if (!currentEvents.length) {
-            container.innerHTML = `<div class="empty-state">No events yet. Press PROCEED to begin the week.</div>`;
-            return;
+
+        const povEvent = getCompetitionEvent("pov");
+        const hohEvent = getCompetitionEvent("hoh");
+        const hackerEvent = getCompetitionEvent("hacker");
+        const weekData = getWeekData() || {};
+        const hasHacker = currentWeek >= 6 && currentWeek <= 7 && currentCycle === 1 && !!hackerEvent;
+
+        const stages = [];
+        if (currentWeek === 1 && currentCycle === 1) {
+            stages.push({ id: "safetyTrash", label: "IMMUNITY", name: "Trash Folder", icon: "📁", competition: true });
+            stages.push({ id: "safetyCyber", label: "IMMUNITY", name: "Cyber Security", icon: "🔐", competition: true });
+            stages.push({ id: "safetySurfing", label: "IMMUNITY", name: "Surfing the BB Web", icon: "🏄", competition: true });
         }
-        const cards = currentEvents.slice().sort((a,b) => (order[a.type] || 99) - (order[b.type] || 99)).map(e => {
-            const people = eventPeople(e.text || e.message || e);
-            const icon = ({competition:"🏆", "competition-detail":"📊", nomination:"🎯", twist:"✨", veto:"🛡️", "veto-draw":"🎲", vote:"🗳️", "vote-detail":"🗳️", "vote-summary":"📋", "vote-result":"🚪", eviction:"🚪", jury:"🏛️", finale:"👑", season:"📅", social:"🤝", alliance:"🤝", cast:"👤", format:"📺"})[e.type] || "•";
-            const labels = {competition:"COMPETITION", "competition-detail":"RESULTS", nomination:"NOMINATIONS", "veto-draw":"POV PLAYERS", veto:"VETO CEREMONY", vote:"EVICTION VOTE", "vote-detail":"VOTE", "vote-summary":"VOTE TOTAL", "vote-result":"RESULT", eviction:"EVICTION", twist:"TWIST / IMMUNITY", finale:"FINALE", jury:"JURY", season:"WEEK"};
-            return `<article class="weekly-event-card event-${escapeAttribute(e.type || "general")} ${currentStage === e.type ? "is-current-chain-step" : ""}>
-                <div class="weekly-event-icon">${icon}</div>
-                <div class="weekly-event-main">
-                    <div class="weekly-event-type">${escapeHTML(labels[e.type] || String(e.type || "EVENT").replaceAll("-", " ").toUpperCase())}</div>
-                    <div class="weekly-event-text">${escapeHTML(e.text || e.message || e)}</div>
-                    ${people.length ? `<div class="weekly-event-people">${people.map(p => personCard(p)).join("")}</div>` : ""}
+        stages.push({ id: "hoh", label: "HOH", name: hohEvent?.name || "Head of Household", icon: "👑", competition: true });
+        stages.push({ id: "nominations", label: "NOMINATIONS", name: "Nomination Ceremony", icon: "🎯" });
+        if (hasHacker) stages.push({ id: "hacker", label: "H@CKER", name: hackerEvent.name || "H@cker Competition", icon: "💻", competition: true });
+        stages.push({ id: "pov", label: "POV PLAYERS", name: povEvent?.name || "Power of Veto", icon: "🎲", competition: true });
+        stages.push({ id: "povWinner", label: "POWER OF VETO", name: povEvent?.name || "Power of Veto", icon: "🏆", competition: true });
+        stages.push({ id: "veto", label: "VETO CEREMONY", name: "Veto Ceremony", icon: "🛡️" });
+        stages.push({ id: "eviction", label: "EVICTION VOTE", name: "Eviction Vote", icon: "🗳️" });
+        stages.push({ id: "evictionReveal", label: "EVICTION", name: "Eviction", icon: "🚪" });
+
+        const order = stages.map(x => x.id);
+        const currentIndex = order.indexOf(currentStage);
+        const relevant = eventLog.filter(e => Number(e.week || 0) === Number(currentWeek) && Number(e.cycle || 1) === Number(currentCycle));
+
+        function findStageEvent(stage) {
+            if (stage.id === "pov") return relevant.find(e => e.type === "veto-draw");
+            if (stage.id === "povWinner") return relevant.find(e => e.type === "competition" && /won the Power of Veto/i.test(e.text));
+            if (stage.id === "veto") return relevant.find(e => e.type === "veto");
+            if (stage.id === "hoh") return relevant.find(e => e.type === "competition" && /won HOH/i.test(e.text));
+            if (stage.id === "nominations") return relevant.find(e => e.type === "nomination");
+            if (stage.id === "hacker") return relevant.find(e => e.type === "twist" && /H@cker/i.test(e.text));
+            if (stage.id === "eviction") return relevant.find(e => ["vote", "vote-summary"].includes(e.type));
+            if (stage.id === "evictionReveal") return relevant.find(e => ["vote-result", "eviction"].includes(e.type));
+            return relevant.find(e => e.type === "competition" && e.text.includes(stage.name));
+        }
+
+        const cards = stages.map((stage, i) => {
+            const event = findStageEvent(stage);
+            let status = "upcoming";
+            if (event || (currentIndex > i && currentIndex !== -1)) status = "complete";
+            if (stage.id === currentStage || (stage.id === "povWinner" && currentStage === "veto")) status = "current";
+            const detail = event?.text || (status === "current" ? `Proceed for ${stage.name}.` : status === "complete" ? `${stage.name} complete.` : "Upcoming");
+            const competitionTag = stage.competition ? `<div class="weekly-chain-competition">${escapeHTML(stage.name)}</div>` : "";
+            return `<article class="weekly-chain-step ${status}">
+                <div class="weekly-chain-step-marker">${status === "complete" ? "✓" : status === "current" ? "▶" : "○"}</div>
+                <div class="weekly-chain-step-body">
+                    <div class="weekly-chain-step-label">${stage.icon} ${escapeHTML(stage.label)}</div>
+                    <div class="weekly-chain-step-name">${escapeHTML(stage.name)}</div>
+                    ${competitionTag}
+                    <div class="weekly-chain-step-detail">${escapeHTML(detail)}</div>
                 </div>
             </article>`;
         }).join("");
-        container.innerHTML = `<section class="weekly-block"><div class="weekly-block-title">WEEK ${currentWeek}${currentCycle > 1 ? ` • CYCLE ${currentCycle}` : ""}</div>${cards}</section>`;
+
+        container.innerHTML = `<section class="weekly-block"><div class="weekly-block-title">WEEK ${currentWeek}${currentCycle > 1 ? ` • CYCLE ${currentCycle}` : ""}</div><div class="weekly-chain-sequence">${cards}</div></section>`;
     };
 
     updateGameStageDisplay = function() {
