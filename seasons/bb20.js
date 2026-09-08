@@ -57,4 +57,3 @@ const BB20 = {
 
 window.BB_SEASON_REGISTRY = window.BB_SEASON_REGISTRY || {};
 window.BB_SEASON_REGISTRY.bb20 = BB20;
-
