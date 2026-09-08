@@ -1399,3 +1399,19 @@ hr {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ================================================================
+   BRANTSTEELE-STYLE WEEKLY GAME PRESENTATION
+   ================================================================ */
+.weekly-presentation-intro{margin:18px 0;display:grid;gap:12px}
+.weekly-presentation-title{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;border-radius:12px;background:#1f2937;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.weekly-presentation-title span{font-size:.82rem;font-weight:800;opacity:.85}.weekly-presentation-title strong{font-size:1.05rem}
+.current-competition{padding:18px;border:1px solid #d6dbe1;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.current-competition-label{font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.65}.current-competition-name{font-size:1.55rem;font-weight:900;margin-top:3px}.current-competition-description{margin-top:6px;line-height:1.45;opacity:.78}.active-week-twists{padding:10px 14px;border-radius:10px;background:#f1f5f9;font-size:.9rem}
+.weekly-houseguest-card{min-height:205px;position:relative}.weekly-houseguest-card .game-houseguest-photo{height:150px;object-fit:cover}.weekly-houseguest-card.is-hoh{outline:3px solid #f59e0b}.weekly-houseguest-card.is-nominee{outline:3px solid #ef4444}
+.weekly-block{margin-bottom:20px}.weekly-block-title{font-size:.9rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:9px 2px;border-bottom:2px solid #d1d5db;margin-bottom:10px}
+.weekly-event-card{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px;margin:9px 0;border:1px solid #d9dee5;border-radius:13px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.weekly-event-icon{font-size:1.45rem;text-align:center;padding-top:2px}.weekly-event-type{font-size:.67rem;font-weight:900;letter-spacing:.08em;opacity:.55}.weekly-event-text{font-size:1rem;font-weight:700;line-height:1.4;margin-top:3px}
+.weekly-event-people{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px;padding-top:10px;border-top:1px solid #edf0f3}.weekly-person{width:86px;text-align:center}.weekly-person-photo{width:68px;height:68px;margin:0 auto 5px;border-radius:50%;object-fit:cover;display:block;border:2px solid #d7dce2;background:#eef1f4}.weekly-person-name{font-size:.72rem;font-weight:800;line-height:1.15}.weekly-person-status{font-size:.62rem;opacity:.55;margin-top:2px}
+.event-twist{border-left:5px solid #8b5cf6}.event-competition{border-left:5px solid #f59e0b}.event-nomination{border-left:5px solid #ef4444}.event-vote-result,.event-eviction{border-left:5px solid #6b7280}.event-finale{border-left:5px solid #10b981}
+@media(max-width:700px){.weekly-presentation-title{align-items:flex-start;flex-direction:column}.weekly-event-card{grid-template-columns:32px 1fr}.weekly-person{width:72px}.weekly-person-photo{width:56px;height:56px}}
