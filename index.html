@@ -1,298 +1,1284 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Big Brother Simulator</title><link rel="stylesheet" href="style.css?v=20260907"><style>
-        #allianceMembers { display:none !important; }
-        .bb-alliance-checklist { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px; margin:10px 0 8px; }
-        .bb-alliance-check { display:flex; align-items:center; gap:9px; padding:10px; background:#111; border:1px solid #444; border-radius:8px; cursor:pointer; }
-        .bb-alliance-check:hover { background:#1d1d1d; }
-        .bb-alliance-check input { width:auto; margin:0; cursor:pointer; }
-        .bb-alliance-empty { color:#999; padding:12px; border:1px dashed #444; border-radius:8px; }
-        .bb-active-twist-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
-        .bb-active-twist { padding:14px; border:1px solid #333; border-radius:10px; background:#101010; }
-        .bb-active-twist.active { border-color:#fff; background:#181818; }
-        .bb-active-twist strong,.bb-active-twist span { display:block; }
-        .bb-active-twist span { margin-top:6px; font-size:12px; color:#999; }
-        .bb-active-twist.active span { color:#fff; font-weight:800; }
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Brother Simulator</title>
+    <link rel="stylesheet" href="style.css?v=20260907">
 
-        .status-card > div { min-height:48px; }
-        .status-player-image { width:44px; height:44px; object-fit:cover; border-radius:8px; flex:0 0 44px; }
-        .status-player-text { display:flex; flex-direction:column; gap:4px; min-width:0; }
-        .status-player-text span { font-size:12px; opacity:.75; }
-        .status-person-inline { display:inline-flex; align-items:center; gap:7px; margin:3px 8px 3px 0; }
-        .status-person-inline span { font-weight:700; }
-        .status-none { opacity:.65; }
-        #hohStatus, #nomineesStatus, #povStatus { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-        .skip-end-button { margin-top:10px; width:100%; }
-        .final-stage-card { margin-top:12px; }
-    </style></head><body><header class="site-header"><div class="logo-area"><div class="logo-main">BIG BROTHER</div><div class="logo-sub">SIMULATOR</div></div><nav class="main-nav"><button onclick="showSection('home')">HOME</button><button onclick="showSection('cast')">CAST</button><button onclick="showSection('twists')">TWISTS</button><button onclick="showSection('house')">HOUSE</button><button onclick="showSection('game')">GAME</button><button onclick="showSection('memory')">MEMORY WALL</button><button onclick="showSection('jury')">JURY</button><button onclick="showSection('finale')">FINALE</button></nav></header><main><section id="home" class="page-section active-section"><div class="hero-panel"><h1>BIG BROTHER</h1><h2>SIMULATOR</h2><p>
+    <style>
+        #allianceMembers {
+            display: none !important;
+        }
+
+        .bb-alliance-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            margin: 10px 0 8px;
+        }
+
+        .bb-alliance-check {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .bb-alliance-check:hover {
+            background: #1d1d1d;
+        }
+
+        .bb-alliance-check input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .bb-alliance-empty {
+            color: #999;
+            padding: 12px;
+            border: 1px dashed #444;
+            border-radius: 8px;
+        }
+
+        .bb-active-twist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+        }
+
+        .bb-active-twist {
+            padding: 14px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #101010;
+        }
+
+        .bb-active-twist.active {
+            border-color: #fff;
+            background: #181818;
+        }
+
+        .bb-active-twist strong,
+        .bb-active-twist span {
+            display: block;
+        }
+
+        .bb-active-twist span {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .bb-active-twist.active span {
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .status-card > div {
+            min-height: 48px;
+        }
+
+        .status-player-image {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex: 0 0 44px;
+        }
+
+        .status-player-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .status-player-text span {
+            font-size: 12px;
+            opacity: .75;
+        }
+
+        .status-person-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 3px 8px 3px 0;
+        }
+
+        .status-person-inline span {
+            font-weight: 700;
+        }
+
+        .status-none {
+            opacity: .65;
+        }
+
+        #hohStatus,
+        #nomineesStatus,
+        #povStatus {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skip-end-button {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .final-stage-card {
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="logo-area">
+        <div class="logo-main">BIG BROTHER</div>
+        <div class="logo-sub">SIMULATOR</div>
+    </div>
+
+    <nav class="main-nav">
+        <button onclick="showSection('home')">HOME</button>
+        <button onclick="showSection('cast')">CAST</button>
+        <button onclick="showSection('twists')">TWISTS</button>
+        <button onclick="showSection('house')">HOUSE</button>
+        <button onclick="showSection('game')">GAME</button>
+        <button onclick="showSection('memory')">MEMORY WALL</button>
+        <button onclick="showSection('jury')">JURY</button>
+        <button onclick="showSection('finale')">FINALE</button>
+    </nav>
+
+</header>
+
+
+<main>
+
+<!-- HOME -->
+
+<section id="home" class="page-section active-section">
+
+    <div class="hero-panel">
+        <h1>BIG BROTHER</h1>
+        <h2>SIMULATOR</h2>
+
+        <p>
             Create your own Big Brother season with custom Houseguests,
             relationships, alliances, twists and season formats.
-        </p></div><div class="panel"><h2>Season Format</h2><div class="form-group"><label for="seasonSelect">Choose Season Format</label><select id="seasonSelect"><option value="custom">Custom Season</option><option value="bb19">Big Brother 19</option><option value="bb20" selected>Big Brother 20</option><option value="bb23">Big Brother 23</option><option value="bb24">Big Brother 24</option><option value="bb25">Big Brother 25</option><option value="bb26">Big Brother 26</option></select></div><button
+        </p>
+    </div>
+
+
+    <div class="panel">
+
+        <h2>Season Format</h2>
+
+        <div class="form-group">
+
+            <label for="seasonSelect">
+                Choose Season Format
+            </label>
+
+            <select id="seasonSelect">
+
+                <option value="custom">
+                    Custom Season
+                </option>
+
+                <option value="bb19">
+                    Big Brother 19
+                </option>
+
+                <option value="bb20" selected>
+                    Big Brother 20
+                </option>
+
+                <option value="bb23">
+                    Big Brother 23
+                </option>
+
+                <option value="bb24">
+                    Big Brother 24
+                </option>
+
+                <option value="bb25">
+                    Big Brother 25
+                </option>
+
+                <option value="bb26">
+                    Big Brother 26
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
             id="selectSeasonButton"
             class="primary-button"
             onclick="selectSeasonTemplate()">
+
             SELECT SEASON
-        </button><div
+
+        </button>
+
+
+        <div
             id="selectedSeasonInfo"
-            class="season-info"></div></div><div class="panel"><h2>Season Controls</h2><div class="button-row"><button
+            class="season-info">
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>Season Controls</h2>
+
+        <div class="button-row">
+
+            <button
                 id="startSeasonButton"
                 class="primary-button"
                 onclick="startNewSeason()">
+
                 START NEW SEASON
-            </button><button
+
+            </button>
+
+
+            <button
                 class="secondary-button"
                 onclick="saveGame()">
+
                 SAVE
-            </button><button
+
+            </button>
+
+
+            <button
                 class="secondary-button"
                 onclick="loadGame()">
+
                 LOAD
-            </button><button
+
+            </button>
+
+
+            <button
                 class="danger-button"
                 onclick="resetGame()">
+
                 RESET
-            </button></div></div><div class="panel"><h2>Season Summary</h2><div
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>Season Summary</h2>
+
+        <div
             id="seasonSummary"
-            class="summary-grid"></div></div></section><section id="cast" class="page-section"><div class="section-heading"><h1>HOUSEGUEST CAST</h1><p>
+            class="summary-grid">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CAST -->
+
+<section id="cast" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>HOUSEGUEST CAST</h1>
+
+        <p>
             Create and edit your Houseguests before or during your season.
-        </p></div><div class="panel"><h2 id="castEditorTitle">
+        </p>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2 id="castEditorTitle">
             Add Houseguest
-        </h2><input
+        </h2>
+
+
+        <input
             type="hidden"
             id="editingHouseguestId"
-            value=""><div class="form-section"><h3>Houseguest Identity</h3><div class="form-grid"><div class="form-group"><label for="firstName">
+            value="">
+
+
+        <div class="form-section">
+
+            <h3>Houseguest Identity</h3>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="firstName">
                         First Name
-                    </label><input
+                    </label>
+
+                    <input
                         id="firstName"
                         type="text"
-                        placeholder="First name"></div><div class="form-group"><label for="lastName">
+                        placeholder="First name">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="lastName">
                         Last Name
-                    </label><input
+                    </label>
+
+                    <input
                         id="lastName"
                         type="text"
-                        placeholder="Last name"></div><div class="form-group"><label for="nickname">
+                        placeholder="Last name">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nickname">
                         Nickname / Display Name
-                    </label><input
+                    </label>
+
+                    <input
                         id="nickname"
                         type="text"
-                        placeholder="What they go by"></div><div class="form-group"><label for="imageUrl">
+                        placeholder="What they go by">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="imageUrl">
                         Image URL
-                    </label><input
+                    </label>
+
+                    <input
                         id="imageUrl"
                         type="text"
-                        placeholder="https://i.imgur.com/example.jpg"></div></div></div><div class="form-section"><h3>Competition Stats</h3><p class="form-help">
+                        placeholder="https://i.imgur.com/example.jpg">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-section">
+
+            <h3>Competition Stats</h3>
+
+            <p class="form-help">
                 Set each Houseguest's ability from 1 to 10.
-            </p><div class="stats-editor"><div class="stat-control"><div class="stat-header"><label for="general">General</label><span id="generalValue">5</span></div><input
+            </p>
+
+
+            <div class="stats-editor">
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="general">
+                            General
+                        </label>
+
+                        <span id="generalValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="general"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('general')"></div><div class="stat-control"><div class="stat-header"><label for="physical">Physical</label><span id="physicalValue">5</span></div><input
+                        oninput="updateStatValue('general')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="physical">
+                            Physical
+                        </label>
+
+                        <span id="physicalValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="physical"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('physical')"></div><div class="stat-control"><div class="stat-header"><label for="endurance">Endurance</label><span id="enduranceValue">5</span></div><input
+                        oninput="updateStatValue('physical')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="endurance">
+                            Endurance
+                        </label>
+
+                        <span id="enduranceValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="endurance"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('endurance')"></div><div class="stat-control"><div class="stat-header"><label for="mental">Mental</label><span id="mentalValue">5</span></div><input
+                        oninput="updateStatValue('endurance')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="mental">
+                            Mental
+                        </label>
+
+                        <span id="mentalValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="mental"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('mental')"></div><div class="stat-control"><div class="stat-header"><label for="strategic">Strategic Ability</label><span id="strategicValue">5</span></div><input
+                        oninput="updateStatValue('mental')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="strategic">
+                            Strategic Ability
+                        </label>
+
+                        <span id="strategicValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="strategic"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('strategic')"></div><div class="stat-control"><div class="stat-header"><label for="loyalty">Loyalty</label><span id="loyaltyValue">5</span></div><input
+                        oninput="updateStatValue('strategic')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="loyalty">
+                            Loyalty
+                        </label>
+
+                        <span id="loyaltyValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="loyalty"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('loyalty')"></div><div class="stat-control"><div class="stat-header"><label for="social">Social Skills</label><span id="socialValue">5</span></div><input
+                        oninput="updateStatValue('loyalty')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="social">
+                            Social Skills
+                        </label>
+
+                        <span id="socialValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="social"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('social')"></div><div class="stat-control"><div class="stat-header"><label for="temperament">Temperament</label><span id="temperamentValue">5</span></div><input
+                        oninput="updateStatValue('social')">
+
+                </div>
+
+
+                <div class="stat-control">
+
+                    <div class="stat-header">
+
+                        <label for="temperament">
+                            Temperament
+                        </label>
+
+                        <span id="temperamentValue">
+                            5
+                        </span>
+
+                    </div>
+
+                    <input
                         id="temperament"
                         type="range"
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('temperament')"></div></div></div><div class="button-row"><button
-                id="saveHouseguestButton"
+                        oninput="updateStatValue('temperament')">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
                 class="primary-button"
                 onclick="saveHouseguest()">
+
                 ADD HOUSEGUEST
-            </button><button
-                id="cancelEditButton"
+
+            </button>
+
+
+            <button
                 class="secondary-button hidden"
+                id="cancelEditButton"
                 onclick="cancelHouseguestEdit()">
+
                 CANCEL EDIT
-            </button></div></div><div class="panel"><div class="panel-title-row"><h2>Your Houseguests</h2><span
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panel-title-row">
+
+            <h2>
+                Your Houseguests
+            </h2>
+
+            <span
                 id="castCount"
                 class="count-badge">
+
                 0
-            </span></div><div
+
+            </span>
+
+        </div>
+
+
+        <div
             id="castGrid"
-            class="cast-grid"></div></div></section><section id="twists" class="page-section"><div class="section-heading"><h1>TWISTS</h1><p>
+            class="cast-grid">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TWISTS -->
+
+<section id="twists" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>TWISTS</h1>
+
+        <p>
             Built-in BB20 twists are shown automatically
             when the BB20 format is selected.
-        </p></div><div
+        </p>
+
+    </div>
+
+
+    <div
         id="bbTwistStatusPanel"
-        class="panel"><h2>Active Season Twists</h2></div><div class="panel"><h2>Create Custom Twist</h2><div class="form-grid"><div class="form-group"><label for="twistName">
+        class="panel">
+
+        <h2>
+            Active Season Twists
+        </h2>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Create Custom Twist
+        </h2>
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="twistName">
                     Twist Name
-                </label><input
+                </label>
+
+                <input
                     id="twistName"
                     type="text"
-                    placeholder="Twist name"></div><div class="form-group full-width"><label for="twistDescription">
+                    placeholder="Twist name">
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="twistDescription">
                     Description
-                </label><textarea
+                </label>
+
+                <textarea
                     id="twistDescription"
-                    placeholder="Describe the twist..."></textarea></div></div><button
+                    placeholder="Describe the twist...">
+                </textarea>
+
+            </div>
+
+        </div>
+
+
+        <button
             class="primary-button"
             onclick="createTwist()">
+
             ADD TWIST
-        </button></div><div
+
+        </button>
+
+    </div>
+
+
+    <div
         id="twistList"
-        class="twist-list"></div></section><section id="house" class="page-section"><div class="section-heading"><h1>HOUSE RELATIONSHIPS</h1><p>
+        class="twist-list">
+    </div>
+
+</section>
+
+
+<!-- HOUSE -->
+
+<section id="house" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>
+            HOUSE RELATIONSHIPS
+        </h1>
+
+        <p>
             Build the social structure of your season.
-        </p></div><div class="panel"><h2>Create Alliance</h2><div class="form-group"><label for="allianceName">
+        </p>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Create Alliance
+        </h2>
+
+
+        <div class="form-group">
+
+            <label for="allianceName">
                 Alliance Name
-            </label><input
+            </label>
+
+            <input
                 id="allianceName"
                 type="text"
-                placeholder="The Level 6"></div><div class="form-group"><label for="allianceMembers">
+                placeholder="The Level 6">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="allianceMembers">
                 Members
-            </label><select
+            </label>
+
+            <select
                 id="allianceMembers"
                 multiple
-                size="8"></select><div class="form-help">
+                size="8">
+            </select>
+
+            <div class="form-help">
                 Check the Houseguests below to add them to the alliance.
-            </div></div><div class="form-group"><label for="allianceStrength">
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="allianceStrength">
                 Alliance Strength
-            </label><select id="allianceStrength"><option value="casual">
+            </label>
+
+            <select id="allianceStrength">
+
+                <option value="casual">
                     Casual
-                </option><option value="weak">
+                </option>
+
+                <option value="weak">
                     Weak
-                </option><option
-                    value="moderate"
-                    selected>
+                </option>
+
+                <option value="moderate" selected>
                     Moderate
-                </option><option value="strong">
+                </option>
+
+                <option value="strong">
                     Strong
-                </option><option value="unbreakable">
+                </option>
+
+                <option value="unbreakable">
                     Unbreakable
-                </option></select></div><button
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
             class="primary-button"
             onclick="createAlliance()">
+
             CREATE ALLIANCE
-        </button></div><div
+
+        </button>
+
+    </div>
+
+
+    <div
         id="allianceList"
-        class="alliance-list"></div><div class="panel"><h2>Houseguest Relationships</h2><p class="form-help">
+        class="alliance-list">
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Houseguest Relationships
+        </h2>
+
+        <p class="form-help">
             Relationships are directional:
             A liking B does not automatically mean B likes A.
-        </p><div class="relationship-editor"><div class="relationship-person"><label for="relationshipFrom">
+        </p>
+
+
+        <div class="relationship-editor">
+
+            <div class="relationship-person">
+
+                <label for="relationshipFrom">
                     Houseguest
-                </label><select id="relationshipFrom"></select><div
+                </label>
+
+                <select id="relationshipFrom"></select>
+
+                <div
                     id="relationshipFromPreview"
-                    class="relationship-preview"></div></div><div class="relationship-arrow">
+                    class="relationship-preview">
+                </div>
+
+            </div>
+
+
+            <div class="relationship-arrow">
                 →
-            </div><div class="relationship-person"><label for="relationshipTo">
+            </div>
+
+
+            <div class="relationship-person">
+
+                <label for="relationshipTo">
                     Other Houseguest
-                </label><select id="relationshipTo"></select><div
+                </label>
+
+                <select id="relationshipTo"></select>
+
+                <div
                     id="relationshipToPreview"
-                    class="relationship-preview"></div></div></div><div class="form-group"><label for="relationshipType">
+                    class="relationship-preview">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="relationshipType">
                 Relationship
-            </label><select id="relationshipType"><option value="love">
+            </label>
+
+            <select id="relationshipType">
+
+                <option value="love">
                     ❤️ Love
-                </option><option value="like">
+                </option>
+
+                <option value="like">
                     😊 Like
-                </option><option
-                    value="neutral"
-                    selected>
+                </option>
+
+                <option value="neutral" selected>
                     😐 Neutral
-                </option><option value="dislike">
+                </option>
+
+                <option value="dislike">
                     😒 Dislike
-                </option><option value="hate">
+                </option>
+
+                <option value="hate">
                     😡 Hate
-                </option></select></div><div class="form-group"><label for="relationshipNote">
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="relationshipNote">
                 Optional Note
-            </label><input
+            </label>
+
+            <input
                 id="relationshipNote"
                 type="text"
-                placeholder="Best friends, former enemies, etc."></div><div class="button-row"><button
+                placeholder="Best friends, former enemies, etc.">
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
                 class="primary-button"
                 onclick="saveRelationship()">
+
                 SAVE RELATIONSHIP
-            </button><button
+
+            </button>
+
+
+            <button
                 class="secondary-button"
                 onclick="loadSelectedRelationship()">
+
                 LOAD EXISTING
-            </button><button
+
+            </button>
+
+
+            <button
                 class="danger-button"
                 onclick="deleteSelectedRelationship()">
+
                 REMOVE RELATIONSHIP
-            </button></div></div><div class="panel"><h2>Relationship Map</h2><div
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Relationship Map
+        </h2>
+
+        <div
             id="relationshipsList"
-            class="relationships-list"></div></div></section><section id="game" class="page-section"><div class="game-header"><div><div
+            class="relationships-list">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- GAME -->
+
+<section id="game" class="page-section">
+
+    <div class="game-header">
+
+        <div>
+
+            <div
                 id="weekBadge"
                 class="week-badge">
+
                 WEEK 1
-            </div><h1 id="weekTitle">
+
+            </div>
+
+
+            <h1 id="weekTitle">
                 Week 1
-            </h1><h2 id="stageTitle">
+            </h1>
+
+
+            <h2 id="stageTitle">
                 Ready
-            </h2></div></div><div class="stage-panel"><div
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="stage-panel">
+
+        <div
             id="stageIcon"
             class="stage-icon">
+
             ★
-        </div><div><h2 id="stageName">
+
+        </div>
+
+
+        <div>
+
+            <h2 id="stageName">
                 Ready
-            </h2><p id="stageDescription">
+            </h2>
+
+
+            <p id="stageDescription">
                 Start the season to begin.
-            </p></div></div><div class="status-grid"><div class="status-card"><h3>HOH</h3><div id="hohStatus">
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="status-grid">
+
+        <div class="status-card">
+
+            <h3>
+                HOH
+            </h3>
+
+            <div id="hohStatus">
                 None
-            </div></div><div class="status-card"><h3>NOMINEES</h3><div id="nomineesStatus">
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <h3>
+                NOMINEES
+            </h3>
+
+            <div id="nomineesStatus">
                 None
-            </div></div><div class="status-card"><h3>POWER OF VETO</h3><div id="povStatus">
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <h3>
+                POWER OF VETO
+            </h3>
+
+            <div id="povStatus">
                 None
-            </div></div><div class="status-card"><h3>FORMAT</h3><div id="formatStatus">
+            </div>
+
+        </div>
+
+
+        <div class="status-card">
+
+            <h3>
+                FORMAT
+            </h3>
+
+            <div id="formatStatus">
                 Normal Week
-            </div></div></div><div class="panel proceed-panel"><button
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel proceed-panel">
+
+        <button
             id="proceedButton"
             class="proceed-button"
             onclick="proceedGame()">
+
             PROCEED
-        </button><button
+
+        </button>
+
+
+        <button
             id="skipEndButton"
             class="secondary-button skip-end-button"
             onclick="skipToEnd()">
+
             SIMULATE TO END
-        </button></div><div class="panel"><h2>Houseguests</h2><div
+
+        </button>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Houseguests
+        </h2>
+
+        <div
             id="gameHouseguests"
-            class="game-houseguest-grid"></div></div><div class="panel"><h2>Event Log</h2><div
+            class="game-houseguest-grid">
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Event Log
+        </h2>
+
+        <div
             id="eventLog"
-            class="event-log"></div></div><div
+            class="event-log">
+        </div>
+
+    </div>
+
+
+    <div
         id="evictionResults"
-        class="panel hidden"></div></section><section id="memory" class="page-section"><div class="section-heading"><h1>MEMORY WALL</h1><p>
+        class="panel hidden">
+    </div>
+
+</section>
+
+
+<!-- MEMORY WALL -->
+
+<section id="memory" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>
+            MEMORY WALL
+        </h1>
+
+        <p>
             Active Houseguests remain in full color.
             Evicted Houseguests become dimmed and grayscale.
-        </p></div><div
+        </p>
+
+    </div>
+
+
+    <div
         id="memoryWall"
-        class="memory-wall"></div></section><section id="jury" class="page-section"><div class="section-heading"><h1>JURY</h1></div><div class="panel"><h2>Jury Members</h2><div
+        class="memory-wall">
+    </div>
+
+</section>
+
+
+<!-- JURY -->
+
+<section id="jury" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>
+            JURY
+        </h1>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Jury Members
+        </h2>
+
+        <div
             id="juryList"
-            class="jury-grid"></div></div><div class="panel"><h2>Evicted Houseguests</h2><div
+            class="jury-grid">
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>
+            Evicted Houseguests
+        </h2>
+
+        <div
             id="evictedPlayers"
-            class="jury-grid"></div></div></section><section id="finale" class="page-section"><div class="section-heading"><h1>FINALE</h1></div><div
+            class="jury-grid">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FINALE -->
+
+<section id="finale" class="page-section">
+
+    <div class="section-heading">
+
+        <h1>
+            FINALE
+        </h1>
+
+    </div>
+
+
+    <div
         id="finaleContent"
-        class="finale-content"></div></section></main><script src="seasons/bb20.js?v=20260907-1"></script><script src="script.js?v=20260907-1"></script></body></html>
+        class="finale-content">
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- LOAD SEASON DATA FIRST, THEN THE SIMULATOR ENGINE -->
+
+<script src="seasons/bb20.js?v=20260907-1"></script>
+<script src="script.js?v=20260907-1"></script>
+
+</body>
+</html>
