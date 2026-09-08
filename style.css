@@ -1415,3 +1415,309 @@ hr {
 .weekly-event-people{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px;padding-top:10px;border-top:1px solid #edf0f3}.weekly-person{width:86px;text-align:center}.weekly-person-photo{width:68px;height:68px;margin:0 auto 5px;border-radius:50%;object-fit:cover;display:block;border:2px solid #d7dce2;background:#eef1f4}.weekly-person-name{font-size:.72rem;font-weight:800;line-height:1.15}.weekly-person-status{font-size:.62rem;opacity:.55;margin-top:2px}
 .event-twist{border-left:5px solid #8b5cf6}.event-competition{border-left:5px solid #f59e0b}.event-nomination{border-left:5px solid #ef4444}.event-vote-result,.event-eviction{border-left:5px solid #6b7280}.event-finale{border-left:5px solid #10b981}
 @media(max-width:700px){.weekly-presentation-title{align-items:flex-start;flex-direction:column}.weekly-event-card{grid-template-columns:32px 1fr}.weekly-person{width:72px}.weekly-person-photo{width:56px;height:56px}}
+
+/* =========================================================
+   FINAL BRANTSTEELE-STYLE WEEKLY CHAIN OVERRIDE
+   ========================================================= */
+
+#eventLog.weekly-chain-container {
+    max-height: none;
+    overflow: visible;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: inherit;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: inherit;
+}
+
+#eventLog.weekly-chain-container > div {
+    border: 0;
+    padding: 0;
+}
+
+
+/* Main chain */
+
+.weekly-chain-sequence {
+    display: grid;
+    gap: 10px;
+}
+
+
+/* Individual chain item */
+
+.weekly-chain-step {
+    display: grid;
+
+    grid-template-columns: 42px minmax(0, 1fr);
+
+    gap: 12px;
+
+    padding: 14px;
+
+    border: 1px solid #d5dbe1;
+
+    border-radius: 10px;
+
+    background: #fff;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, .05);
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.weekly-chain-step:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, .08);
+}
+
+
+/* Marker */
+
+.weekly-chain-step-marker {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e5e7eb;
+
+    color: #4b5563;
+
+    font-weight: 900;
+
+    font-size: 14px;
+}
+
+
+/* Completed */
+
+.weekly-chain-step.complete {
+    border-left: 5px solid #64748b;
+}
+
+.weekly-chain-step.complete
+.weekly-chain-step-marker {
+    background: #334155;
+
+    color: #fff;
+}
+
+
+/* Current */
+
+.weekly-chain-step.current {
+    border: 2px solid #2563eb;
+
+    background: #eff6ff;
+
+    box-shadow:
+        0 3px 12px rgba(37, 99, 235, .12);
+}
+
+.weekly-chain-step.current
+.weekly-chain-step-marker {
+    background: #2563eb;
+
+    color: #fff;
+}
+
+
+/* Upcoming */
+
+.weekly-chain-step.upcoming {
+    opacity: .65;
+}
+
+
+/* Text */
+
+.weekly-chain-step-label {
+    font-size: 11px;
+
+    font-weight: 900;
+
+    letter-spacing: .08em;
+
+    text-transform: uppercase;
+
+    color: #64748b;
+}
+
+.weekly-chain-step-name {
+    margin-top: 2px;
+
+    font-size: 18px;
+
+    font-weight: 900;
+
+    color: #1f2937;
+}
+
+.weekly-chain-step-detail {
+    margin-top: 5px;
+
+    color: #4b5563;
+
+    line-height: 1.45;
+}
+
+
+/* Week header */
+
+.weekly-block-title {
+    margin-bottom: 12px;
+
+    padding: 11px 14px;
+
+    border-radius: 8px;
+
+    background: #1f2937;
+
+    color: #fff;
+
+    font-size: 13px;
+
+    font-weight: 900;
+
+    letter-spacing: .08em;
+}
+
+
+/* Player pictures in the chain */
+
+.weekly-event-people {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 12px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.weekly-person {
+    width: 82px;
+
+    text-align: center;
+}
+
+.weekly-person-photo {
+    width: 62px;
+    height: 62px;
+
+    margin: 0 auto 5px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 2px solid #d1d5db;
+
+    background: #f1f5f9;
+}
+
+.weekly-person-name {
+    font-size: 11px;
+
+    font-weight: 800;
+
+    line-height: 1.15;
+}
+
+.weekly-person-status {
+    margin-top: 2px;
+
+    font-size: 9px;
+
+    color: #6b7280;
+}
+
+
+/* Event categories */
+
+.weekly-chain-step:has(.weekly-chain-step-label) {
+    min-width: 0;
+}
+
+
+/* Make competition names especially obvious */
+
+.weekly-chain-step-name {
+    word-break: normal;
+}
+
+
+/* Current competition panel */
+
+.current-competition {
+    border-left: 5px solid #2563eb;
+}
+
+
+/* Active twists */
+
+.active-week-twists {
+    border: 1px solid #d7dee7;
+
+    background: #f8fafc;
+
+    color: #334155;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .weekly-chain-step {
+        grid-template-columns: 34px minmax(0, 1fr);
+
+        gap: 9px;
+
+        padding: 11px;
+    }
+
+    .weekly-chain-step-marker {
+        width: 27px;
+        height: 27px;
+
+        font-size: 12px;
+    }
+
+    .weekly-chain-step-name {
+        font-size: 16px;
+    }
+
+    .weekly-person {
+        width: 68px;
+    }
+
+    .weekly-person-photo {
+        width: 52px;
+        height: 52px;
+    }
+}
