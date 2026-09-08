@@ -1,1846 +1,568 @@
-/* =========================================================
-   BIG BROTHER SIMULATOR
-   BRANTSTEELE-INSPIRED RESPONSIVE STYLESHEET
-========================================================= */
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#0b0b10;
+    color:#f4f4f6
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
 
-
-/* =========================================================
-   RESET
-========================================================= */
-
-* {
-    box-sizing: border-box;
+.site-header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:#111117;
+    border-bottom:1px solid #292932;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 18px
 }
 
-
-html {
-    min-width: 0;
+.brand{
+    font-weight:900;
+    letter-spacing:.08em
 }
 
-
-body {
-    margin: 0;
-    padding: 0;
-
-    min-width: 0;
-
-    background: #d9dde2;
-
-    color: #252a30;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.45;
+.nav{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap
 }
 
-
-button,
-input,
-select,
-textarea {
-    font:
-        inherit;
+.nav button{
+    background:transparent;
+    color:#ddd;
+    border:0;
+    padding:9px 10px;
+    font-weight:800;
+    font-size:11px
 }
 
-
-button {
-    cursor: pointer;
+.nav button:hover,
+.nav button.active{
+    background:#24242d;
+    border-radius:7px;
+    color:#fff
 }
 
-
-img {
-    max-width: 100%;
+.page-section{
+    display:none;
+    max-width:1200px;
+    margin:auto;
+    padding:28px 18px 60px
 }
 
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-header,
-.site-header,
-#header {
-
-    background:
-        linear-gradient(
-            #3d4650,
-            #252c34
-        );
-
-    border-bottom:
-        3px solid #171c21;
-
-    color: white;
-
-    width: 100%;
+.page-section.active{
+    display:block
 }
 
-
-.header-inner {
-
-    width:
-        min(
-            1180px,
-            calc(100% - 24px)
-        );
-
-    margin:
-        0 auto;
-
-    padding:
-        20px 0 0;
-
+.section-heading{
+    margin-bottom:18px
 }
 
-
-.logo,
-.site-logo,
-.brand {
-
-    margin:
-        0 0 16px;
-
+.section-heading h1{
+    margin:0 0 5px;
+    font-size:30px
 }
 
-
-.logo h1,
-.site-logo h1,
-.brand h1 {
-
-    margin: 0;
-
-    color: #ffffff;
-
-    font-size:
-        clamp(
-            28px,
-            4vw,
-            42px
-        );
-
-    font-weight: 900;
-
-    letter-spacing: 3px;
-
-    line-height: 1;
-
-    text-shadow:
-        2px 2px 0 #111;
-
+.section-heading p{
+    margin:0;
+    opacity:.65
 }
 
-
-.logo span,
-.site-logo span,
-.brand span {
-
-    display: block;
-
-    margin-top: 7px;
-
-    color: #d5d9dd;
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    letter-spacing: 6px;
-
+.hero{
+    padding:38px 28px;
+    border:1px solid #292932;
+    border-radius:16px;
+    background:linear-gradient(135deg,#191921,#0f0f14);
+    margin-bottom:18px
 }
 
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-nav,
-.navigation,
-.main-nav {
-
-    width:
-        min(
-            1180px,
-            calc(100% - 24px)
-        );
-
-    margin:
-        0 auto;
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    align-items: flex-end;
-
-    gap: 4px;
-
+.hero h1{
+    font-size:42px;
+    margin:0 0 8px
 }
 
-
-nav button,
-.navigation button,
-.main-nav button,
-.nav-button {
-
-    appearance: none;
-
-    border:
-        1px solid #1c2228;
-
-    border-bottom: none;
-
-    border-radius:
-        4px 4px 0 0;
-
-    background:
-        linear-gradient(
-            #56616d,
-            #353e48
-        );
-
-    color: #f5f5f5;
-
-    min-height: 48px;
-
-    padding:
-        0 18px;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-    letter-spacing: .5px;
-
-    text-transform: uppercase;
-
-    white-space: nowrap;
-
-    transition:
-        background .15s ease,
-        color .15s ease;
-
+.hero p{
+    opacity:.7
 }
 
-
-nav button:hover,
-.navigation button:hover,
-.main-nav button:hover,
-.nav-button:hover {
-
-    background:
-        linear-gradient(
-            #697581,
-            #444f5b
-        );
-
+.panel{
+    background:#121218;
+    border:1px solid #292932;
+    border-radius:13px;
+    padding:18px;
+    margin:16px 0
 }
 
-
-nav button.active,
-.navigation button.active,
-.main-nav button.active,
-.nav-button.active {
-
-    background:
-        #eef0f2;
-
-    color: #252a30;
-
-    position: relative;
-
+.form-group{
+    margin:14px 0
 }
 
-
-
-/* =========================================================
-   MAIN PAGE
-========================================================= */
-
-main,
-.main-content,
-#app {
-
-    width:
-        min(
-            1180px,
-            calc(100% - 24px)
-        );
-
-    margin:
-        22px auto 40px;
-
+.form-group label{
+    display:block;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:7px;
+    opacity:.75
 }
-
-
-/*
-   The simulator pages.
-*/
-
-section,
-.page,
-.page-section,
-.simulator-section {
-
-    display: none;
-
-}
-
-
-section.active,
-.page.active,
-.page-section.active,
-.simulator-section.active {
-
-    display: block;
-
-}
-
-
-
-/* =========================================================
-   GENERAL PANELS
-========================================================= */
-
-.panel,
-.card,
-.content-panel,
-.simulator-panel {
-
-    background: #f7f7f7;
-
-    border:
-        1px solid #aeb6be;
-
-    border-radius: 4px;
-
-    box-shadow:
-        0 1px 3px
-        rgba(0, 0, 0, .18);
-
-    margin-bottom: 16px;
-
-    padding: 18px;
-
-}
-
-
-.panel h1,
-.panel h2,
-.panel h3,
-.card h1,
-.card h2,
-.card h3 {
-
-    margin-top: 0;
-
-}
-
-
-.panel h1,
-.card h1 {
-
-    font-size: 30px;
-
-    letter-spacing: 1px;
-
-}
-
-
-.panel h2,
-.card h2 {
-
-    padding-bottom: 8px;
-
-    border-bottom:
-        1px solid #c8cdd2;
-
-    font-size: 24px;
-
-}
-
-
-.panel h3,
-.card h3 {
-
-    font-size: 17px;
-
-}
-
-
-
-/* =========================================================
-   HOME HERO
-========================================================= */
-
-.hero,
-.home-hero,
-.welcome-panel {
-
-    background:
-        linear-gradient(
-            #ffffff,
-            #e8ebee
-        );
-
-    padding:
-        28px 34px;
-
-}
-
-
-.hero h1,
-.home-hero h1,
-.welcome-panel h1 {
-
-    margin-bottom: 18px;
-
-    font-size:
-        clamp(
-            28px,
-            4vw,
-            38px
-        );
-
-    letter-spacing: 2px;
-
-}
-
-
-.hero h2,
-.home-hero h2,
-.welcome-panel h2 {
-
-    border: none;
-
-    padding: 0;
-
-    font-size: 20px;
-
-}
-
-
-.hero p,
-.home-hero p,
-.welcome-panel p {
-
-    max-width: 850px;
-
-    margin-bottom: 0;
-
-}
-
-
-
-/* =========================================================
-   SEASON FORMAT
-========================================================= */
-
-.season-format,
-#seasonFormat {
-
-    background: #f7f7f7;
-
-}
-
-
-.season-info {
-
-    margin-top: 16px;
-
-    padding: 14px;
-
-    border-top:
-        1px solid #c9cdd1;
-
-}
-
-
-.season-info h3 {
-
-    margin:
-        0 0 10px;
-
-}
-
-
-.season-stats {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 6px;
-
-    margin: 14px 0;
-
-    font-weight: bold;
-
-}
-
-
-.season-stat {
-
-    padding: 4px 8px;
-
-    background: #e3e6e9;
-
-    border:
-        1px solid #b8bec4;
-
-    border-radius: 3px;
-
-}
-
-
-
-/* =========================================================
-   FORM CONTROLS
-========================================================= */
-
-label {
-
-    display: block;
-
-    margin-bottom: 5px;
-
-    font-weight: 700;
-
-}
-
 
 input,
-select,
-textarea {
-
-    width: 100%;
-
-    border:
-        1px solid #aeb6be;
-
-    border-radius: 3px;
-
-    background: #ffffff;
-
-    color: #252a30;
-
-    padding: 9px 10px;
-
-    min-height: 38px;
-
-    outline: none;
-
+select{
+    width:100%;
+    background:#0d0d12;
+    color:#fff;
+    border:1px solid #363640;
+    border-radius:7px;
+    padding:10px
 }
 
-
-input:focus,
-select:focus,
-textarea:focus {
-
-    border-color: #586b7e;
-
-    box-shadow:
-        0 0 0 2px
-        rgba(
-            88,
-            107,
-            126,
-            .18
-        );
-
+select[multiple]{
+    min-height:150px
 }
 
-
-textarea {
-
-    min-height: 100px;
-
-    resize: vertical;
-
+.button-row{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap
 }
 
-
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-
-button,
 .primary-button,
-.action-button {
-
-    border:
-        1px solid #242b32;
-
-    border-radius: 3px;
-
-    background:
-        linear-gradient(
-            #58636f,
-            #39424c
-        );
-
-    color: #ffffff;
-
-    padding:
-        9px 16px;
-
-    min-height: 38px;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
-
-    letter-spacing: .3px;
-
-    box-shadow:
-        inset 0 1px 0
-        rgba(255,255,255,.16);
-
-}
-
-
-button:hover,
-.primary-button:hover,
-.action-button:hover {
-
-    background:
-        linear-gradient(
-            #697582,
-            #46515d
-        );
-
-}
-
-
-button:active {
-
-    transform:
-        translateY(1px);
-
-}
-
-
+.secondary-button,
 .danger-button,
-.delete-button {
-
-    background:
-        linear-gradient(
-            #a94c4c,
-            #7f3030
-        );
-
-    border-color:
-        #682626;
-
+.proceed-button{
+    border:0;
+    border-radius:8px;
+    padding:11px 15px;
+    font-weight:900
 }
 
-
-.danger-button:hover,
-.delete-button:hover {
-
-    background:
-        linear-gradient(
-            #bd5c5c,
-            #913939
-        );
-
+.primary-button{
+    background:#eee;
+    color:#111
 }
 
-
-
-/* =========================================================
-   SEASON CONTROL BUTTONS
-========================================================= */
-
-.season-controls,
-.controls,
-.button-row {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
+.secondary-button{
+    background:#2a2a34;
+    color:#fff
 }
 
-
-
-/* =========================================================
-   SUMMARY
-========================================================= */
-
-#seasonSummary,
-.season-summary {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0, 1fr)
-        );
-
-    gap: 8px;
-
+.danger-button{
+    background:#6c2525;
+    color:#fff
 }
 
-
-.summary-card {
-
-    background:
-        linear-gradient(
-            #fdfdfd,
-            #e7e9eb
-        );
-
-    border:
-        1px solid #b8bec4;
-
-    border-radius: 3px;
-
-    text-align: center;
-
-    padding: 12px 8px;
-
+.proceed-button{
+    background:#e8e8e8;
+    color:#111;
+    min-width:180px
 }
 
-
-.summary-card span {
-
-    display: block;
-
-    color: #60676e;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    letter-spacing: .7px;
-
+.proceed-panel{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap
 }
 
-
-.summary-card strong {
-
-    display: block;
-
-    margin-top: 3px;
-
-    font-size: 25px;
-
+.hidden{
+    display:none!important
 }
 
-
-
-/* =========================================================
-   COMPETITION SCHEDULE
-========================================================= */
-
-.competition-schedule-table {
-
-    width: 100%;
-
-    border:
-        1px solid #aeb6be;
-
-    overflow: hidden;
-
-}
-
-
-.schedule-header-row {
-
-    display: grid;
-
-    grid-template-columns:
-        90px
-        minmax(180px, 1fr)
-        minmax(180px, 1fr)
-        minmax(130px, .7fr);
-
-    background:
-        linear-gradient(
-            #56616d,
-            #3a434d
-        );
-
-    color: white;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
-
-}
-
-
-.schedule-header-row > div {
-
-    padding: 10px;
-
-    border-right:
-        1px solid #2b333b;
-
-}
-
-
-.schedule-week-row {
-
-    display: grid;
-
-    grid-template-columns:
-        90px
-        minmax(180px, 1fr)
-        minmax(180px, 1fr)
-        minmax(130px, .7fr);
-
-    background: #ffffff;
-
-    border-top:
-        1px solid #cbd0d5;
-
-}
-
-
-.schedule-week-row:nth-child(odd) {
-
-    background: #f0f2f4;
-
-}
-
-
-.schedule-week-row > div {
-
-    padding: 9px 10px;
-
-    border-right:
-        1px solid #d2d6da;
-
-}
-
-
-.schedule-week-number {
-
-    font-weight: 800;
-
-}
-
-
-.mobile-label {
-
-    display: none;
-
-}
-
-
-
-/* =========================================================
-   HOUSEGUEST CAST
-========================================================= */
-
-.houseguest-grid,
+.season-grid,
 .cast-grid,
-#houseguestList {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(170px, 1fr)
-        );
-
-    gap: 10px;
-
-}
-
-
-.houseguest-card,
-.cast-card {
-
-    background: #ffffff;
-
-    border:
-        1px solid #adb5bd;
-
-    border-radius: 3px;
-
-    overflow: hidden;
-
-    text-align: center;
-
-}
-
-
-.houseguest-card img,
-.cast-card img {
-
-    display: block;
-
-    width: 100%;
-
-    height: 190px;
-
-    object-fit: cover;
-
-    background: #d8dde1;
-
-}
-
-
-.houseguest-card h3,
-.cast-card h3 {
-
-    margin: 0;
-
-    padding: 8px;
-
-    font-size: 16px;
-
-}
-
-
-.houseguest-card p,
-.cast-card p {
-
-    margin: 0;
-
-    padding:
-        0 8px 8px;
-
-    color: #5e666e;
-
-    font-size: 13px;
-
-}
-
-
-
-/* =========================================================
-   GAME PAGE
-========================================================= */
-
-#game,
-.game-page {
-
-    max-width: 100%;
-
-}
-
-
-.game-status,
-#gameStatus {
-
-    background:
-        linear-gradient(
-            #ffffff,
-            #edf0f2
-        );
-
-    border:
-        1px solid #adb5bd;
-
-    border-radius: 4px;
-
-    margin-bottom: 12px;
-
-    padding: 14px;
-
-}
-
-
-.week-chain,
-#weekChain {
-
-    background: #ffffff;
-
-    border:
-        1px solid #aeb6be;
-
-    border-radius: 3px;
-
-    padding: 0;
-
-    overflow: hidden;
-
-}
-
-
-.game-stage,
-.stage-card,
-.week-event {
-
-    padding: 14px;
-
-    border-bottom:
-        1px solid #d0d4d8;
-
-}
-
-
-.game-stage:last-child,
-.stage-card:last-child,
-.week-event:last-child {
-
-    border-bottom: none;
-
-}
-
-
-.game-stage h3,
-.stage-card h3,
-.week-event h3 {
-
-    margin: 0 0 8px;
-
-    color: #303940;
-
-    font-size: 17px;
-
-}
-
-
-.game-stage-title {
-
-    background:
-        #3e4852;
-
-    color: white;
-
-    font-weight: 800;
-
-    padding: 9px 12px;
-
-    text-transform: uppercase;
-
-}
-
-
-
-/* =========================================================
-   MEMORY WALL
-========================================================= */
-
+.game-houseguest-grid,
 .memory-wall,
-#memoryWall {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(130px, 1fr)
-        );
-
-    gap: 10px;
-
+.jury-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:14px
 }
 
-
-.memory-wall-card {
-
-    background: #171b20;
-
-    border:
-        2px solid #39434d;
-
-    color: white;
-
-    text-align: center;
-
-    overflow: hidden;
-
+.cast-card,
+.game-player-card,
+.memory-card,
+.jury-card{
+    background:#17171e;
+    border:1px solid #30303a;
+    border-radius:11px;
+    overflow:hidden
 }
 
-
-.memory-wall-photo {
-
-    aspect-ratio: 3 / 4;
-
-    overflow: hidden;
-
+.cast-card img,
+.game-player-card img,
+.memory-card img,
+.jury-card img{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+    background:#222
 }
 
-
-.memory-wall-card img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-
+.cast-card-info,
+.game-player-info,
+.memory-card-info,
+.jury-card-info{
+    padding:10px
 }
 
-
-.memory-wall-name {
-
-    padding: 7px 5px 3px;
-
-    font-weight: 800;
-
-    font-size: 14px;
-
+.cast-card-name,
+.game-player-name,
+.memory-name,
+.jury-name{
+    font-weight:900
 }
 
-
-.memory-wall-status {
-
-    padding:
-        0 5px 7px;
-
-    color: #aeb8c1;
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    text-transform: uppercase;
-
+.game-player-full-name{
+    font-size:10px;
+    opacity:.55;
+    margin-top:3px
 }
 
-
-.memory-wall-card.evicted {
-
-    opacity: .45;
-
-    filter: grayscale(1);
-
+.role-badge{
+    display:inline-block;
+    font-size:9px;
+    font-weight:900;
+    padding:4px 6px;
+    border-radius:5px;
+    background:#292933;
+    margin:6px 4px 0 0
 }
 
-
-.memory-wall-card.winner {
-
-    border-color: #c59d38;
-
+.status-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px
 }
 
+.status-card{
+    background:#14141b;
+    border:1px solid #292932;
+    border-radius:10px;
+    padding:13px
+}
+
+.status-card h3{
+    font-size:10px;
+    letter-spacing:.1em;
+    opacity:.6;
+    margin:0 0 6px
+}
+
+.stage-panel{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    background:#17171f;
+    border:1px solid #30303a;
+    border-radius:12px;
+    padding:15px
+}
+
+.stage-icon{
+    font-size:30px
+}
+
+.event-log{
+    max-height:360px;
+    overflow:auto;
+    font-family:monospace;
+    font-size:12px;
+    line-height:1.6
+}
+
+.memory-card.evicted-memory-card{
+    filter:grayscale(1);
+    opacity:.45
+}
+
+.memory-card .memory-role{
+    font-size:10px;
+    opacity:.6;
+    text-transform:uppercase
+}
+
+.alliance-card,
+.relationship-card{
+    background:#17171e;
+    border:1px solid #30303a;
+    border-radius:10px;
+    padding:12px;
+    margin:10px 0
+}
+
+.finale-content{
+    min-height:200px
+}
+
+.bb-alliance-checklist{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:7px;
+    margin-top:8px
+}
+
+.bb-alliance-check{
+    display:flex;
+    gap:7px;
+    align-items:center;
+    background:#17171e;
+    border:1px solid #30303a;
+    padding:8px;
+    border-radius:7px
+}
+
+.bb-alliance-check input{
+    width:auto
+}
+
+.bb-active-twist-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px
+}
+
+.bb-active-twist{
+    padding:12px;
+    border-radius:9px;
+    background:#17171e;
+    border:1px solid #30303a;
+    display:flex;
+    flex-direction:column;
+    gap:5px
+}
+
+.bb-active-twist.active{
+    border-color:#b9a24e
+}
+
+.bb-active-twist span{
+    font-size:10px;
+    opacity:.6
+}
+
+.relationship-preview{
+    margin-top:7px
+}
+
+.bb-permanent-memory-wall{
+    position:sticky;
+    top:55px;
+    z-index:900;
+    background:rgba(10,10,14,.97);
+    border-bottom:1px solid rgba(255,255,255,.14);
+    padding:8px 12px
+}
+
+.bb-memory-title{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    margin-bottom:6px
+}
+
+.bb-memory-track{
+    display:flex;
+    gap:8px;
+    overflow-x:auto
+}
+
+.bb-memory-mini{
+    flex:0 0 70px;
+    text-align:center
+}
+
+.bb-memory-mini img,
+.bb-memory-mini .bb-memory-placeholder{
+    width:56px;
+    height:56px;
+    object-fit:cover;
+    border-radius:6px;
+    margin:auto;
+    display:block;
+    background:#222;
+    border:2px solid #444
+}
+
+.bb-memory-mini.evicted img,
+.bb-memory-mini.evicted .bb-memory-placeholder{
+    filter:grayscale(1) brightness(.45)
+}
+
+.bb-memory-mini-name{
+    font-size:10px;
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis
+}
+
+.bb-memory-mini-status{
+    font-size:8px;
+    text-transform:uppercase;
+    opacity:.55
+}
+
+@media(max-width:800px){
+    .status-grid{
+        grid-template-columns:repeat(2,1fr)
+    }
+
+    .hero h1{
+        font-size:32px
+    }
+}
+
+@media(max-width:500px){
+    .page-section{
+        padding:20px 12px 40px
+    }
+
+    .status-grid{
+        grid-template-columns:1fr
+    }
+
+    .nav button{
+        padding:7px 6px;
+        font-size:9px
+    }
+}
 
 
 /* =========================================================
-   JURY
-========================================================= */
+   CEREMONY / PORTRAIT PRESENTATION
+   ========================================================= */
 
-#juryList,
-.jury-list {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(180px, 1fr)
-        );
-
-    gap: 10px;
-
+.ceremony-display{
+    margin:18px 0;
+    padding:20px;
+    background:#101017;
+    border:1px solid #30303a;
+    border-radius:14px
 }
 
-
-.jury-card {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    background: #ffffff;
-
-    border:
-        1px solid #adb5bd;
-
-    padding: 8px;
-
+.ceremony-heading{
+    text-align:center;
+    margin-bottom:18px
 }
 
-
-.jury-photo {
-
-    width: 55px;
-
-    height: 70px;
-
-    object-fit: cover;
-
+.ceremony-heading > span{
+    display:block;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.15em;
+    opacity:.55;
+    text-transform:uppercase
 }
 
-
-.jury-order {
-
-    font-weight: 900;
-
-    color: #65717c;
-
+.ceremony-heading h2{
+    margin:7px 0 5px;
+    font-size:25px
 }
 
-
-
-/* =========================================================
-   ALLIANCES / RELATIONSHIPS
-========================================================= */
-
-.relationship-card {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        minmax(120px, 180px)
-        1fr
-        auto;
-
-    align-items: center;
-
-    gap: 10px;
-
-    background: #ffffff;
-
-    border:
-        1px solid #b6bdc4;
-
-    padding: 10px;
-
-    margin-bottom: 8px;
-
+.ceremony-heading p{
+    margin:0;
+    color:#aaa;
+    font-size:13px
 }
 
-
-.relationship-person {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
+.ceremony-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(125px,1fr));
+    gap:12px
 }
 
-
-.relationship-avatar {
-
-    width: 45px;
-
-    height: 45px;
-
-    object-fit: cover;
-
-    border-radius: 50%;
-
+.ceremony-feature-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap
 }
 
-
-.relationship-middle {
-
-    text-align: center;
-
+.ceremony-arrow{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.1em;
+    opacity:.6;
+    padding:8px 10px;
+    border:1px solid #393943;
+    border-radius:6px
 }
 
-
-.relationship-type {
-
-    font-weight: 800;
-
+.ceremony-card{
+    position:relative;
+    background:#181820;
+    border:1px solid #34343e;
+    border-radius:10px;
+    overflow:hidden;
+    text-align:center
 }
 
-
-.relationship-value {
-
-    font-size: 12px;
-
-    color: #68727b;
-
+.ceremony-card.winner-card{
+    border-color:#ddd;
+    box-shadow:0 0 0 2px rgba(255,255,255,.08)
 }
 
-
-
-/* =========================================================
-   EVENT LOG
-========================================================= */
-
-.event-log-entry {
-
-    display: grid;
-
-    grid-template-columns:
-        45px
-        1fr;
-
-    border-bottom:
-        1px solid #d1d5d8;
-
-    background: #ffffff;
-
+.ceremony-card.nominee-card{
+    border-color:#753b3b
 }
 
-
-.event-log-entry:nth-child(even) {
-
-    background: #f0f2f4;
-
+.ceremony-photo{
+    width:100%;
+    height:155px;
+    display:block;
+    object-fit:cover;
+    background:#25252d
 }
 
-
-.event-log-number {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background: #dfe3e6;
-
-    font-weight: 800;
-
+.ceremony-card .player-placeholder{
+    width:100%;
+    height:155px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#24242d;
+    color:#ddd;
+    font-size:38px;
+    font-weight:900
 }
 
-
-.event-log-text {
-
-    padding: 10px;
-
+.ceremony-name{
+    padding:9px 7px 2px;
+    font-weight:900;
+    font-size:13px
 }
 
-
-
-/* =========================================================
-   EMPTY STATES
-========================================================= */
-
-.empty-state,
-.schedule-empty {
-
-    padding: 25px;
-
-    background: #f4f5f6;
-
-    border:
-        1px dashed #aeb6be;
-
-    color: #69727a;
-
-    text-align: center;
-
+.ceremony-role{
+    padding:3px 7px 10px;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.08em;
+    opacity:.58;
+    text-transform:uppercase
 }
 
-
-
-/* =========================================================
-   TABLE WRAPPERS
-========================================================= */
-
-.table-wrapper {
-
-    width: 100%;
-
-    overflow-x: auto;
-
+.ceremony-hoh{
+    border-color:#77775d
 }
 
-
-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-}
-
-
-th {
-
-    background: #48535e;
-
-    color: white;
-
-    padding: 9px;
-
-    text-align: left;
-
-    font-size: 12px;
-
-    text-transform: uppercase;
-
-}
-
-
-td {
-
-    padding: 9px;
-
-    border:
-        1px solid #c9ced3;
-
-}
-
-
-tr:nth-child(even) {
-
-    background: #f0f2f4;
-
-}
-
-
-
-/* =========================================================
-   RESPONSIVE TABLET
-========================================================= */
-
-@media (
-    max-width: 900px
-) {
-
-    #seasonSummary,
-    .season-summary {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
+@media(max-width:600px){
+    .ceremony-display{
+        padding:12px
     }
 
-
-    .relationship-card {
-
-        grid-template-columns:
-            1fr 1fr;
-
+    .ceremony-photo,
+    .ceremony-card .player-placeholder{
+        height:125px
     }
 
-
-    .relationship-middle {
-
-        grid-column:
-            1 / -1;
-
-        grid-row: 2;
-
+    .ceremony-grid{
+        grid-template-columns:repeat(2,1fr)
     }
-
-
-    .relationship-card button {
-
-        grid-column:
-            1 / -1;
-
-    }
-
-
-    .schedule-header-row,
-    .schedule-week-row {
-
-        grid-template-columns:
-            75px
-            1fr
-            1fr;
-
-    }
-
-
-    .schedule-header-row > div:last-child,
-    .schedule-week-row > div:last-child {
-
-        display: none;
-
-    }
-
-}
-
-
-
-/* =========================================================
-   RESPONSIVE PHONE
-========================================================= */
-
-@media (
-    max-width: 650px
-) {
-
-    body {
-
-        font-size: 14px;
-
-    }
-
-
-    .header-inner {
-
-        padding-top: 16px;
-
-    }
-
-
-    .logo h1,
-    .site-logo h1,
-    .brand h1 {
-
-        font-size: 28px;
-
-        letter-spacing: 2px;
-
-    }
-
-
-    .logo span,
-    .site-logo span,
-    .brand span {
-
-        font-size: 11px;
-
-        letter-spacing: 4px;
-
-    }
-
-
-    nav,
-    .navigation,
-    .main-nav {
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 3px;
-
-        padding-bottom: 5px;
-
-    }
-
-
-    nav button,
-    .navigation button,
-    .main-nav button,
-    .nav-button {
-
-        width: 100%;
-
-        min-height: 42px;
-
-        padding: 7px 5px;
-
-        border:
-            1px solid #20272e;
-
-        border-radius: 3px;
-
-        font-size: 11px;
-
-        white-space: normal;
-
-    }
-
-
-    main,
-    .main-content,
-    #app {
-
-        width:
-            calc(100% - 16px);
-
-        margin-top: 10px;
-
-    }
-
-
-    .panel,
-    .card,
-    .content-panel,
-    .simulator-panel {
-
-        padding: 12px;
-
-        margin-bottom: 10px;
-
-    }
-
-
-    .hero,
-    .home-hero,
-    .welcome-panel {
-
-        padding: 20px 16px;
-
-    }
-
-
-    .hero h1,
-    .home-hero h1,
-    .welcome-panel h1 {
-
-        font-size: 25px;
-
-    }
-
-
-    .panel h2,
-    .card h2 {
-
-        font-size: 20px;
-
-    }
-
-
-    #seasonSummary,
-    .season-summary {
-
-        grid-template-columns:
-            1fr 1fr;
-
-        gap: 5px;
-
-    }
-
-
-    .summary-card strong {
-
-        font-size: 20px;
-
-    }
-
-
-    .season-controls,
-    .controls,
-    .button-row {
-
-        display: grid;
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-
-    .season-controls button,
-    .controls button,
-    .button-row button {
-
-        width: 100%;
-
-    }
-
-
-    /*
-       Turn competition schedule into
-       stacked BrantSteele-style week entries.
-    */
-
-    .competition-schedule-table {
-
-        border: none;
-
-    }
-
-
-    .schedule-header-row {
-
-        display: none;
-
-    }
-
-
-    .schedule-week-row {
-
-        display: block;
-
-        margin-bottom: 8px;
-
-        border:
-            1px solid #b7bec5;
-
-        background: #ffffff;
-
-    }
-
-
-    .schedule-week-row > div {
-
-        display: flex !important;
-
-        justify-content: space-between;
-
-        gap: 15px;
-
-        border-right: none;
-
-        border-bottom:
-            1px solid #d8dde1;
-
-    }
-
-
-    .schedule-week-row > div:last-child {
-
-        border-bottom: none;
-
-    }
-
-
-    .schedule-week-number {
-
-        display: block !important;
-
-        background: #47525d;
-
-        color: white;
-
-        font-size: 15px;
-
-    }
-
-
-    .mobile-label {
-
-        display: inline;
-
-        min-width: 50px;
-
-        font-weight: 800;
-
-        color: #606971;
-
-    }
-
-
-    .houseguest-grid,
-    .cast-grid,
-    #houseguestList {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 7px;
-
-    }
-
-
-    .houseguest-card img,
-    .cast-card img {
-
-        height: 170px;
-
-    }
-
-
-    .memory-wall,
-    #memoryWall {
-
-        grid-template-columns:
-            repeat(3, 1fr);
-
-        gap: 5px;
-
-    }
-
-
-    .memory-wall-name {
-
-        font-size: 11px;
-
-    }
-
-
-    .memory-wall-status {
-
-        font-size: 9px;
-
-    }
-
-
-    #juryList,
-    .jury-list {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .relationship-card {
-
-        display: block;
-
-    }
-
-
-    .relationship-person {
-
-        margin-bottom: 8px;
-
-    }
-
-
-    .relationship-middle {
-
-        margin:
-            8px 0;
-
-    }
-
-
-    .relationship-card button {
-
-        width: 100%;
-
-    }
-
-}
-
-
-
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
-
-@media (
-    max-width: 380px
-) {
-
-    nav,
-    .navigation,
-    .main-nav {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .houseguest-grid,
-    .cast-grid,
-    #houseguestList {
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-
-    .memory-wall,
-    #memoryWall {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-    }
-
-
-    .season-controls,
-    .controls,
-    .button-row {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
 }
