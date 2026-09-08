@@ -9,6 +9,32 @@ const BB20 = {
     juryStartAfterEvictions: 5,
     juryBattleBackAfterJurors: 4,
     competitionCategories: { hoh: "overall", pov: "overall" },
+    safetyCompetitions: [
+        {
+            id: "trashFolder",
+            name: "Trash Folder",
+            category: "mental",
+            competitors: 8,
+            type: "immunityPunishment",
+            description: "Houseguests hunt for folders. There is one fewer folder than competitors; the Houseguest without a folder receives a punishment. One special folder grants its finder automatic advancement to Surfing the BB Web, while every other folder avoids the punishment."
+        },
+        {
+            id: "cyberSecurity",
+            name: "Cyber Security",
+            category: "physical",
+            competitors: 8,
+            type: "immunityPunishment",
+            description: "Houseguests are harnessed above a sea of letters and blocks. Competitors gather blocks and spell HOUSEGUEST vertically in a standing position. The winner advances to Surfing the BB Web."
+        },
+        {
+            id: "surfingTheBBWeb",
+            name: "Surfing the BB Web",
+            category: "physical",
+            competitors: 2,
+            type: "immunity",
+            description: "Only the winners of Trash Folder and Cyber Security compete. The winner reprograms Week 1 by choosing 8 Houseguests, including themselves, to be safe from the first eviction. Those 8 do not compete in the Week 1 HOH; the other 8 are the only HOH competitors."
+        }
+    ],
     competitions: {
         1: { hoh: { name: "Microchip Mayhem", category: "general", description: "A technology-themed HOH competition testing broad competition ability." }, pov: { name: "Going Viral", category: "general", description: "A BB20 technology-themed Power of Veto competition." } },
         2: { hoh: { name: "Level 6", category: "mental", description: "A job-search themed HOH competition emphasizing mental skill." }, pov: { name: "Pop Goes the Power", category: "mental", description: "A web-themed Power of Veto competition emphasizing memory and mental ability." } },
