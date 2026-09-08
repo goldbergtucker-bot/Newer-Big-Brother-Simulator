@@ -408,11 +408,11 @@ function updateSelectedSeasonInfo() {
                 }
 
                 if (data.hoh) {
-                    text += `HOH â ${escapeHTML(data.hoh)}`;
+                    text += `HOH — ${escapeHTML(data.hoh)}`;
                 }
 
                 if (data.pov) {
-                    text += ` | POV â ${escapeHTML(data.pov)}`;
+                    text += ` | POV — ${escapeHTML(data.pov)}`;
                 }
 
                 return `<div>${text}</div>`;
@@ -855,7 +855,7 @@ function renderCast() {
                                 ${
                                     player.nickname
                                         ? `
-                                            Â·
+                                            ·
                                             Goes by
                                             "${escapeHTML(
                                                 player.nickname
@@ -1177,9 +1177,9 @@ function updateAllianceDropdown() {
    The user chooses:
 
    Houseguest A
-   â
+   ↓
    Houseguest B
-   â
+   ↓
    Love / Like / Neutral / Dislike / Hate
 
    The simulator internally converts those labels into
@@ -1199,11 +1199,11 @@ const relationshipValues = {
 
 const relationshipLabels = {
 
-    love: "â¤ï¸ Love",
-    like: "ð Like",
-    neutral: "ð Neutral",
-    dislike: "ð Dislike",
-    hate: "ð¡ Hate"
+    love: "❤️ Love",
+    like: "😊 Like",
+    neutral: "😐 Neutral",
+    dislike: "😒 Dislike",
+    hate: "😡 Hate"
 
 };
 
@@ -2028,19 +2028,19 @@ function updateStageDisplay() {
         opening1: [
             "OPENING SAFETY",
             "The Trash Folder",
-            "Opening safety competition â Part 1."
+            "Opening safety competition — Part 1."
         ],
 
         opening2: [
             "OPENING SAFETY",
             "HouseGuest CAPTCHA",
-            "Opening safety competition â Part 2."
+            "Opening safety competition — Part 2."
         ],
 
         opening3: [
             "OPENING SAFETY",
             "Surfing the BB Web",
-            "Opening safety competition â Part 3."
+            "Opening safety competition — Part 3."
         ],
 
         hoh: [
@@ -3971,7 +3971,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        â
+                        —
                     </div>
 
                     <div>
@@ -4027,7 +4027,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        â
+                        →
                     </div>
 
                     <div class="${
@@ -4082,7 +4082,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        â
+                        →
                     </div>
 
                     <div class="vote-pending">
@@ -4124,7 +4124,7 @@ function renderEvictionVoteReveal() {
 
 
                 <div class="vote-arrow">
-                    â
+                    →
                 </div>
 
 
@@ -5220,7 +5220,7 @@ function renderFinaleJuryVoteReveal() {
                         </div>
 
                         <div class="vote-arrow">
-                            â
+                            →
                         </div>
 
                         <div class="vote-person">
@@ -5578,7 +5578,7 @@ function updateGameDisplay() {
 
         $("formatStatus").textContent =
             currentCycle === 2
-                ? "DOUBLE EVICTION â ROUND 2"
+                ? "DOUBLE EVICTION — ROUND 2"
                 : "DOUBLE EVICTION";
 
     } else {
@@ -6434,7 +6434,7 @@ document.addEventListener(
 
     }
 );/* =========================================================
-   BIG BROTHER SIMULATOR â SOCIAL / MEMORY / POV ENHANCEMENTS
+   BIG BROTHER SIMULATOR — SOCIAL / MEMORY / POV ENHANCEMENTS
    Added as a safe extension layer so the original simulator engine
    remains intact.
 ========================================================= */
@@ -6815,7 +6815,7 @@ function renderShowmances() {
         const strength = getShowmanceStrength(showmance);
         return `<div class="bb-showmance-card">
             <div class="bb-showmance-person">${a.image ? `<img src="${escapeAttribute(a.image)}" alt="">` : `<div class="bb-showmance-placeholder">${escapeHTML(getInitials(getDisplayName(a)))}</div>`}<strong>${escapeHTML(getDisplayName(a))}</strong></div>
-            <div class="bb-showmance-heart">â¤ï¸</div>
+            <div class="bb-showmance-heart">❤️</div>
             <div class="bb-showmance-person">${b.image ? `<img src="${escapeAttribute(b.image)}" alt="">` : `<div class="bb-showmance-placeholder">${escapeHTML(getInitials(getDisplayName(b)))}</div>`}<strong>${escapeHTML(getDisplayName(b))}</strong></div>
             <div style="grid-column:1/-1;text-align:center"><span class="bb-strength-badge">${escapeHTML(strength.label)}</span> <button type="button" onclick="deleteShowmance('${escapeAttribute(showmance.id)}')">DELETE</button></div>
         </div>`;
@@ -6996,7 +6996,7 @@ if (document.readyState === "loading") {
 }
 
 /* =========================================================
-   FINAL RELIABILITY FIX â ALLIANCE CHECKLIST + TWIST STATUS
+   FINAL RELIABILITY FIX — ALLIANCE CHECKLIST + TWIST STATUS
    This replaces the fragile CTRL/CMD multi-select workflow with
    clickable checkboxes while keeping the original select in sync.
 ========================================================= */
@@ -7101,15 +7101,15 @@ if (document.readyState === "loading") {
             <h2>Active Season Twists</h2>
             <div class="bb-active-twist-grid">
                 <div class="bb-active-twist ${appActive ? "active" : ""}">
-                    <strong>ð± App Store</strong>
+                    <strong>📱 App Store</strong>
                     <span>${appActive ? "ACTIVE THIS WEEK" : "Not active this week"}</span>
                 </div>
                 <div class="bb-active-twist ${hackerActive ? "active" : ""}">
-                    <strong>ðµï¸ Hacker Competition</strong>
+                    <strong>🕵️ Hacker Competition</strong>
                     <span>${hackerActive ? "ACTIVE THIS WEEK" : "Not active this week"}</span>
                 </div>
                 <div class="bb-active-twist ${battleBackActive ? "active" : ""}">
-                    <strong>ðª Jury Battle Back</strong>
+                    <strong>🎪 Jury Battle Back</strong>
                     <span>${battleBackActive ? "SCHEDULED" : "Not active this week"}</span>
                 </div>
             </div>
@@ -7137,4 +7137,111 @@ if (document.readyState === "loading") {
     }
 
     window.bbRefreshAllianceControls = allianceChecklist;
+})();
+
+/* =========================================================
+   BRANTSTEELE-INSPIRED PORTRAIT CEREMONY UI
+   Visual layer only: preserves the existing simulation engine.
+========================================================= */
+(function () {
+    const CEREMONY_CSS = `
+    .bb-ceremony-panel{margin:18px 0;padding:22px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(0,0,0,.16));box-shadow:0 12px 30px rgba(0,0,0,.22)}
+    .bb-ceremony-kicker{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;opacity:.7;margin-bottom:5px}
+    .bb-ceremony-title{font-size:26px;font-weight:900;margin:0 0 5px}
+    .bb-ceremony-subtitle{margin:0 0 20px;opacity:.7}
+    .bb-ceremony-stage{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;align-items:flex-start}
+    .bb-portrait-card{width:128px;text-align:center;position:relative}
+    .bb-portrait{width:112px;height:132px;object-fit:cover;border-radius:10px;display:block;margin:0 auto 8px;border:2px solid rgba(255,255,255,.18);background:#17171c;box-shadow:0 8px 18px rgba(0,0,0,.3)}
+    .bb-portrait-placeholder{display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;letter-spacing:.04em}
+    .bb-portrait-name{font-size:14px;font-weight:900;line-height:1.1}
+    .bb-portrait-role{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;opacity:.65;margin-top:5px}
+    .bb-role-hoh{border-color:#e4c35a}.bb-role-nominee{border-color:#d65a5a}.bb-role-pov{border-color:#6da7e8}.bb-role-evicted{filter:grayscale(1);opacity:.45}
+    .bb-ceremony-vs{align-self:center;font-size:24px;font-weight:900;opacity:.5}
+    .bb-selection-grid{display:grid;grid-template-columns:repeat(6,minmax(100px,1fr));gap:12px}
+    .bb-selection-card{padding:10px;border-radius:10px;background:rgba(0,0,0,.2);border:2px solid rgba(255,255,255,.1);text-align:center}
+    .bb-selection-card img,.bb-selection-card .bb-portrait-placeholder{width:88px;height:104px;margin:0 auto 7px}
+    .bb-selection-card.selected{border-color:#e4c35a;box-shadow:0 0 0 1px rgba(228,195,90,.18),0 8px 20px rgba(0,0,0,.2)}
+    .bb-selection-label{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+    .bb-ceremony-banner{margin:16px 0 0;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,.055);text-align:center;font-weight:800}
+    .bb-vote-board{display:grid;gap:8px;margin-top:14px}
+    .bb-vote-item{display:grid;grid-template-columns:70px 1fr 36px 1fr;align-items:center;gap:10px;padding:8px;border-radius:9px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+    .bb-vote-item img,.bb-vote-item .bb-portrait-placeholder{width:52px;height:60px;border-radius:7px;object-fit:cover}
+    .bb-vote-arrow{text-align:center;font-size:20px;opacity:.55}
+    .bb-eviction-result{text-align:center;padding:16px;border-radius:10px;background:rgba(255,255,255,.05);margin-top:15px}
+    .bb-eviction-result .bb-portrait{width:150px;height:176px}
+    .bb-stage-note{font-size:12px;opacity:.62;margin-top:8px;text-align:center}
+    @media(max-width:900px){.bb-selection-grid{grid-template-columns:repeat(3,minmax(100px,1fr))}}
+    @media(max-width:600px){.bb-selection-grid{grid-template-columns:repeat(2,minmax(100px,1fr))}.bb-portrait-card{width:105px}.bb-portrait{width:92px;height:112px}.bb-vote-item{grid-template-columns:58px 1fr 25px 1fr}}
+    `;
+    function inject() {
+        if (document.getElementById('bb-ceremony-css')) return;
+        const s=document.createElement('style'); s.id='bb-ceremony-css'; s.textContent=CEREMONY_CSS; document.head.appendChild(s);
+    }
+    function img(p, cls='') {
+        if (!p) return '<div class="bb-portrait bb-portrait-placeholder">?</div>';
+        if (p.image) return `<img class="bb-portrait ${cls}" src="${escapeAttribute(p.image)}" alt="${escapeAttribute(getDisplayName(p))}" loading="lazy">`;
+        return `<div class="bb-portrait bb-portrait-placeholder ${cls}">${escapeHTML(getInitials(getDisplayName(p)))}</div>`;
+    }
+    function card(p, role='', cls='') {
+        if (!p) return '';
+        return `<div class="bb-portrait-card"><div>${img(p,cls)}</div><div class="bb-portrait-name">${escapeHTML(getDisplayName(p))}</div><div class="bb-portrait-role">${escapeHTML(role)}</div></div>`;
+    }
+    function panel() {
+        let el=document.getElementById('bbCeremonyDisplay');
+        if(!el){
+            const game=document.getElementById('game'); if(!game) return null;
+            el=document.createElement('div'); el.id='bbCeremonyDisplay'; el.className='bb-ceremony-panel';
+            const status=document.querySelector('#game .status-grid');
+            if(status) status.insertAdjacentElement('afterend',el); else game.prepend(el);
+        }
+        return el;
+    }
+    function render() {
+        const el=panel(); if(!el) return;
+        if(!seasonStarted){el.innerHTML='<div class="bb-ceremony-kicker">GAME PRESENTATION</div><h2 class="bb-ceremony-title">Start Your Season</h2><p class="bb-ceremony-subtitle">Your Houseguests will appear here throughout every competition and ceremony.</p>';return;}
+        const hoh=houseguests.find(p=>p.id===currentHOH);
+        const names=nominees||[];
+        let html='';
+        switch(currentStage){
+            case 'hoh':
+            case 'opening1': case 'opening2': case 'opening3':
+                html=`<div class="bb-ceremony-kicker">WEEK ${currentWeek}</div><h2 class="bb-ceremony-title">${escapeHTML(document.getElementById('stageName')?.textContent||'Competition')}</h2><p class="bb-ceremony-subtitle">${escapeHTML(document.getElementById('stageDescription')?.textContent||'')}</p><div class="bb-ceremony-stage">${getActivePlayers().map(p=>card(p,'HOUSEGUEST')).join('')}</div><div class="bb-stage-note">Advance to run the competition.</div>`;
+                break;
+            case 'appstore':
+                html=`<div class="bb-ceremony-kicker">WEEK ${currentWeek}</div><h2 class="bb-ceremony-title">BB App Store</h2><p class="bb-ceremony-subtitle">The week's special powers and punishments are being assigned.</p><div class="bb-ceremony-stage">${getActivePlayers().map(p=>card(p,'HOUSEGUEST')).join('')}</div>`;
+                break;
+            case 'nominations':
+                html=`<div class="bb-ceremony-kicker">NOMINATION CEREMONY</div><h2 class="bb-ceremony-title">${hoh?escapeHTML(getDisplayName(hoh)):'HOH'}'s Nominations</h2><p class="bb-ceremony-subtitle">The Head of Household must nominate two Houseguests for eviction.</p><div class="bb-ceremony-stage">${card(hoh,'HEAD OF HOUSEHOLD','bb-role-hoh')}<div class="bb-ceremony-vs">→</div>${names.length?names.map(p=>card(p,'NOMINEE','bb-role-nominee')).join(''):'<div class="bb-ceremony-banner">Nominations have not been made yet.</div>'}</div>`;
+                break;
+            case 'hacker':
+                html=`<div class="bb-ceremony-kicker">HACKER COMPETITION</div><h2 class="bb-ceremony-title">Secret Power in Play</h2><p class="bb-ceremony-subtitle">The Hacker can alter the nominations and influence the Veto player selection.</p><div class="bb-ceremony-stage">${getActivePlayers().map(p=>card(p,p.id===hackerWinner?.id?'HACKER':'HOUSEGUEST')).join('')}</div>`;
+                break;
+            case 'povDraw':
+                html=`<div class="bb-ceremony-kicker">POWER OF VETO</div><h2 class="bb-ceremony-title">Veto Player Selection</h2><p class="bb-ceremony-subtitle">The HOH, two nominees, and three selected Houseguests will compete.</p><div class="bb-selection-grid">${[hoh,...names,...(povPlayers||[]).filter(p=>p&&p.id!==currentHOH&&!names.some(n=>n.id===p.id))].filter(Boolean).map((p,i)=>`<div class="bb-selection-card ${i<3?'selected':''}">${img(p)}<div class="bb-portrait-name">${escapeHTML(getDisplayName(p))}</div><div class="bb-selection-label">${i===0?'HOH':names.some(n=>n.id===p.id)?'NOMINEE':'SELECTED PLAYER'}</div></div>`).join('')}</div><div class="bb-ceremony-banner">Advance to select the six Veto players.</div>`;
+                break;
+            case 'pov':
+                html=`<div class="bb-ceremony-kicker">POWER OF VETO COMPETITION</div><h2 class="bb-ceremony-title">${escapeHTML(getCurrentPOVCompetition())}</h2><p class="bb-ceremony-subtitle">Six Houseguests compete for the Power of Veto.</p><div class="bb-ceremony-stage">${(povPlayers||[]).map(p=>card(p,p.id===povWinner?.id?'VETO WINNER':p.id===currentHOH?'HOH':names.some(n=>n.id===p.id)?'NOMINEE':'VETO PLAYER',p.id===povWinner?.id?'bb-role-pov':'')).join('')}</div>${povWinner?`<div class="bb-ceremony-banner">🏆 ${escapeHTML(getDisplayName(povWinner))} won the Power of Veto.</div>`:'<div class="bb-stage-note">Advance to run the competition.</div>'}`;
+                break;
+            case 'veto':
+                html=`<div class="bb-ceremony-kicker">VETO CEREMONY</div><h2 class="bb-ceremony-title">Power of Veto Ceremony</h2><p class="bb-ceremony-subtitle">${povWinner?escapeHTML(getDisplayName(povWinner)):'The Veto holder'} decides whether to use the Power of Veto.</p><div class="bb-ceremony-stage">${card(povWinner,'VETO HOLDER','bb-role-pov')}${names.map(p=>card(p,'NOMINEE','bb-role-nominee')).join('')}</div><div class="bb-ceremony-banner">Advance to conduct the Veto Ceremony.</div>`;
+                break;
+            case 'evictionVoting':
+                html=`<div class="bb-ceremony-kicker">LIVE EVICTION</div><h2 class="bb-ceremony-title">Eviction Vote</h2><p class="bb-ceremony-subtitle">Each eligible Houseguest will cast a vote to evict.</p><div class="bb-ceremony-stage">${names.map(p=>card(p,'ON THE BLOCK','bb-role-nominee')).join('')}</div><div class="bb-ceremony-banner">Advance to prepare the individual votes.</div>`;
+                break;
+            case 'eviction':
+                html=`<div class="bb-ceremony-kicker">LIVE EVICTION</div><h2 class="bb-ceremony-title">Vote Reveal</h2><p class="bb-ceremony-subtitle">Votes are revealed one at a time.</p><div class="bb-vote-board">${Object.keys(currentEvictionVotes||{}).map(id=>{const voter=houseguests.find(p=>p.id===id),v=currentEvictionVotes[id]; if(!voter||v.type==='no-vote')return ''; const target=houseguests.find(p=>p.id===v.target); const revealed=(typeof currentVoteRevealIndex==='number')&&getActivePlayers().filter(x=>currentEvictionVotes[x.id]&&currentEvictionVotes[x.id].type!=='no-vote').slice(0,currentVoteRevealIndex).some(x=>x.id===id); return `<div class="bb-vote-item">${img(voter)}<strong>${escapeHTML(getDisplayName(voter))}</strong><div class="bb-vote-arrow">→</div><strong>${revealed&&target?escapeHTML(getDisplayName(target)):'Vote Pending'}</strong></div>`;}).join('')}</div>`;
+                break;
+            default:
+                if(evictedHouseguests.length){const last=evictedHouseguests[evictedHouseguests.length-1];html=`<div class="bb-ceremony-kicker">MEMORY WALL UPDATE</div><h2 class="bb-ceremony-title">${escapeHTML(getDisplayName(last))} has been evicted</h2><div class="bb-ceremony-stage">${card(last,'EVICTED','bb-role-evicted')}</div>`;}else html=`<div class="bb-ceremony-kicker">BIG BROTHER</div><h2 class="bb-ceremony-title">${escapeHTML(document.getElementById('stageName')?.textContent||'Game in Progress')}</h2>`;
+        }
+        el.innerHTML=html;
+    }
+    const oldUpdate=updateGameDisplay;
+    updateGameDisplay=function(){oldUpdate();inject();render();};
+    const oldUpdateAll=updateAllDisplays;
+    updateAllDisplays=function(){oldUpdateAll();inject();render();};
+    const oldReveal=renderEvictionVoteReveal;
+    if(typeof oldReveal==='function') renderEvictionVoteReveal=function(){oldReveal();render();};
+    function init(){inject();render();}
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
