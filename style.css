@@ -1,443 +1,685 @@
 /* =========================================================
    BIG BROTHER SIMULATOR
-   BRANTSTEELE-STYLE STYLESHEET
-   Built for the current index.html structure
-   ========================================================= */
+   BRANTSTEELE-INSPIRED RESPONSIVE STYLESHEET
+========================================================= */
 
-/* ---------------------------------------------------------
-   GLOBAL
-   --------------------------------------------------------- */
 
-*,
-*::before,
-*::after {
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
     box-sizing: border-box;
 }
 
+
 html {
-    scroll-behavior: smooth;
+    min-width: 0;
 }
+
 
 body {
     margin: 0;
-    min-width: 320px;
-    background: #eef1f5;
-    color: #222;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
+    padding: 0;
+
+    min-width: 0;
+
+    background: #d9dde2;
+
+    color: #252a30;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 15px;
+
     line-height: 1.45;
 }
+
 
 button,
 input,
 select,
 textarea {
-    font: inherit;
+    font:
+        inherit;
 }
+
 
 button {
     cursor: pointer;
 }
+
 
 img {
     max-width: 100%;
 }
 
 
-/* ---------------------------------------------------------
-   SITE HEADER
-   --------------------------------------------------------- */
 
-.site-header {
-    background: linear-gradient(
-        #3d4650,
-        #20262c
-    );
+/* =========================================================
+   HEADER
+========================================================= */
 
-    color: #fff;
+header,
+.site-header,
+#header {
 
-    border-bottom: 4px solid #111;
+    background:
+        linear-gradient(
+            #3d4650,
+            #252c34
+        );
 
-    box-shadow:
-        0 2px 7px rgba(0, 0, 0, 0.28);
+    border-bottom:
+        3px solid #171c21;
+
+    color: white;
+
+    width: 100%;
 }
 
-.logo-area {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 18px 20px 14px;
+
+.header-inner {
+
+    width:
+        min(
+            1180px,
+            calc(100% - 24px)
+        );
+
+    margin:
+        0 auto;
+
+    padding:
+        20px 0 0;
+
 }
 
-.logo-main {
-    font-size: 34px;
-    line-height: 1;
+
+.logo,
+.site-logo,
+.brand {
+
+    margin:
+        0 0 16px;
+
+}
+
+
+.logo h1,
+.site-logo h1,
+.brand h1 {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            42px
+        );
+
     font-weight: 900;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px #000;
-}
 
-.logo-sub {
-    margin-top: 3px;
+    letter-spacing: 3px;
 
-    color: #cbd2d8;
+    line-height: 1;
 
-    font-size: 15px;
-    font-weight: 700;
+    text-shadow:
+        2px 2px 0 #111;
 
-    letter-spacing: 4px;
 }
 
 
-/* ---------------------------------------------------------
+.logo span,
+.site-logo span,
+.brand span {
+
+    display: block;
+
+    margin-top: 7px;
+
+    color: #d5d9dd;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+    letter-spacing: 6px;
+
+}
+
+
+
+/* =========================================================
    NAVIGATION
-   --------------------------------------------------------- */
+========================================================= */
 
+nav,
+.navigation,
 .main-nav {
+
+    width:
+        min(
+            1180px,
+            calc(100% - 24px)
+        );
+
+    margin:
+        0 auto;
+
     display: flex;
+
     flex-wrap: wrap;
 
-    gap: 0;
+    align-items: flex-end;
 
-    max-width: 1180px;
-    margin: 0 auto;
+    gap: 4px;
 
-    padding: 0 12px;
 }
 
-.main-nav button {
+
+nav button,
+.navigation button,
+.main-nav button,
+.nav-button {
+
     appearance: none;
 
-    border: 1px solid #111;
-    border-bottom: 0;
+    border:
+        1px solid #1c2228;
 
-    border-radius: 4px 4px 0 0;
+    border-bottom: none;
 
-    margin: 0 3px;
-
-    padding: 10px 14px;
+    border-radius:
+        4px 4px 0 0;
 
     background:
         linear-gradient(
-            #59636d,
-            #333b43
+            #56616d,
+            #353e48
         );
 
-    color: #fff;
+    color: #f5f5f5;
 
-    font-weight: 700;
-    font-size: 12px;
+    min-height: 48px;
 
-    letter-spacing: 0.4px;
+    padding:
+        0 18px;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+
+    transition:
+        background .15s ease,
+        color .15s ease;
+
 }
 
-.main-nav button:hover {
+
+nav button:hover,
+.navigation button:hover,
+.main-nav button:hover,
+.nav-button:hover {
+
     background:
         linear-gradient(
-            #727d88,
-            #444d56
+            #697581,
+            #444f5b
         );
+
 }
 
 
-/* ---------------------------------------------------------
-   MAIN PAGE SECTIONS
-   --------------------------------------------------------- */
+nav button.active,
+.navigation button.active,
+.main-nav button.active,
+.nav-button.active {
 
-main {
-    width: 100%;
+    background:
+        #eef0f2;
+
+    color: #252a30;
+
+    position: relative;
+
 }
 
-.page-section {
-    display: none;
 
-    width: 100%;
-    max-width: 1180px;
 
-    margin: 0 auto;
+/* =========================================================
+   MAIN PAGE
+========================================================= */
 
-    padding: 20px;
+main,
+.main-content,
+#app {
+
+    width:
+        min(
+            1180px,
+            calc(100% - 24px)
+        );
+
+    margin:
+        22px auto 40px;
+
 }
+
 
 /*
-   IMPORTANT:
-
-   The JavaScript uses:
-   .active-section
-
-   NOT:
-   .active
+   The simulator pages.
 */
 
-.page-section.active-section {
-    display: block;
+section,
+.page,
+.page-section,
+.simulator-section {
+
+    display: none;
+
 }
 
 
-/* ---------------------------------------------------------
-   HERO
-   --------------------------------------------------------- */
+section.active,
+.page.active,
+.page-section.active,
+.simulator-section.active {
 
-.hero-panel {
-    padding: 28px;
+    display: block;
 
-    margin-bottom: 18px;
+}
+
+
+
+/* =========================================================
+   GENERAL PANELS
+========================================================= */
+
+.panel,
+.card,
+.content-panel,
+.simulator-panel {
+
+    background: #f7f7f7;
+
+    border:
+        1px solid #aeb6be;
+
+    border-radius: 4px;
+
+    box-shadow:
+        0 1px 3px
+        rgba(0, 0, 0, .18);
+
+    margin-bottom: 16px;
+
+    padding: 18px;
+
+}
+
+
+.panel h1,
+.panel h2,
+.panel h3,
+.card h1,
+.card h2,
+.card h3 {
+
+    margin-top: 0;
+
+}
+
+
+.panel h1,
+.card h1 {
+
+    font-size: 30px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.panel h2,
+.card h2 {
+
+    padding-bottom: 8px;
+
+    border-bottom:
+        1px solid #c8cdd2;
+
+    font-size: 24px;
+
+}
+
+
+.panel h3,
+.card h3 {
+
+    font-size: 17px;
+
+}
+
+
+
+/* =========================================================
+   HOME HERO
+========================================================= */
+
+.hero,
+.home-hero,
+.welcome-panel {
 
     background:
         linear-gradient(
             #ffffff,
-            #f4f5f7
+            #e8ebee
         );
 
-    border: 1px solid #b7bec6;
+    padding:
+        28px 34px;
 
-    border-radius: 4px;
-
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-.hero-panel h1,
-.hero-panel h2 {
-    margin-top: 0;
-}
-
-.hero-panel h1 {
-    font-size: 28px;
-
-    letter-spacing: 1px;
 }
 
 
-/* ---------------------------------------------------------
-   GENERAL PANELS
-   --------------------------------------------------------- */
-
-.panel {
-    padding: 18px;
+.hero h1,
+.home-hero h1,
+.welcome-panel h1 {
 
     margin-bottom: 18px;
 
-    background: #fff;
-
-    border: 1px solid #b7bec6;
-
-    border-radius: 4px;
-
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-.section-heading {
-    margin: 0 0 14px;
-
-    padding: 9px 12px;
-
-    background:
-        linear-gradient(
-            #59636d,
-            #353d45
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            38px
         );
 
-    border: 1px solid #252b31;
+    letter-spacing: 2px;
 
-    border-radius: 3px;
-
-    color: #fff;
-
-    font-size: 16px;
-    font-weight: 800;
 }
 
 
-/* ---------------------------------------------------------
-   FORMS
-   --------------------------------------------------------- */
+.hero h2,
+.home-hero h2,
+.welcome-panel h2 {
 
-.form-section {
-    padding: 16px;
+    border: none;
+
+    padding: 0;
+
+    font-size: 20px;
+
+}
+
+
+.hero p,
+.home-hero p,
+.welcome-panel p {
+
+    max-width: 850px;
+
+    margin-bottom: 0;
+
+}
+
+
+
+/* =========================================================
+   SEASON FORMAT
+========================================================= */
+
+.season-format,
+#seasonFormat {
+
+    background: #f7f7f7;
+
+}
+
+
+.season-info {
+
+    margin-top: 16px;
+
+    padding: 14px;
+
+    border-top:
+        1px solid #c9cdd1;
+
+}
+
+
+.season-info h3 {
+
+    margin:
+        0 0 10px;
+
+}
+
+
+.season-stats {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
 
     margin: 14px 0;
 
-    background: #fff;
+    font-weight: bold;
 
-    border: 1px solid #b7bec6;
-
-    border-radius: 4px;
-
-    box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.form-grid {
-    display: grid;
 
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+.season-stat {
 
-    gap: 14px;
+    padding: 4px 8px;
+
+    background: #e3e6e9;
+
+    border:
+        1px solid #b8bec4;
+
+    border-radius: 3px;
+
 }
 
-.form-grid.three,
-.form-grid.stats-grid {
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0, 1fr)
-        );
-}
 
-.form-group {
-    min-width: 0;
-}
 
-.form-group label,
-.form-section label {
+/* =========================================================
+   FORM CONTROLS
+========================================================= */
+
+label {
+
     display: block;
 
     margin-bottom: 5px;
 
     font-weight: 700;
 
-    color: #333;
 }
 
 
-/* ---------------------------------------------------------
-   INPUTS
-   --------------------------------------------------------- */
-
-input[type="text"],
-input[type="url"],
-input[type="number"],
+input,
 select,
 textarea {
+
     width: 100%;
 
-    border: 1px solid #aeb6bf;
+    border:
+        1px solid #aeb6be;
 
     border-radius: 3px;
 
-    background: #fff;
+    background: #ffffff;
 
-    color: #222;
+    color: #252a30;
 
-    padding: 8px 9px;
+    padding: 9px 10px;
+
+    min-height: 38px;
 
     outline: none;
+
 }
 
-textarea {
-    min-height: 90px;
-
-    resize: vertical;
-}
 
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #596b7b;
+
+    border-color: #586b7e;
 
     box-shadow:
         0 0 0 2px
-        rgba(67, 84, 99, 0.12);
+        rgba(
+            88,
+            107,
+            126,
+            .18
+        );
+
 }
 
 
-/* ---------------------------------------------------------
+textarea {
+
+    min-height: 100px;
+
+    resize: vertical;
+
+}
+
+
+
+/* =========================================================
    BUTTONS
-   --------------------------------------------------------- */
+========================================================= */
 
-button.primary-button,
-button.secondary-button,
-button.danger-button,
-button.proceed-button,
-#addHouseguestButton,
-#saveHouseguestButton,
-#cancelEditButton,
-#startSeasonButton,
-#saveSeasonButton,
-#loadSeasonButton,
-#resetSeasonButton,
-#selectSeasonButton,
-#addTwistButton,
-#addAllianceButton,
-#addRelationshipButton {
+button,
+.primary-button,
+.action-button {
 
-    border: 1px solid #20262c;
+    border:
+        1px solid #242b32;
 
     border-radius: 3px;
 
-    padding: 9px 15px;
-
-    font-weight: 700;
-
-    color: #fff;
-
     background:
         linear-gradient(
-            #626d77,
-            #343b42
+            #58636f,
+            #39424c
         );
+
+    color: #ffffff;
+
+    padding:
+        9px 16px;
+
+    min-height: 38px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
 
     box-shadow:
-        inset 0 1px
-        rgba(255, 255, 255, 0.16);
+        inset 0 1px 0
+        rgba(255,255,255,.16);
+
 }
 
-button.primary-button:hover,
-button.secondary-button:hover,
-button.proceed-button:hover,
-#addHouseguestButton:hover,
-#saveHouseguestButton:hover,
-#startSeasonButton:hover,
-#saveSeasonButton:hover,
-#loadSeasonButton:hover,
-#selectSeasonButton:hover {
 
-    filter: brightness(1.1);
-}
-
-button.danger-button,
-#resetSeasonButton {
+button:hover,
+.primary-button:hover,
+.action-button:hover {
 
     background:
         linear-gradient(
-            #a34a4a,
-            #6d2727
+            #697582,
+            #46515d
         );
+
 }
 
-.proceed-button {
-    min-width: 170px;
+
+button:active {
+
+    transform:
+        translateY(1px);
+
+}
+
+
+.danger-button,
+.delete-button {
 
     background:
         linear-gradient(
-            #4c78a0,
-            #274b6b
-        ) !important;
+            #a94c4c,
+            #7f3030
+        );
+
+    border-color:
+        #682626;
+
 }
 
+
+.danger-button:hover,
+.delete-button:hover {
+
+    background:
+        linear-gradient(
+            #bd5c5c,
+            #913939
+        );
+
+}
+
+
+
+/* =========================================================
+   SEASON CONTROL BUTTONS
+========================================================= */
+
+.season-controls,
+.controls,
 .button-row {
+
     display: flex;
 
     flex-wrap: wrap;
 
     gap: 8px;
 
-    align-items: center;
-
-    margin-top: 14px;
 }
 
 
-/* ---------------------------------------------------------
-   SEASON SUMMARY
-   --------------------------------------------------------- */
 
-.summary-grid {
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+#seasonSummary,
+.season-summary {
+
     display: grid;
 
     grid-template-columns:
@@ -446,233 +688,168 @@ button.danger-button,
             minmax(0, 1fr)
         );
 
-    gap: 10px;
-}
+    gap: 8px;
 
-.summary-item {
-    border: 1px solid #c4cad0;
-
-    background: #f5f6f7;
-
-    padding: 12px;
-
-    text-align: center;
-}
-
-.summary-item strong {
-    display: block;
-
-    font-size: 20px;
 }
 
 
-/* ---------------------------------------------------------
-   CAST GRID
-   --------------------------------------------------------- */
+.summary-card {
 
-#castGrid,
-#gameHouseguests,
-#memoryWall,
-#juryList,
-#evictedPlayers,
-#finaleContent {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(160px, 1fr)
+    background:
+        linear-gradient(
+            #fdfdfd,
+            #e7e9eb
         );
 
-    gap: 12px;
-}
-
-
-/* ---------------------------------------------------------
-   CAST CARDS
-   --------------------------------------------------------- */
-
-.cast-card,
-.houseguest-card,
-.memory-card,
-.jury-card,
-.evicted-card {
-
-    min-width: 0;
-
-    background: #fff;
-
-    border: 1px solid #b8bec4;
+    border:
+        1px solid #b8bec4;
 
     border-radius: 3px;
 
-    overflow: hidden;
+    text-align: center;
 
-    box-shadow:
-        0 1px 2px
-        rgba(0, 0, 0, 0.12);
+    padding: 12px 8px;
+
 }
 
-.cast-card img,
-.houseguest-card img,
-.memory-card img,
-.jury-card img,
-.evicted-card img {
+
+.summary-card span {
 
     display: block;
+
+    color: #60676e;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: .7px;
+
+}
+
+
+.summary-card strong {
+
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 25px;
+
+}
+
+
+
+/* =========================================================
+   COMPETITION SCHEDULE
+========================================================= */
+
+.competition-schedule-table {
 
     width: 100%;
 
-    height: 190px;
-
-    object-fit: cover;
-
-    background: #dfe3e7;
-}
-
-.cast-card-content,
-.houseguest-card-content,
-.memory-card-content,
-.jury-card-content {
-
-    padding: 10px;
-}
-
-.cast-card h3,
-.houseguest-card h3,
-.memory-card h3,
-.jury-card h3 {
-
-    margin: 0 0 5px;
-
-    font-size: 15px;
-}
-
-.cast-card p,
-.houseguest-card p,
-.memory-card p,
-.jury-card p {
-
-    margin: 3px 0;
-
-    font-size: 12px;
-}
-
-
-/* ---------------------------------------------------------
-   STAT BARS
-   --------------------------------------------------------- */
-
-.stat-bar {
-
-    height: 7px;
-
-    margin: 4px 0 7px;
-
-    border: 1px solid #adb4bb;
-
-    background: #e4e7ea;
-
-    border-radius: 2px;
+    border:
+        1px solid #aeb6be;
 
     overflow: hidden;
-}
 
-.stat-bar > span {
-
-    display: block;
-
-    height: 100%;
-
-    background: #566d82;
 }
 
 
-/* ---------------------------------------------------------
-   CAST CARD ACTIONS
-   --------------------------------------------------------- */
-
-.cast-card .card-actions {
-
-    display: flex;
-
-    gap: 5px;
-
-    padding: 0 10px 10px;
-}
-
-.cast-card .card-actions button {
-
-    flex: 1;
-
-    padding: 6px;
-
-    font-size: 11px;
-}
-
-
-/* ---------------------------------------------------------
-   TWISTS
-   --------------------------------------------------------- */
-
-.twist-list,
-.alliance-list,
-.relationships-list {
-
-    display: grid;
-
-    gap: 10px;
-}
-
-.twist-item,
-.alliance-item,
-.relationship-item {
-
-    padding: 12px;
-
-    border: 1px solid #c3c9ce;
-
-    background: #f8f9fa;
-
-    border-radius: 3px;
-}
-
-
-/* ---------------------------------------------------------
-   ACTIVE TWISTS
-   --------------------------------------------------------- */
-
-.bb-active-twist-grid {
+.schedule-header-row {
 
     display: grid;
 
     grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(220px, 1fr)
+        90px
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(130px, .7fr);
+
+    background:
+        linear-gradient(
+            #56616d,
+            #3a434d
         );
 
-    gap: 10px;
-}
+    color: white;
 
-.bb-active-twist {
+    font-size: 12px;
 
-    border: 1px solid #adb5bd;
+    font-weight: 800;
 
-    padding: 12px;
+    text-transform: uppercase;
 
-    background: #f7f8f9;
-
-    border-radius: 3px;
 }
 
 
-/* ---------------------------------------------------------
-   ALLIANCE MEMBER CHECKLIST
-   --------------------------------------------------------- */
+.schedule-header-row > div {
 
-.bb-alliance-checklist {
+    padding: 10px;
+
+    border-right:
+        1px solid #2b333b;
+
+}
+
+
+.schedule-week-row {
+
+    display: grid;
+
+    grid-template-columns:
+        90px
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(130px, .7fr);
+
+    background: #ffffff;
+
+    border-top:
+        1px solid #cbd0d5;
+
+}
+
+
+.schedule-week-row:nth-child(odd) {
+
+    background: #f0f2f4;
+
+}
+
+
+.schedule-week-row > div {
+
+    padding: 9px 10px;
+
+    border-right:
+        1px solid #d2d6da;
+
+}
+
+
+.schedule-week-number {
+
+    font-weight: 800;
+
+}
+
+
+.mobile-label {
+
+    display: none;
+
+}
+
+
+
+/* =========================================================
+   HOUSEGUEST CAST
+========================================================= */
+
+.houseguest-grid,
+.cast-grid,
+#houseguestList {
 
     display: grid;
 
@@ -682,142 +859,438 @@ button.danger-button,
             minmax(170px, 1fr)
         );
 
-    gap: 6px;
+    gap: 10px;
 
-    margin-top: 8px;
 }
 
-.bb-alliance-checklist label {
+
+.houseguest-card,
+.cast-card {
+
+    background: #ffffff;
+
+    border:
+        1px solid #adb5bd;
+
+    border-radius: 3px;
+
+    overflow: hidden;
+
+    text-align: center;
+
+}
+
+
+.houseguest-card img,
+.cast-card img {
+
+    display: block;
+
+    width: 100%;
+
+    height: 190px;
+
+    object-fit: cover;
+
+    background: #d8dde1;
+
+}
+
+
+.houseguest-card h3,
+.cast-card h3 {
+
+    margin: 0;
+
+    padding: 8px;
+
+    font-size: 16px;
+
+}
+
+
+.houseguest-card p,
+.cast-card p {
+
+    margin: 0;
+
+    padding:
+        0 8px 8px;
+
+    color: #5e666e;
+
+    font-size: 13px;
+
+}
+
+
+
+/* =========================================================
+   GAME PAGE
+========================================================= */
+
+#game,
+.game-page {
+
+    max-width: 100%;
+
+}
+
+
+.game-status,
+#gameStatus {
+
+    background:
+        linear-gradient(
+            #ffffff,
+            #edf0f2
+        );
+
+    border:
+        1px solid #adb5bd;
+
+    border-radius: 4px;
+
+    margin-bottom: 12px;
+
+    padding: 14px;
+
+}
+
+
+.week-chain,
+#weekChain {
+
+    background: #ffffff;
+
+    border:
+        1px solid #aeb6be;
+
+    border-radius: 3px;
+
+    padding: 0;
+
+    overflow: hidden;
+
+}
+
+
+.game-stage,
+.stage-card,
+.week-event {
+
+    padding: 14px;
+
+    border-bottom:
+        1px solid #d0d4d8;
+
+}
+
+
+.game-stage:last-child,
+.stage-card:last-child,
+.week-event:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.game-stage h3,
+.stage-card h3,
+.week-event h3 {
+
+    margin: 0 0 8px;
+
+    color: #303940;
+
+    font-size: 17px;
+
+}
+
+
+.game-stage-title {
+
+    background:
+        #3e4852;
+
+    color: white;
+
+    font-weight: 800;
+
+    padding: 9px 12px;
+
+    text-transform: uppercase;
+
+}
+
+
+
+/* =========================================================
+   MEMORY WALL
+========================================================= */
+
+.memory-wall,
+#memoryWall {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(130px, 1fr)
+        );
+
+    gap: 10px;
+
+}
+
+
+.memory-wall-card {
+
+    background: #171b20;
+
+    border:
+        2px solid #39434d;
+
+    color: white;
+
+    text-align: center;
+
+    overflow: hidden;
+
+}
+
+
+.memory-wall-photo {
+
+    aspect-ratio: 3 / 4;
+
+    overflow: hidden;
+
+}
+
+
+.memory-wall-card img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+}
+
+
+.memory-wall-name {
+
+    padding: 7px 5px 3px;
+
+    font-weight: 800;
+
+    font-size: 14px;
+
+}
+
+
+.memory-wall-status {
+
+    padding:
+        0 5px 7px;
+
+    color: #aeb8c1;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+}
+
+
+.memory-wall-card.evicted {
+
+    opacity: .45;
+
+    filter: grayscale(1);
+
+}
+
+
+.memory-wall-card.winner {
+
+    border-color: #c59d38;
+
+}
+
+
+
+/* =========================================================
+   JURY
+========================================================= */
+
+#juryList,
+.jury-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(180px, 1fr)
+        );
+
+    gap: 10px;
+
+}
+
+
+.jury-card {
 
     display: flex;
 
     align-items: center;
 
-    gap: 7px;
+    gap: 10px;
 
-    padding: 6px 8px;
+    background: #ffffff;
 
-    border: 1px solid #d0d5d9;
+    border:
+        1px solid #adb5bd;
 
-    background: #fff;
+    padding: 8px;
 
-    font-weight: 400;
 }
 
 
-/*
-   The current HTML contains this hidden legacy
-   allianceMembers select.
+.jury-photo {
 
-   The JavaScript uses the custom checklist instead.
-*/
+    width: 55px;
 
-#allianceMembers {
-    display: none !important;
+    height: 70px;
+
+    object-fit: cover;
+
 }
 
 
-/* ---------------------------------------------------------
-   RELATIONSHIP PREVIEW
-   --------------------------------------------------------- */
+.jury-order {
 
-.relationship-preview {
+    font-weight: 900;
+
+    color: #65717c;
+
+}
+
+
+
+/* =========================================================
+   ALLIANCES / RELATIONSHIPS
+========================================================= */
+
+.relationship-card {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        minmax(120px, 180px)
+        1fr
+        auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #b6bdc4;
 
     padding: 10px;
 
-    margin: 8px 0;
+    margin-bottom: 8px;
+
+}
+
+
+.relationship-person {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.relationship-avatar {
+
+    width: 45px;
+
+    height: 45px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+}
+
+
+.relationship-middle {
+
+    text-align: center;
+
+}
+
+
+.relationship-type {
+
+    font-weight: 800;
+
+}
+
+
+.relationship-value {
+
+    font-size: 12px;
+
+    color: #68727b;
+
+}
+
+
+
+/* =========================================================
+   EVENT LOG
+========================================================= */
+
+.event-log-entry {
+
+    display: grid;
+
+    grid-template-columns:
+        45px
+        1fr;
+
+    border-bottom:
+        1px solid #d1d5d8;
+
+    background: #ffffff;
+
+}
+
+
+.event-log-entry:nth-child(even) {
 
     background: #f0f2f4;
 
-    border: 1px solid #ccd1d5;
 }
 
 
-/* ---------------------------------------------------------
-   GAME SECTION
-   --------------------------------------------------------- */
-
-#game {
-    padding-top: 14px;
-}
-
-
-/* ---------------------------------------------------------
-   GAME HEADER
-   --------------------------------------------------------- */
-
-.game-header {
-
-    background: #252c33;
-
-    border: 1px solid #111;
-
-    color: #fff;
-
-    padding: 14px 16px;
-
-    border-radius: 4px 4px 0 0;
-}
-
-.week-badge,
-#weekBadge {
-
-    display: inline-block;
-
-    padding: 4px 8px;
-
-    margin-right: 8px;
-
-    background: #69747e;
-
-    border: 1px solid #15191d;
-
-    border-radius: 3px;
-
-    font-size: 11px;
-
-    font-weight: 800;
-}
-
-#weekTitle {
-
-    display: inline;
-
-    margin: 0;
-
-    font-size: 20px;
-}
-
-
-/* ---------------------------------------------------------
-   GAME STAGE
-   --------------------------------------------------------- */
-
-.stage-panel {
-
-    border: 1px solid #b7bec5;
-
-    border-top: 0;
-
-    background: #fff;
-
-    padding: 20px;
-}
-
-.stage-icon {
-
-    float: left;
-
-    width: 55px;
-    height: 55px;
-
-    margin-right: 14px;
-
-    border: 1px solid #aab1b8;
-
-    border-radius: 4px;
-
-    background: #edf0f2;
+.event-log-number {
 
     display: flex;
 
@@ -825,302 +1298,55 @@ button.danger-button,
 
     justify-content: center;
 
-    font-size: 26px;
-}
-
-#stageName {
-
-    margin: 0;
-
-    font-size: 20px;
-}
-
-#stageDescription {
-
-    margin: 4px 0 0;
-
-    color: #555;
-}
-
-
-/* ---------------------------------------------------------
-   GAME STATUS BOXES
-   --------------------------------------------------------- */
-
-.status-grid {
-
-    clear: both;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0, 1fr)
-        );
-
-    gap: 10px;
-
-    margin-top: 18px;
-}
-
-.status-box {
-
-    border: 1px solid #c2c8cd;
-
-    background: #f5f6f7;
-
-    padding: 10px;
-}
-
-.status-box strong {
-
-    display: block;
-
-    font-size: 11px;
-
-    text-transform: uppercase;
-
-    color: #666;
-
-    margin-bottom: 4px;
-}
-
-.status-box span {
-
-    font-weight: 700;
-}
-
-
-/* ---------------------------------------------------------
-   GAME COLUMNS
-   --------------------------------------------------------- */
-
-.game-columns {
-
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 2fr)
-        minmax(280px, 1fr);
-
-    gap: 15px;
-
-    margin-top: 15px;
-}
-
-
-/* ---------------------------------------------------------
-   EVENT LOG
-   --------------------------------------------------------- */
-
-.event-log {
-
-    max-height: 520px;
-
-    overflow: auto;
-
-    border: 1px solid #c4c9ce;
-
-    background: #111820;
-
-    color: #e9edf0;
-
-    padding: 10px;
-
-    font-family:
-        "Courier New",
-        monospace;
-
-    font-size: 12px;
-}
-
-.event-log div {
-
-    padding: 5px 3px;
-
-    border-bottom:
-        1px solid
-        rgba(255, 255, 255, 0.08);
-}
-
-
-/* ---------------------------------------------------------
-   EVICTION RESULTS
-   --------------------------------------------------------- */
-
-#evictionResults {
-
-    margin-top: 12px;
-}
-
-
-/* ---------------------------------------------------------
-   POV DRAW
-   --------------------------------------------------------- */
-
-.pov-draw-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(120px, 1fr)
-        );
-
-    gap: 8px;
-}
-
-.pov-draw-card {
-
-    padding: 10px;
-
-    text-align: center;
-
-    border: 1px solid #b9c0c6;
-
-    background: #f7f8f9;
-}
-
-.pov-draw-card.selected {
-
-    border-color: #4a6074;
-
-    background: #e7edf2;
-
-    font-weight: 700;
-}
-
-
-/* ---------------------------------------------------------
-   MEMORY WALL
-   --------------------------------------------------------- */
-
-#memoryWall {
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(145px, 1fr)
-        );
-}
-
-.memory-wall-card {
-
-    position: relative;
-
-    min-height: 210px;
-
-    border: 2px solid #252c33;
-
     background: #dfe3e6;
 
-    overflow: hidden;
-}
-
-.memory-wall-card img {
-
-    width: 100%;
-
-    height: 175px;
-
-    object-fit: cover;
-
-    display: block;
-}
-
-.memory-wall-card .memory-wall-name {
-
-    padding: 7px;
-
-    background: #252c33;
-
-    color: #fff;
-
-    text-align: center;
-
     font-weight: 800;
-}
 
-.memory-wall-card.evicted {
-
-    opacity: 0.55;
 }
 
 
-/* ---------------------------------------------------------
-   JURY
-   --------------------------------------------------------- */
+.event-log-text {
 
-.jury-vote {
+    padding: 10px;
 
-    display: inline-block;
-
-    margin-top: 6px;
-
-    padding: 4px 7px;
-
-    border-radius: 3px;
-
-    background: #e5e8eb;
-
-    font-size: 11px;
-
-    font-weight: 700;
 }
 
 
-/* ---------------------------------------------------------
-   FINALE
-   --------------------------------------------------------- */
 
-.finale-panel {
+/* =========================================================
+   EMPTY STATES
+========================================================= */
 
-    background: #fff;
+.empty-state,
+.schedule-empty {
 
-    border: 1px solid #b6bdc4;
+    padding: 25px;
 
-    padding: 20px;
-}
+    background: #f4f5f6;
 
-.finale-finalists {
+    border:
+        1px dashed #aeb6be;
 
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            3,
-            minmax(0, 1fr)
-        );
-
-    gap: 14px;
-}
-
-.finale-finalist {
+    color: #69727a;
 
     text-align: center;
 
-    border: 1px solid #c1c7cc;
-
-    background: #f5f6f7;
-
-    padding: 12px;
 }
 
-.finale-finalist img {
+
+
+/* =========================================================
+   TABLE WRAPPERS
+========================================================= */
+
+.table-wrapper {
 
     width: 100%;
 
-    height: 250px;
+    overflow-x: auto;
 
-    object-fit: cover;
 }
 
-
-/* ---------------------------------------------------------
-   TABLES
-   --------------------------------------------------------- */
 
 table {
 
@@ -1128,307 +1354,493 @@ table {
 
     border-collapse: collapse;
 
-    background: #fff;
 }
 
-th,
-td {
-
-    border: 1px solid #c3c8cd;
-
-    padding: 8px;
-
-    text-align: left;
-
-    vertical-align: top;
-}
 
 th {
 
-    background: #e3e6e9;
+    background: #48535e;
 
-    font-weight: 800;
+    color: white;
+
+    padding: 9px;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
 }
 
 
-/* ---------------------------------------------------------
-   MISC
-   --------------------------------------------------------- */
+td {
 
-hr {
-
-    border: 0;
-
-    border-top:
-        1px solid #d0d4d8;
-
-    margin: 18px 0;
-}
-
-.muted,
-.help-text {
-
-    color: #666;
-}
-
-.empty-state {
-
-    padding: 25px;
+    padding: 9px;
 
     border:
-        1px dashed #aeb5bb;
+        1px solid #c9ced3;
 
-    background: #f7f8f9;
-
-    text-align: center;
-
-    color: #666;
-}
-
-.hidden {
-
-    display: none !important;
 }
 
 
-/* ---------------------------------------------------------
-   DYNAMIC CONTROLS
-   --------------------------------------------------------- */
+tr:nth-child(even) {
 
-#castGrid button,
-#gameHouseguests button,
-#memoryWall button,
-#juryList button,
-#finaleContent button {
+    background: #f0f2f4;
 
-    max-width: 100%;
 }
 
 
-/* ---------------------------------------------------------
-   TABLET
-   --------------------------------------------------------- */
 
-@media (max-width: 1000px) {
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
 
-    .summary-grid,
-    .status-grid {
+@media (
+    max-width: 900px
+) {
+
+    #seasonSummary,
+    .season-summary {
 
         grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
+            repeat(2, 1fr);
+
     }
 
-    .game-columns {
 
-        grid-template-columns: 1fr;
-    }
-
-    .form-grid.three,
-    .form-grid.stats-grid {
+    .relationship-card {
 
         grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
+            1fr 1fr;
+
     }
+
+
+    .relationship-middle {
+
+        grid-column:
+            1 / -1;
+
+        grid-row: 2;
+
+    }
+
+
+    .relationship-card button {
+
+        grid-column:
+            1 / -1;
+
+    }
+
+
+    .schedule-header-row,
+    .schedule-week-row {
+
+        grid-template-columns:
+            75px
+            1fr
+            1fr;
+
+    }
+
+
+    .schedule-header-row > div:last-child,
+    .schedule-week-row > div:last-child {
+
+        display: none;
+
+    }
+
 }
 
 
-/* ---------------------------------------------------------
-   MOBILE
-   --------------------------------------------------------- */
 
-@media (max-width: 720px) {
+/* =========================================================
+   RESPONSIVE PHONE
+========================================================= */
 
-    .page-section {
-
-        padding: 12px;
-    }
-
-    .logo-area {
-
-        padding: 14px;
-    }
-
-    .logo-main {
-
-        font-size: 28px;
-    }
-
-    .main-nav {
-
-        padding: 0 6px 6px;
-    }
-
-    .main-nav button {
-
-        flex: 1 1 auto;
-
-        margin: 2px;
-
-        border-radius: 3px;
-
-        padding: 9px 7px;
-
-        font-size: 11px;
-    }
-
-    .hero-panel,
-    .panel {
-
-        padding: 14px;
-    }
-
-    .form-grid,
-    .form-grid.three,
-    .form-grid.stats-grid,
-    .summary-grid,
-    .status-grid,
-    .finale-finalists {
-
-        grid-template-columns: 1fr;
-    }
-
-    #castGrid,
-    #gameHouseguests,
-    #juryList,
-    #evictedPlayers,
-    #finaleContent {
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-    }
-}
-
-
-/* ---------------------------------------------------------
-   SMALL PHONES
-   --------------------------------------------------------- */
-
-@media (max-width: 480px) {
+@media (
+    max-width: 650px
+) {
 
     body {
 
-        font-size: 13px;
+        font-size: 14px;
+
     }
 
-    #castGrid,
-    #gameHouseguests,
-    #memoryWall,
-    #juryList,
-    #evictedPlayers,
-    #finaleContent {
 
-        grid-template-columns: 1fr;
+    .header-inner {
+
+        padding-top: 16px;
+
     }
 
-    .cast-card img,
-    .houseguest-card img,
-    .memory-card img,
-    .jury-card img,
-    .evicted-card img {
 
-        height: 230px;
+    .logo h1,
+    .site-logo h1,
+    .brand h1 {
+
+        font-size: 28px;
+
+        letter-spacing: 2px;
+
     }
 
+
+    .logo span,
+    .site-logo span,
+    .brand span {
+
+        font-size: 11px;
+
+        letter-spacing: 4px;
+
+    }
+
+
+    nav,
+    .navigation,
+    .main-nav {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 3px;
+
+        padding-bottom: 5px;
+
+    }
+
+
+    nav button,
+    .navigation button,
+    .main-nav button,
+    .nav-button {
+
+        width: 100%;
+
+        min-height: 42px;
+
+        padding: 7px 5px;
+
+        border:
+            1px solid #20272e;
+
+        border-radius: 3px;
+
+        font-size: 11px;
+
+        white-space: normal;
+
+    }
+
+
+    main,
+    .main-content,
+    #app {
+
+        width:
+            calc(100% - 16px);
+
+        margin-top: 10px;
+
+    }
+
+
+    .panel,
+    .card,
+    .content-panel,
+    .simulator-panel {
+
+        padding: 12px;
+
+        margin-bottom: 10px;
+
+    }
+
+
+    .hero,
+    .home-hero,
+    .welcome-panel {
+
+        padding: 20px 16px;
+
+    }
+
+
+    .hero h1,
+    .home-hero h1,
+    .welcome-panel h1 {
+
+        font-size: 25px;
+
+    }
+
+
+    .panel h2,
+    .card h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    #seasonSummary,
+    .season-summary {
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 5px;
+
+    }
+
+
+    .summary-card strong {
+
+        font-size: 20px;
+
+    }
+
+
+    .season-controls,
+    .controls,
     .button-row {
 
-        flex-direction: column;
+        display: grid;
 
-        align-items: stretch;
+        grid-template-columns:
+            1fr 1fr;
+
     }
 
+
+    .season-controls button,
+    .controls button,
     .button-row button {
 
         width: 100%;
+
     }
 
-    .stage-icon {
 
-        float: none;
+    /*
+       Turn competition schedule into
+       stacked BrantSteele-style week entries.
+    */
 
-        margin-bottom: 10px;
+    .competition-schedule-table {
+
+        border: none;
+
     }
+
+
+    .schedule-header-row {
+
+        display: none;
+
+    }
+
+
+    .schedule-week-row {
+
+        display: block;
+
+        margin-bottom: 8px;
+
+        border:
+            1px solid #b7bec5;
+
+        background: #ffffff;
+
+    }
+
+
+    .schedule-week-row > div {
+
+        display: flex !important;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        border-right: none;
+
+        border-bottom:
+            1px solid #d8dde1;
+
+    }
+
+
+    .schedule-week-row > div:last-child {
+
+        border-bottom: none;
+
+    }
+
+
+    .schedule-week-number {
+
+        display: block !important;
+
+        background: #47525d;
+
+        color: white;
+
+        font-size: 15px;
+
+    }
+
+
+    .mobile-label {
+
+        display: inline;
+
+        min-width: 50px;
+
+        font-weight: 800;
+
+        color: #606971;
+
+    }
+
+
+    .houseguest-grid,
+    .cast-grid,
+    #houseguestList {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 7px;
+
+    }
+
+
+    .houseguest-card img,
+    .cast-card img {
+
+        height: 170px;
+
+    }
+
+
+    .memory-wall,
+    #memoryWall {
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 5px;
+
+    }
+
+
+    .memory-wall-name {
+
+        font-size: 11px;
+
+    }
+
+
+    .memory-wall-status {
+
+        font-size: 9px;
+
+    }
+
+
+    #juryList,
+    .jury-list {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .relationship-card {
+
+        display: block;
+
+    }
+
+
+    .relationship-person {
+
+        margin-bottom: 8px;
+
+    }
+
+
+    .relationship-middle {
+
+        margin:
+            8px 0;
+
+    }
+
+
+    .relationship-card button {
+
+        width: 100%;
+
+    }
+
 }
 
 
-/* ---------------------------------------------------------
+
+/* =========================================================
    VERY SMALL PHONES
-   --------------------------------------------------------- */
+========================================================= */
 
-@media (max-width: 330px) {
+@media (
+    max-width: 380px
+) {
 
-    .main-nav button {
+    nav,
+    .navigation,
+    .main-nav {
 
-        flex-basis: 100%;
+        grid-template-columns:
+            1fr;
+
     }
 
-    .logo-main {
 
-        font-size: 24px;
+    .houseguest-grid,
+    .cast-grid,
+    #houseguestList {
+
+        grid-template-columns:
+            1fr 1fr;
+
     }
+
+
+    .memory-wall,
+    #memoryWall {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .season-controls,
+    .controls,
+    .button-row {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
 }
-
-
-/* ---------------------------------------------------------
-   ACCESSIBILITY
-   --------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-
-    html {
-
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-
-        animation-duration: 0.01ms !important;
-
-        animation-iteration-count: 1 !important;
-
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* ================================================================
-   BRANTSTEELE-STYLE WEEKLY GAME PRESENTATION
-   ================================================================ */
-.weekly-presentation-intro{margin:18px 0;display:grid;gap:12px}
-.weekly-presentation-title{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;border-radius:12px;background:#1f2937;color:#fff;text-transform:uppercase;letter-spacing:.05em}
-.weekly-presentation-title span{font-size:.82rem;font-weight:800;opacity:.85}.weekly-presentation-title strong{font-size:1.05rem}
-.current-competition{padding:18px;border:1px solid #d6dbe1;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.06)}
-.current-competition-label{font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.65}.current-competition-name{font-size:1.55rem;font-weight:900;margin-top:3px}.current-competition-description{margin-top:6px;line-height:1.45;opacity:.78}.active-week-twists{padding:10px 14px;border-radius:10px;background:#f1f5f9;font-size:.9rem}
-.weekly-houseguest-card{min-height:205px;position:relative}.weekly-houseguest-card .game-houseguest-photo{height:150px;object-fit:cover}.weekly-houseguest-card.is-hoh{outline:3px solid #f59e0b}.weekly-houseguest-card.is-nominee{outline:3px solid #ef4444}
-.weekly-block{margin-bottom:20px}.weekly-block-title{font-size:.9rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:9px 2px;border-bottom:2px solid #d1d5db;margin-bottom:10px}
-.weekly-event-card{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px;margin:9px 0;border:1px solid #d9dee5;border-radius:13px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.weekly-event-icon{font-size:1.45rem;text-align:center;padding-top:2px}.weekly-event-type{font-size:.67rem;font-weight:900;letter-spacing:.08em;opacity:.55}.weekly-event-text{font-size:1rem;font-weight:700;line-height:1.4;margin-top:3px}
-.weekly-event-people{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px;padding-top:10px;border-top:1px solid #edf0f3}.weekly-person{width:86px;text-align:center}.weekly-person-photo{width:68px;height:68px;margin:0 auto 5px;border-radius:50%;object-fit:cover;display:block;border:2px solid #d7dce2;background:#eef1f4}.weekly-person-name{font-size:.72rem;font-weight:800;line-height:1.15}.weekly-person-status{font-size:.62rem;opacity:.55;margin-top:2px}
-.event-twist{border-left:5px solid #8b5cf6}.event-competition{border-left:5px solid #f59e0b}.event-nomination{border-left:5px solid #ef4444}.event-vote-result,.event-eviction{border-left:5px solid #6b7280}.event-finale{border-left:5px solid #10b981}
-@media(max-width:700px){.weekly-presentation-title{align-items:flex-start;flex-direction:column}.weekly-event-card{grid-template-columns:32px 1fr}.weekly-person{width:72px}.weekly-person-photo{width:56px;height:56px}}
-
-/* ---------------------------------------------------------
-   BRANTSTEELE-STYLE WEEKLY CHAIN
-   --------------------------------------------------------- */
-.weekly-chain-panel { overflow:hidden; }
-.weekly-timeline { margin-top:14px; }
-.weekly-chain { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:6px 2px 14px; }
-.weekly-chain-step { min-width:155px; max-width:190px; padding:14px; border:1px solid #d9dee5; border-radius:12px; background:#f7f8fa; opacity:.55; transition:.2s ease; }
-.weekly-chain-step.is-complete { opacity:1; background:#eef7ef; border-color:#b8d7bd; }
-.weekly-chain-step.is-current { opacity:1; background:#fff; border:2px solid #111827; box-shadow:0 4px 14px rgba(0,0,0,.08); transform:translateY(-2px); }
-.weekly-chain-node { font-size:1.45rem; margin-bottom:8px; }
-.weekly-chain-label { font-size:.68rem; font-weight:900; letter-spacing:.06em; }
-.weekly-chain-summary { margin-top:5px; font-size:.82rem; font-weight:700; line-height:1.3; }
-.weekly-chain-comp { margin-top:8px; font-size:.7rem; font-weight:800; opacity:.65; }
-.weekly-chain-connector { align-self:center; min-width:28px; height:3px; background:#d9dee5; }
-.weekly-chain-connector.is-complete { background:#75a77b; }
-@media(max-width:900px){ .weekly-chain-step{min-width:135px;} .weekly-chain-connector{min-width:18px;} }
