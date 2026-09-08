@@ -4,206 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Big Brother Simulator</title>
-    <link rel="stylesheet" href="style.css?v=20260907">
+    <link rel="stylesheet" href="style.css?v=20260908-2">
 
     <style>
         #allianceMembers {
-            display:none !important;
+            display: none !important;
         }
 
         .bb-alliance-checklist {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-            gap:8px;
-            margin:10px 0 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            margin: 10px 0 8px;
         }
 
         .bb-alliance-check {
-            display:flex;
-            align-items:center;
-            gap:9px;
-            padding:10px;
-            background:#111;
-            border:1px solid #444;
-            border-radius:8px;
-            cursor:pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         .bb-alliance-check:hover {
-            background:#1d1d1d;
+            background: #1d1d1d;
         }
 
         .bb-alliance-check input {
-            width:auto;
-            margin:0;
-            cursor:pointer;
+            width: auto;
+            margin: 0;
+            cursor: pointer;
         }
 
         .bb-alliance-empty {
-            color:#999;
-            padding:12px;
-            border:1px dashed #444;
-            border-radius:8px;
+            color: #999;
+            padding: 12px;
+            border: 1px dashed #444;
+            border-radius: 8px;
         }
 
         .bb-active-twist-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-            gap:10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
         }
 
         .bb-active-twist {
-            padding:14px;
-            border:1px solid #333;
-            border-radius:10px;
-            background:#101010;
+            padding: 14px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #101010;
         }
 
         .bb-active-twist.active {
-            border-color:#fff;
-            background:#181818;
+            border-color: #fff;
+            background: #181818;
         }
 
         .bb-active-twist strong,
         .bb-active-twist span {
-            display:block;
+            display: block;
         }
 
         .bb-active-twist span {
-            margin-top:6px;
-            font-size:12px;
-            color:#999;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #999;
         }
 
         .bb-active-twist.active span {
-            color:#fff;
-            font-weight:800;
+            color: #fff;
+            font-weight: 800;
         }
 
         .status-card > div {
-            min-height:48px;
+            min-height: 48px;
         }
 
         .status-player-image {
-            width:44px;
-            height:44px;
-            object-fit:cover;
-            border-radius:8px;
-            flex:0 0 44px;
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex: 0 0 44px;
         }
 
         .status-player-text {
-            display:flex;
-            flex-direction:column;
-            gap:4px;
-            min-width:0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
         }
 
         .status-player-text span {
-            font-size:12px;
-            opacity:.75;
+            font-size: 12px;
+            opacity: .75;
         }
 
         .status-person-inline {
-            display:inline-flex;
-            align-items:center;
-            gap:7px;
-            margin:3px 8px 3px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 3px 8px 3px 0;
         }
 
         .status-person-inline span {
-            font-weight:700;
+            font-weight: 700;
         }
 
         .status-none {
-            opacity:.65;
+            opacity: .65;
         }
 
         #hohStatus,
         #nomineesStatus,
         #povStatus {
-            display:flex;
-            align-items:center;
-            flex-wrap:wrap;
-            gap:8px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .skip-end-button {
-            margin-top:10px;
-            width:100%;
+            margin-top: 10px;
+            width: 100%;
         }
 
         .final-stage-card {
-            margin-top:12px;
-        }
-
-        .bb-twist-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-            gap:14px;
-            margin-top:14px;
-        }
-
-        .bb-twist-card {
-            background:#101010;
-            border:1px solid #333;
-            border-radius:12px;
-            padding:16px;
-        }
-
-        .bb-twist-card h4 {
-            margin:14px 0 6px;
-        }
-
-        .bb-twist-card ul {
-            margin:6px 0 0 20px;
-            padding:0;
-        }
-
-        .bb-twist-card li {
-            margin:6px 0;
-        }
-
-        .bb-twist-title {
-            font-size:18px;
-            font-weight:800;
-        }
-
-        .bb-twist-weeks {
-            color:#aaa;
-            font-size:12px;
-            font-weight:700;
-            margin-top:4px;
-            text-transform:uppercase;
-        }
-
-        .bb-twist-note {
-            font-size:12px;
-            color:#aaa;
-        }
-
-        .bb-competition-schedule {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-            gap:12px;
-            margin-top:14px;
-        }
-
-        .bb-week-card {
-            background:#101010;
-            border:1px solid #333;
-            border-radius:10px;
-            padding:14px;
-        }
-
-        .bb-week-card h3 {
-            margin:0 0 10px;
-            font-size:16px;
-        }
-
-        .bb-week-card p {
-            margin:6px 0;
-            line-height:1.4;
+            margin-top: 12px;
         }
     </style>
 </head>
@@ -218,64 +149,31 @@
     </div>
 
     <nav class="main-nav">
-
-        <button onclick="showSection('home')">
-            HOME
-        </button>
-
-        <button onclick="showSection('cast')">
-            CAST
-        </button>
-
-        <button onclick="showSection('twists')">
-            TWISTS
-        </button>
-
-        <button onclick="showSection('house')">
-            HOUSE
-        </button>
-
-        <button onclick="showSection('game')">
-            GAME
-        </button>
-
-        <button onclick="showSection('memory')">
-            MEMORY WALL
-        </button>
-
-        <button onclick="showSection('jury')">
-            JURY
-        </button>
-
-        <button onclick="showSection('finale')">
-            FINALE
-        </button>
-
+        <button onclick="showSection('home')">HOME</button>
+        <button onclick="showSection('cast')">CAST</button>
+        <button onclick="showSection('twists')">TWISTS</button>
+        <button onclick="showSection('house')">HOUSE</button>
+        <button onclick="showSection('game')">GAME</button>
+        <button onclick="showSection('memory')">MEMORY WALL</button>
+        <button onclick="showSection('jury')">JURY</button>
+        <button onclick="showSection('finale')">FINALE</button>
     </nav>
 
 </header>
 
 <main>
 
-<!-- =====================================================
-     HOME
-===================================================== -->
-
 <section id="home" class="page-section active-section">
 
     <div class="hero-panel">
-
         <h1>BIG BROTHER</h1>
-
         <h2>SIMULATOR</h2>
 
         <p>
             Create your own Big Brother season with custom Houseguests,
             relationships, alliances, twists and season formats.
         </p>
-
     </div>
-
 
     <div class="panel">
 
@@ -321,7 +219,6 @@
 
         </div>
 
-
         <button
             id="selectSeasonButton"
             class="primary-button"
@@ -330,7 +227,6 @@
             SELECT SEASON
 
         </button>
-
 
         <div
             id="selectedSeasonInfo"
@@ -355,7 +251,6 @@
 
             </button>
 
-
             <button
                 class="secondary-button"
                 onclick="saveGame()">
@@ -364,7 +259,6 @@
 
             </button>
 
-
             <button
                 class="secondary-button"
                 onclick="loadGame()">
@@ -372,7 +266,6 @@
                 LOAD
 
             </button>
-
 
             <button
                 class="danger-button"
@@ -401,10 +294,6 @@
 </section>
 
 
-<!-- =====================================================
-     CAST
-===================================================== -->
-
 <section id="cast" class="page-section">
 
     <div class="section-heading">
@@ -424,7 +313,6 @@
             Add Houseguest
         </h2>
 
-
         <input
             type="hidden"
             id="editingHouseguestId"
@@ -433,10 +321,7 @@
 
         <div class="form-section">
 
-            <h3>
-                Houseguest Identity
-            </h3>
-
+            <h3>Houseguest Identity</h3>
 
             <div class="form-grid">
 
@@ -502,22 +387,17 @@
 
         <div class="form-section">
 
-            <h3>
-                Competition Stats
-            </h3>
+            <h3>Competition Stats</h3>
 
             <p class="form-help">
                 Set each Houseguest's ability from 1 to 10.
             </p>
 
-
             <div class="stats-editor">
-
 
                 <div class="stat-control">
 
                     <div class="stat-header">
-
                         <label for="general">
                             General
                         </label>
@@ -525,7 +405,6 @@
                         <span id="generalValue">
                             5
                         </span>
-
                     </div>
 
                     <input
@@ -663,20 +542,22 @@
 
                 </div>
 
+            </div>
 
-                <div class="stat-control">
+        </div>
 
-                    <div class="stat-header">
 
-                        <label for="social">
-                            Social Skills
-                        </label>
+        <div class="form-section">
 
-                        <span id="socialValue">
-                            5
-                        </span>
+            <h3>Social / Personality</h3>
 
-                    </div>
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="social">
+                        Social Ability
+                    </label>
 
                     <input
                         id="social"
@@ -686,22 +567,18 @@
                         value="5"
                         oninput="updateStatValue('social')">
 
+                    <span id="socialValue">
+                        5
+                    </span>
+
                 </div>
 
 
-                <div class="stat-control">
+                <div class="form-group">
 
-                    <div class="stat-header">
-
-                        <label for="temperament">
-                            Temperament
-                        </label>
-
-                        <span id="temperamentValue">
-                            5
-                        </span>
-
-                    </div>
+                    <label for="temperament">
+                        Temperament
+                    </label>
 
                     <input
                         id="temperament"
@@ -711,8 +588,11 @@
                         value="5"
                         oninput="updateStatValue('temperament')">
 
-                </div>
+                    <span id="temperamentValue">
+                        5
+                    </span>
 
+                </div>
 
             </div>
 
@@ -722,21 +602,18 @@
         <div class="button-row">
 
             <button
-                id="saveHouseguestButton"
                 class="primary-button"
                 onclick="saveHouseguest()">
 
-                ADD HOUSEGUEST
+                SAVE HOUSEGUEST
 
             </button>
 
-
             <button
-                id="cancelEditButton"
-                class="secondary-button hidden"
+                class="secondary-button"
                 onclick="cancelHouseguestEdit()">
 
-                CANCEL EDIT
+                CANCEL
 
             </button>
 
@@ -749,227 +626,46 @@
 
         <div class="panel-title-row">
 
-            <h2>
-                Your Houseguests
-            </h2>
+            <h2>Houseguests</h2>
 
             <span
                 id="castCount"
                 class="count-badge">
-
                 0
-
             </span>
 
         </div>
 
-
         <div
             id="castGrid"
-            class="cast-grid">
+            class="card-grid">
         </div>
 
     </div>
 
 </section>
 
-
-<!-- =====================================================
-     TWISTS
-===================================================== -->
 
 <section id="twists" class="page-section">
 
     <div class="section-heading">
 
-        <h1>
-            TWISTS
-        </h1>
+        <h1>TWISTS</h1>
 
         <p>
-            Built-in BB20 twists are shown automatically
-            when the BB20 format is selected.
+            Configure season twists and special powers.
         </p>
 
     </div>
 
 
-    <div
-        id="bbTwistStatusPanel"
-        class="panel">
+    <div class="panel">
 
-        <h2>
-            Big Brother 20 Twists
-        </h2>
+        <h2>Active Twists</h2>
 
-
-        <div class="bb-twist-grid">
-
-
-            <article class="bb-twist-card">
-
-                <div class="bb-twist-title">
-                    BB App Store
-                </div>
-
-                <div class="bb-twist-weeks">
-                    Weeks 1–3
-                </div>
-
-                <p>
-                    Each week, Houseguests receive either
-                    a Power App or a Crap App based on the
-                    simulated App Store trend results.
-                    A Houseguest who receives an app becomes
-                    ineligible to receive another app.
-                </p>
-
-
-                <h4>
-                    Power Apps
-                </h4>
-
-                <ul>
-
-                    <li>
-                        <strong>
-                            Bonus Life
-                        </strong>
-                        — gives an eligible evicted
-                        Houseguest a chance to compete
-                        to return to the game.
-                    </li>
-
-                    <li>
-                        <strong>
-                            The Cloud
-                        </strong>
-                        — protects its holder from one
-                        nomination or veto ceremony.
-                    </li>
-
-                    <li>
-                        <strong>
-                            Identity Theft
-                        </strong>
-                        — allows its holder to secretly
-                        replace both of the HOH's nominations.
-                    </li>
-
-                </ul>
-
-
-                <h4>
-                    Crap Apps
-                </h4>
-
-                <ul>
-
-                    <li>
-                        <strong>
-                            Hamazon
-                        </strong>
-                        — recurring ham-delivery punishment.
-                    </li>
-
-                    <li>
-                        <strong>
-                            Yell!
-                        </strong>
-                        — surprise angry-reviewer feedback
-                        for 24 hours.
-                    </li>
-
-                    <li>
-                        <strong>
-                            Read It!
-                        </strong>
-                        — requires the Houseguest to perform/read
-                        Hamlet in costume and character.
-                    </li>
-
-                </ul>
-
-            </article>
-
-
-            <article class="bb-twist-card">
-
-                <div class="bb-twist-title">
-                    H@cker Competition
-                </div>
-
-                <div class="bb-twist-weeks">
-                    Weeks 6–7
-                </div>
-
-                <p>
-                    An anonymous H@cker is selected
-                    through a competition.
-                </p>
-
-                <ul>
-
-                    <li>
-                        Replace one nominee.
-                    </li>
-
-                    <li>
-                        Choose one of the three randomly
-                        selected Veto participants.
-                    </li>
-
-                    <li>
-                        Nullify one eviction vote.
-                    </li>
-
-                </ul>
-
-                <p class="bb-twist-note">
-                    The simulator applies these powers
-                    through the weekly game engine.
-                </p>
-
-            </article>
-
-
-            <article class="bb-twist-card">
-
-                <div class="bb-twist-title">
-                    Jury Battle Back
-                </div>
-
-                <div class="bb-twist-weeks">
-                    After the first 4 jurors
-                </div>
-
-                <p>
-                    The first four Jury members compete
-                    in <strong>Big Top Drop</strong>
-                    for a chance to return to the game.
-                </p>
-
-            </article>
-
-
-            <article class="bb-twist-card">
-
-                <div class="bb-twist-title">
-                    Double Eviction
-                </div>
-
-                <div class="bb-twist-weeks">
-                    Week 11
-                </div>
-
-                <p>
-                    Week 11 contains a second rapid-fire
-                    HOH, nomination, POV and eviction cycle.
-                </p>
-
-            </article>
-
-
+        <div
+            id="activeTwists"
+            class="bb-active-twist-grid">
         </div>
 
     </div>
@@ -977,621 +673,57 @@
 
     <div class="panel">
 
-        <h2>
-            BB20 Competition Schedule
-        </h2>
+        <h2>Custom Twists</h2>
 
-        <p class="form-help">
-            These are the named competitions built into
-            the Big Brother 20 format. The simulator uses
-            your Houseguest stats to determine competition
-            performance.
-        </p>
-
-
-        <div class="bb-competition-schedule">
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 1
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Microchip Mayhem
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Going Viral
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 2
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Land a Job
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    HouseGuestsOnly.com
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 3
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Product Launch
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Mamma Mia! Madness
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 4
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Out on a Limb
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Chop, Bonk, Spank
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 5
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Perfect Timing
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Goober Driver
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 6
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    GIF That Keeps on Giving
-                </p>
-
-                <p>
-                    <strong>H@cker:</strong>
-                    Crack The Code
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Boom Power Trip
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 7
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    #HashtagTooLong
-                </p>
-
-                <p>
-                    <strong>H@cker:</strong>
-                    Hack the House
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    OTEV the Sneezy Skunk
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 8
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Glow &amp; Flow
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Zing Force
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 9
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Sweet Shot
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Mission to Planet Veto
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 10
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    High in the Sky
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Control Your Emojis
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 11 — Double Eviction
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    Shell or Highwater
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    BB Comics
-                </p>
-
-                <p>
-                    <strong>2nd HOH:</strong>
-                    Buffering
-                </p>
-
-                <p>
-                    <strong>2nd POV:</strong>
-                    Block and Roll
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Week 12
-                </h3>
-
-                <p>
-                    <strong>HOH:</strong>
-                    BBFlix &amp; Chill
-                </p>
-
-                <p>
-                    <strong>POV:</strong>
-                    Your Mazes are Numbered
-                </p>
-
-            </div>
-
-
-            <div class="bb-week-card">
-
-                <h3>
-                    Finale
-                </h3>
-
-                <p>
-                    <strong>Final HOH Part 1:</strong>
-                    Jetpack Attack
-                </p>
-
-                <p>
-                    <strong>Final HOH Part 2:</strong>
-                    Mount Evictus
-                </p>
-
-                <p>
-                    <strong>Final HOH Part 3:</strong>
-                    Jury Oddcasts
-                </p>
-
-            </div>
-
-
+        <div
+            id="customTwistsList">
         </div>
 
-    </div>
-
-
-    <div class="panel">
-
-        <h2>
-            Create Custom Twist
-        </h2>
-
-
-        <div class="form-grid">
-
-
-            <div class="form-group">
-
-                <label for="twistName">
-                    Twist Name
-                </label>
-
-                <input
-                    id="twistName"
-                    type="text"
-                    placeholder="Twist name">
-
-            </div>
-
-
-            <div class="form-group full-width">
-
-                <label for="twistDescription">
-                    Description
-                </label>
-
-                <textarea
-                    id="twistDescription"
-                    placeholder="Describe the twist...">
-                </textarea>
-
-            </div>
-
-
-        </div>
-
-
-        <button
-            class="primary-button"
-            onclick="createTwist()">
-
-            ADD TWIST
-
-        </button>
-
-    </div>
-
-
-    <div
-        id="twistList"
-        class="twist-list">
     </div>
 
 </section>
 
-
-<!-- =====================================================
-     HOUSE
-===================================================== -->
 
 <section id="house" class="page-section">
 
     <div class="section-heading">
 
-        <h1>
-            HOUSE RELATIONSHIPS
-        </h1>
+        <h1>BIG BROTHER HOUSE</h1>
 
         <p>
-            Build the social structure of your season.
+            View the current Houseguests and game status.
         </p>
 
     </div>
 
 
     <div class="panel">
-
-        <h2>
-            Create Alliance
-        </h2>
-
-
-        <div class="form-group">
-
-            <label for="allianceName">
-                Alliance Name
-            </label>
-
-            <input
-                id="allianceName"
-                type="text"
-                placeholder="The Level 6">
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="allianceMembers">
-                Members
-            </label>
-
-            <select
-                id="allianceMembers"
-                multiple
-                size="8">
-            </select>
-
-            <div class="form-help">
-                Check the Houseguests below to add them
-                to the alliance.
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="allianceStrength">
-                Alliance Strength
-            </label>
-
-            <select id="allianceStrength">
-
-                <option value="casual">
-                    Casual
-                </option>
-
-                <option value="weak">
-                    Weak
-                </option>
-
-                <option
-                    value="moderate"
-                    selected>
-                    Moderate
-                </option>
-
-                <option value="strong">
-                    Strong
-                </option>
-
-                <option value="unbreakable">
-                    Unbreakable
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <button
-            class="primary-button"
-            onclick="createAlliance()">
-
-            CREATE ALLIANCE
-
-        </button>
-
-    </div>
-
-
-    <div
-        id="allianceList"
-        class="alliance-list">
-    </div>
-
-
-    <div class="panel">
-
-        <h2>
-            Houseguest Relationships
-        </h2>
-
-        <p class="form-help">
-            Relationships are directional:
-            A liking B does not automatically mean
-            B likes A.
-        </p>
-
-
-        <div class="relationship-editor">
-
-
-            <div class="relationship-person">
-
-                <label for="relationshipFrom">
-                    Houseguest
-                </label>
-
-                <select
-                    id="relationshipFrom">
-                </select>
-
-                <div
-                    id="relationshipFromPreview"
-                    class="relationship-preview">
-                </div>
-
-            </div>
-
-
-            <div class="relationship-arrow">
-                →
-            </div>
-
-
-            <div class="relationship-person">
-
-                <label for="relationshipTo">
-                    Other Houseguest
-                </label>
-
-                <select
-                    id="relationshipTo">
-                </select>
-
-                <div
-                    id="relationshipToPreview"
-                    class="relationship-preview">
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="relationshipType">
-                Relationship
-            </label>
-
-            <select id="relationshipType">
-
-                <option value="love">
-                    ❤️ Love
-                </option>
-
-                <option value="like">
-                    😊 Like
-                </option>
-
-                <option
-                    value="neutral"
-                    selected>
-                    😐 Neutral
-                </option>
-
-                <option value="dislike">
-                    😒 Dislike
-                </option>
-
-                <option value="hate">
-                    😡 Hate
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="relationshipNote">
-                Optional Note
-            </label>
-
-            <input
-                id="relationshipNote"
-                type="text"
-                placeholder="Best friends, former enemies, etc.">
-
-        </div>
-
-
-        <div class="button-row">
-
-            <button
-                class="primary-button"
-                onclick="saveRelationship()">
-
-                SAVE RELATIONSHIP
-
-            </button>
-
-
-            <button
-                class="secondary-button"
-                onclick="loadSelectedRelationship()">
-
-                LOAD EXISTING
-
-            </button>
-
-
-            <button
-                class="danger-button"
-                onclick="deleteSelectedRelationship()">
-
-                REMOVE RELATIONSHIP
-
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>
-            Relationship Map
-        </h2>
 
         <div
-            id="relationshipsList"
-            class="relationships-list">
+            id="houseStatus"
+            class="status-grid">
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panel-title-row">
+
+            <h2>Current Houseguests</h2>
+
+            <span
+                id="houseCount"
+                class="count-badge">
+                0
+            </span>
+
+        </div>
+
+        <div
+            id="gameHouseguests"
+            class="card-grid">
         </div>
 
     </div>
@@ -1599,141 +731,41 @@
 </section>
 
 
-<!-- =====================================================
-     GAME
-===================================================== -->
-
 <section id="game" class="page-section">
 
-    <div class="game-header">
+    <div class="section-heading">
 
-        <div>
+        <h1>GAME</h1>
 
-            <div
-                id="weekBadge"
-                class="week-badge">
-
-                WEEK 1
-
-            </div>
-
-
-            <h1 id="weekTitle">
-                Week 1
-            </h1>
-
-
-            <h2 id="stageTitle">
-                Ready
-            </h2>
-
-        </div>
+        <p>
+            Run the season one stage at a time.
+        </p>
 
     </div>
 
 
-    <div class="stage-panel">
+    <div class="panel">
 
         <div
-            id="stageIcon"
-            class="stage-icon">
-
-            ★
-
+            id="gameStage"
+            class="game-stage">
         </div>
-
-
-        <div>
-
-            <h2 id="stageName">
-                Ready
-            </h2>
-
-            <p id="stageDescription">
-                Start the season to begin.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="status-grid">
-
-
-        <div class="status-card">
-
-            <h3>
-                HOH
-            </h3>
-
-            <div id="hohStatus">
-                None
-            </div>
-
-        </div>
-
-
-        <div class="status-card">
-
-            <h3>
-                NOMINEES
-            </h3>
-
-            <div id="nomineesStatus">
-                None
-            </div>
-
-        </div>
-
-
-        <div class="status-card">
-
-            <h3>
-                POWER OF VETO
-            </h3>
-
-            <div id="povStatus">
-                None
-            </div>
-
-        </div>
-
-
-        <div class="status-card">
-
-            <h3>
-                FORMAT
-            </h3>
-
-            <div id="formatStatus">
-                Normal Week
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-    <div class="panel proceed-panel">
 
         <button
             id="proceedButton"
-            class="proceed-button"
+            class="primary-button"
             onclick="proceedGame()">
 
             PROCEED
 
         </button>
 
-
         <button
             id="skipEndButton"
             class="secondary-button skip-end-button"
             onclick="skipToEnd()">
 
-            SIMULATE TO END
+            SKIP TO END
 
         </button>
 
@@ -1742,141 +774,121 @@
 
     <div class="panel">
 
-        <h2>
-            Houseguests
-        </h2>
+        <div class="panel-title-row">
+
+            <h2>Game Status</h2>
+
+        </div>
 
         <div
-            id="gameHouseguests"
-            class="game-houseguest-grid">
+            id="hohStatus"
+            class="status-card">
+        </div>
+
+        <div
+            id="nomineesStatus"
+            class="status-card">
+        </div>
+
+        <div
+            id="povStatus"
+            class="status-card">
         </div>
 
     </div>
 
 
-    <div class="panel">
+    <div class="panel weekly-chain-panel">
 
-        <h2>
-            Event Log
-        </h2>
+        <div class="panel-title-row">
+
+            <h2>Week Chain</h2>
+
+            <span class="count-badge">
+                BRANTSTEELE STYLE
+            </span>
+
+        </div>
 
         <div
             id="eventLog"
-            class="event-log">
+            class="weekly-chain">
         </div>
 
-    </div>
-
-
-    <div
-        id="evictionResults"
-        class="panel hidden">
     </div>
 
 </section>
 
-
-<!-- =====================================================
-     MEMORY WALL
-===================================================== -->
 
 <section id="memory" class="page-section">
 
     <div class="section-heading">
 
-        <h1>
-            MEMORY WALL
-        </h1>
+        <h1>MEMORY WALL</h1>
 
         <p>
-            Active Houseguests remain in full color.
-            Evicted Houseguests become dimmed and grayscale.
+            Track who is still in the game.
         </p>
 
     </div>
 
-
     <div
         id="memoryWall"
-        class="memory-wall">
+        class="card-grid">
     </div>
 
 </section>
 
-
-<!-- =====================================================
-     JURY
-===================================================== -->
 
 <section id="jury" class="page-section">
 
     <div class="section-heading">
 
-        <h1>
-            JURY
-        </h1>
+        <h1>JURY</h1>
+
+        <p>
+            View the current jury and their votes.
+        </p>
 
     </div>
 
-
-    <div class="panel">
-
-        <h2>
-            Jury Members
-        </h2>
-
-        <div
-            id="juryList"
-            class="jury-grid">
-        </div>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>
-            Evicted Houseguests
-        </h2>
-
-        <div
-            id="evictedPlayers"
-            class="jury-grid">
-        </div>
-
+    <div
+        id="juryList"
+        class="card-grid">
     </div>
 
 </section>
 
-
-<!-- =====================================================
-     FINALE
-===================================================== -->
 
 <section id="finale" class="page-section">
 
     <div class="section-heading">
 
-        <h1>
-            FINALE
-        </h1>
+        <h1>FINALE</h1>
+
+        <p>
+            Final HOH, jury voting and winner.
+        </p>
 
     </div>
 
-
     <div
         id="finaleContent"
-        class="finale-content">
+        class="finale-panel">
     </div>
 
 </section>
 
-
 </main>
 
 
-<script src="seasons/bb20.js?v=20260907-1"></script>
-<script src="script.js?v=20260907-1"></script>
+<script src="seasons/bb19.js"></script>
+<script src="seasons/bb20.js"></script>
+<script src="seasons/bb23.js"></script>
+<script src="seasons/bb24.js"></script>
+<script src="seasons/bb25.js"></script>
+<script src="seasons/bb26.js"></script>
+<script src="script.js?v=20260908-2"></script>
 
 </body>
 </html>
