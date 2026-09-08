@@ -1,449 +1,847 @@
-*{
-    box-sizing:border-box
+/* =========================================================
+   BIG BROTHER SIMULATOR
+   BrantSteele-style Responsive Layout
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#0b0b10;
-    color:#f4f4f6
+html {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef1f5;
+    color: #17202a;
+    line-height: 1.45;
 }
 
 button,
 input,
-select{
-    font:inherit
+select,
+textarea {
+    font: inherit;
 }
 
-button{
-    cursor:pointer
+button {
+    cursor: pointer;
 }
 
-.site-header{
-    position:sticky;
-    top:0;
-    z-index:1000;
-    background:#111117;
-    border-bottom:1px solid #292932;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 18px
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
-.brand{
-    font-weight:900;
-    letter-spacing:.08em
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+    width: 100%;
+    background: #101820;
+    color: #ffffff;
+    border-bottom: 4px solid #d8a72c;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
-.nav{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap
+.logo-area {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 14px 18px 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
 }
 
-.nav button{
-    background:transparent;
-    color:#ddd;
-    border:0;
-    padding:9px 10px;
-    font-weight:800;
-    font-size:11px
+.logo-main {
+    font-size: clamp(25px, 5vw, 42px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
 }
 
-.nav button:hover,
-.nav button.active{
-    background:#24242d;
-    border-radius:7px;
-    color:#fff
+.logo-sub {
+    font-size: clamp(12px, 2vw, 17px);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #d8a72c;
 }
 
-.page-section{
-    display:none;
-    max-width:1200px;
-    margin:auto;
-    padding:28px 18px 60px
+.main-nav {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 12px 10px;
+
+    display: flex;
+    gap: 6px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
 }
 
-.page-section.active{
-    display:block
+.main-nav button {
+    flex: 0 0 auto;
+
+    border: 1px solid #46515d;
+    background: #1b2630;
+    color: #ffffff;
+
+    padding: 9px 13px;
+    border-radius: 3px;
+
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
 }
 
-.section-heading{
-    margin-bottom:18px
+.main-nav button:hover,
+.main-nav button:focus-visible {
+    background: #d8a72c;
+    color: #111111;
+    outline: none;
 }
 
-.section-heading h1{
-    margin:0 0 5px;
-    font-size:30px
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+main {
+    width: 100%;
+    min-width: 0;
 }
 
-.section-heading p{
-    margin:0;
-    opacity:.65
+
+/*
+   IMPORTANT FIX:
+
+   JavaScript uses:
+       active-section
+
+   Therefore CSS MUST use:
+       .page-section.active-section
+
+   Do NOT change this to .active.
+*/
+
+.page-section {
+    display: none;
+
+    width: 100%;
+    max-width: 1180px;
+    min-width: 0;
+
+    margin: 0 auto;
+
+    padding: 24px 18px 60px;
 }
 
-.hero{
-    padding:38px 28px;
-    border:1px solid #292932;
-    border-radius:16px;
-    background:linear-gradient(135deg,#191921,#0f0f14);
-    margin-bottom:18px
+.page-section.active-section {
+    display: block;
 }
 
-.hero h1{
-    font-size:42px;
-    margin:0 0 8px
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.hero-panel,
+.panel,
+.editor-panel,
+.status-panel,
+.results-panel,
+.twist-panel {
+    width: 100%;
+    min-width: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #c9d0d7;
+    border-radius: 5px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    padding: 18px;
+    margin-bottom: 18px;
 }
 
-.hero p{
-    opacity:.7
+.hero-panel {
+    border-top: 5px solid #d8a72c;
+    padding: clamp(18px, 4vw, 30px);
 }
 
-.panel{
-    background:#121218;
-    border:1px solid #292932;
-    border-radius:13px;
-    padding:18px;
-    margin:16px 0
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4 {
+    margin-top: 0;
+    color: #18232d;
 }
 
-.form-group{
-    margin:14px 0
+h1 {
+    font-size: clamp(24px, 4vw, 36px);
 }
 
-.form-group label{
-    display:block;
-    font-size:11px;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    margin-bottom:7px;
-    opacity:.75
+h2 {
+    font-size: clamp(20px, 3vw, 28px);
 }
+
+h3 {
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   GENERAL GRIDS
+   ========================================================= */
+
+.grid,
+.cast-grid,
+.game-grid,
+.memory-grid,
+.jury-grid,
+.twist-list,
+.alliance-list,
+.relationships-list {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+}
+
+.cast-grid {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(170px, 1fr)
+    );
+}
+
+.game-grid {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(170px, 1fr)
+    );
+}
+
+.memory-grid {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(150px, 1fr)
+    );
+}
+
+.jury-grid {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, 1fr)
+    );
+}
+
+.twist-list,
+.alliance-list,
+.relationships-list {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(260px, 1fr)
+    );
+}
+
+
+/* =========================================================
+   FORM LAYOUT
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.form-grid.three,
+.three-column {
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+}
+
+.form-group {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.form-group.full,
+.full-width {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #394754;
+}
+
+
+/* =========================================================
+   FORM CONTROLS
+   ========================================================= */
 
 input,
-select{
-    width:100%;
-    background:#0d0d12;
-    color:#fff;
-    border:1px solid #363640;
-    border-radius:7px;
-    padding:10px
+select,
+textarea {
+    width: 100%;
+    min-width: 0;
+
+    border: 1px solid #b8c1c9;
+    border-radius: 3px;
+
+    background: #ffffff;
+    color: #17202a;
+
+    padding: 9px 10px;
 }
 
-select[multiple]{
-    min-height:150px
+textarea {
+    min-height: 90px;
+    resize: vertical;
 }
 
-.button-row{
-    display:flex;
-    gap:9px;
-    flex-wrap:wrap
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #d8a72c;
+
+    outline:
+        2px solid
+        rgba(216, 167, 44, 0.2);
 }
 
-.primary-button,
-.secondary-button,
-.danger-button,
-.proceed-button{
-    border:0;
-    border-radius:8px;
-    padding:11px 15px;
-    font-weight:900
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+button.primary,
+.primary-button {
+    border: 1px solid #9c7614;
+
+    background: #d8a72c;
+    color: #111111;
+
+    padding: 10px 15px;
+
+    border-radius: 3px;
+
+    font-weight: 800;
 }
 
-.primary-button{
-    background:#eee;
-    color:#111
+button.secondary,
+.secondary-button {
+    border: 1px solid #8d98a2;
+
+    background: #e9edf0;
+    color: #17202a;
+
+    padding: 10px 15px;
+
+    border-radius: 3px;
+
+    font-weight: 700;
 }
 
-.secondary-button{
-    background:#2a2a34;
-    color:#fff
+button.danger {
+    border: 1px solid #8b2e2e;
+
+    background: #b53b3b;
+    color: #ffffff;
+
+    padding: 10px 15px;
+
+    border-radius: 3px;
+
+    font-weight: 800;
 }
 
-.danger-button{
-    background:#6c2525;
-    color:#fff
+button:hover {
+    filter: brightness(0.96);
 }
 
-.proceed-button{
-    background:#e8e8e8;
-    color:#111;
-    min-width:180px
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 12px;
 }
 
-.proceed-panel{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap:wrap
-}
 
-.hidden{
-    display:none!important
-}
+/* =========================================================
+   CAST / PLAYER CARDS
+   ========================================================= */
 
-.season-grid,
-.cast-grid,
-.game-houseguest-grid,
-.memory-wall,
-.jury-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-    gap:14px
-}
-
+.houseguest-card,
 .cast-card,
-.game-player-card,
+.player-card,
 .memory-card,
-.jury-card{
-    background:#17171e;
-    border:1px solid #30303a;
-    border-radius:11px;
-    overflow:hidden
+.jury-card,
+.alliance-card,
+.relationship-card,
+.twist-card {
+    min-width: 0;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #c8d0d8;
+    border-radius: 4px;
+
+    box-shadow:
+        0 1px 4px
+        rgba(0, 0, 0, 0.07);
 }
 
 .cast-card img,
-.game-player-card img,
+.player-card img,
 .memory-card img,
-.jury-card img{
-    width:100%;
-    height:170px;
-    object-fit:cover;
-    background:#222
+.jury-card img,
+.houseguest-card img {
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+
+    background: #dfe4e8;
 }
 
-.cast-card-info,
-.game-player-info,
-.memory-card-info,
-.jury-card-info{
-    padding:10px
+.cast-card-body,
+.player-card-body,
+.memory-card-body,
+.jury-card-body,
+.houseguest-card-body {
+    padding: 10px;
 }
 
-.cast-card-name,
-.game-player-name,
-.memory-name,
-.jury-name{
-    font-weight:900
+.placeholder,
+.image-placeholder {
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    display: grid;
+
+    place-items: center;
+
+    background: #dfe4e8;
+
+    color: #65717c;
+
+    font-size: 12px;
+
+    text-align: center;
 }
 
-.game-player-full-name{
-    font-size:10px;
-    opacity:.55;
-    margin-top:3px
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.stat-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 8px 0;
 }
 
-.role-badge{
-    display:inline-block;
-    font-size:9px;
-    font-weight:900;
-    padding:4px 6px;
-    border-radius:5px;
-    background:#292933;
-    margin:6px 4px 0 0
+.stat-row input[type="range"] {
+    width: 100%;
+    padding: 0;
 }
 
-.status-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px
+
+/* =========================================================
+   STATUS BOXES
+   ========================================================= */
+
+.status-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 10px;
 }
 
-.status-card{
-    background:#14141b;
-    border:1px solid #292932;
-    border-radius:10px;
-    padding:13px
+.status-box {
+    min-width: 0;
+
+    padding: 12px;
+
+    background: #f3f5f7;
+
+    border: 1px solid #d0d6dc;
+    border-radius: 4px;
 }
 
-.status-card h3{
-    font-size:10px;
-    letter-spacing:.1em;
-    opacity:.6;
-    margin:0 0 6px
+.status-box strong {
+    display: block;
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.05em;
+
+    color: #596773;
 }
 
-.stage-panel{
-    display:flex;
-    gap:14px;
-    align-items:center;
-    background:#17171f;
-    border:1px solid #30303a;
-    border-radius:12px;
-    padding:15px
+.status-box span {
+    display: block;
+
+    margin-top: 3px;
+
+    font-weight: 800;
 }
 
-.stage-icon{
-    font-size:30px
+
+/* =========================================================
+   EVENT LOG
+   ========================================================= */
+
+.event-log,
+#eventLog {
+    max-height: 430px;
+
+    overflow: auto;
+
+    background: #111820;
+    color: #e8edf1;
+
+    border-radius: 4px;
+
+    padding: 12px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 13px;
 }
 
-.event-log{
-    max-height:360px;
-    overflow:auto;
-    font-family:monospace;
-    font-size:12px;
-    line-height:1.6
+.event-entry {
+    padding: 5px 0;
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.08);
 }
 
-.memory-card.evicted-memory-card{
-    filter:grayscale(1);
-    opacity:.45
+.event-entry:last-child {
+    border-bottom: 0;
 }
 
-.memory-card .memory-role{
-    font-size:10px;
-    opacity:.6;
-    text-transform:uppercase
+
+/* =========================================================
+   MEMORY WALL
+   ========================================================= */
+
+#memoryWall {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(125px, 1fr)
+        );
+
+    gap: 10px;
 }
 
-.alliance-card,
-.relationship-card{
-    background:#17171e;
-    border:1px solid #30303a;
-    border-radius:10px;
-    padding:12px;
-    margin:10px 0
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    display: block;
+
+    overflow-x: auto;
 }
 
-.finale-content{
-    min-height:200px
+th,
+td {
+    padding: 8px 10px;
+
+    border: 1px solid #cdd4da;
+
+    text-align: left;
+
+    white-space: nowrap;
 }
 
-.bb-alliance-checklist{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-    gap:7px;
-    margin-top:8px
+th {
+    background: #e8edf1;
+
+    font-size: 12px;
 }
 
-.bb-alliance-check{
-    display:flex;
-    gap:7px;
-    align-items:center;
-    background:#17171e;
-    border:1px solid #30303a;
-    padding:8px;
-    border-radius:7px
+
+/* =========================================================
+   GAME / WEEK DISPLAY
+   ========================================================= */
+
+.badge,
+#weekBadge {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 3px;
+
+    background: #101820;
+    color: #ffffff;
+
+    font-weight: 800;
+
+    font-size: 12px;
 }
 
-.bb-alliance-check input{
-    width:auto
+#stageIcon {
+    font-size: 30px;
 }
 
-.bb-active-twist-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:10px
+#stageDescription {
+    color: #5d6974;
 }
 
-.bb-active-twist{
-    padding:12px;
-    border-radius:9px;
-    background:#17171e;
-    border:1px solid #30303a;
-    display:flex;
-    flex-direction:column;
-    gap:5px
+
+/* =========================================================
+   PREVENT OVERFLOW
+   ========================================================= */
+
+#castGrid,
+#twistList,
+#allianceList,
+#relationshipsList,
+#gameHouseguests,
+#memoryWall,
+#juryList,
+#evictedPlayers,
+#finaleContent {
+    min-width: 0;
+    max-width: 100%;
 }
 
-.bb-active-twist.active{
-    border-color:#b9a24e
+.panel *,
+.hero-panel *,
+.editor-panel *,
+.status-panel *,
+.results-panel *,
+.twist-panel * {
+    max-width: 100%;
 }
 
-.bb-active-twist span{
-    font-size:10px;
-    opacity:.6
-}
 
-.relationship-preview{
-    margin-top:7px
-}
+/* =========================================================
+   TABLET
+   ========================================================= */
 
-.bb-permanent-memory-wall{
-    position:sticky;
-    top:55px;
-    z-index:900;
-    background:rgba(10,10,14,.97);
-    border-bottom:1px solid rgba(255,255,255,.14);
-    padding:8px 12px
-}
+@media (max-width: 900px) {
 
-.bb-memory-title{
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    margin-bottom:6px
-}
-
-.bb-memory-track{
-    display:flex;
-    gap:8px;
-    overflow-x:auto
-}
-
-.bb-memory-mini{
-    flex:0 0 70px;
-    text-align:center
-}
-
-.bb-memory-mini img,
-.bb-memory-mini .bb-memory-placeholder{
-    width:56px;
-    height:56px;
-    object-fit:cover;
-    border-radius:6px;
-    margin:auto;
-    display:block;
-    background:#222;
-    border:2px solid #444
-}
-
-.bb-memory-mini.evicted img,
-.bb-memory-mini.evicted .bb-memory-placeholder{
-    filter:grayscale(1) brightness(.45)
-}
-
-.bb-memory-mini-name{
-    font-size:10px;
-    font-weight:800;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis
-}
-
-.bb-memory-mini-status{
-    font-size:8px;
-    text-transform:uppercase;
-    opacity:.55
-}
-
-@media(max-width:800px){
-
-    .status-grid{
-        grid-template-columns:repeat(2,1fr)
+    .status-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
 
-    .hero h1{
-        font-size:32px
+    .form-grid.three,
+    .three-column {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
-
 }
 
-@media(max-width:500px){
 
-    .page-section{
-        padding:20px 12px 40px
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .logo-area {
+        padding:
+            12px
+            14px
+            9px;
+
+        gap: 8px;
+
+        flex-wrap: wrap;
     }
 
-    .status-grid{
-        grid-template-columns:1fr
+    .main-nav {
+        padding-left: 8px;
+        padding-right: 8px;
     }
 
-    .nav button{
-        padding:7px 6px;
-        font-size:9px
+    .main-nav button {
+        padding: 8px 10px;
+
+        font-size: 11px;
     }
 
+    .page-section {
+        padding:
+            16px
+            10px
+            40px;
+    }
+
+    .hero-panel,
+    .panel,
+    .editor-panel,
+    .status-panel,
+    .results-panel,
+    .twist-panel {
+        padding: 13px;
+    }
+
+
+    /* Forms become one column */
+
+    .form-grid,
+    .form-grid.three,
+    .three-column {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full,
+    .full-width {
+        grid-column: auto;
+    }
+
+
+    /* Two-column cast/game/jury */
+
+    .cast-grid,
+    .game-grid,
+    .jury-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    /* Three-column memory wall */
+
+    .memory-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    /* Single-column lists */
+
+    .twist-list,
+    .alliance-list,
+    .relationships-list {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Status */
+
+    .status-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    /* Buttons */
+
+    .button-row {
+        flex-direction: column;
+    }
+
+    .button-row button,
+    button.primary,
+    button.secondary,
+    button.danger {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .cast-grid,
+    .game-grid,
+    .jury-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .memory-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .logo-main {
+        font-size: 25px;
+    }
+
+    .logo-sub {
+        font-size: 11px;
+    }
+
+    .page-section {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
 }
