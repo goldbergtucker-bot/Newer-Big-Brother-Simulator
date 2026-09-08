@@ -7404,7 +7404,7 @@ if (document.readyState === "loading") {
                     <h2>Veto Player Selection</h2>
                     <p>The HOH, two nominees and three additional Houseguests will play.</p>
                 </div>
-                <div class="ceremony-grid">${povPlayers.map((p, i) => playerCard(p, i === 0 ? "HOH" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "SELECTED PLAYER"), nominees.some(n => n.id === p.id) ? "nominee-card" : "")).join("")}</div>
+                <div class="ceremony-grid">${(Array.isArray(povPlayers) ? povPlayers : []).map((p, i) => playerCard(p, i === 0 ? "HOH" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "SELECTED PLAYER"), nominees.some(n => n.id === p.id) ? "nominee-card" : "")).join("")}</div>
             `;
         }
 
@@ -7415,7 +7415,7 @@ if (document.readyState === "loading") {
                     <h2>${cleanLabel(competition || "Power of Veto")}</h2>
                     <p>Six Houseguests are competing for the Golden Power of Veto.</p>
                 </div>
-                ${povPlayers.map(p => playerCard(p, povWinner && p.id === povWinner.id ? "VETO WINNER" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "COMPETING"), povWinner && p.id === povWinner.id ? "winner-card" : (nominees.some(n => n.id === p.id) ? "nominee-card" : ""))).join("")}</div>
+                ${(Array.isArray(povPlayers) ? povPlayers : []).map(p => playerCard(p, povWinner && p.id === povWinner.id ? "VETO WINNER" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "COMPETING"), povWinner && p.id === povWinner.id ? "winner-card" : (nominees.some(n => n.id === p.id) ? "nominee-card" : ""))).join("")}</div>
             `;
         }
 
@@ -7470,7 +7470,7 @@ if (document.readyState === "loading") {
                     <span>FINALE</span>
                     <h2>${currentStage === "juryVote" ? "Jury Vote" : "Finalists"}</h2>
                 </div>
-                <div class="ceremony-grid">${active.map(p => playerCard(p, p.id === (finalHOH.winner && finalHOH.winner.id) ? "FINAL HOH" : "FINALIST", "")).join("")}</div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, p.id === (finalHOH && finalHOH.winner && finalHOH.winner.id) ? "FINAL HOH" : "FINALIST", "")).join("")}</div>
             `;
         }
 
@@ -7515,5 +7515,33 @@ if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", renderCeremonyDisplay);
     } else {
         renderCeremonyDisplay();
+    }
+})();
+
+
+/* =========================================================
+   V3 BOOT / GITHUB PAGES SAFETY
+   Keeps the interface usable if an optional display element is missing.
+========================================================= */
+(function () {
+    function safeBoot() {
+        try {
+            if (typeof updateAllDisplays === "function") updateAllDisplays();
+            if (typeof updateCastDisplay === "function") updateCastDisplay();
+            if (typeof updateTwistDisplay === "function") updateTwistDisplay();
+            if (typeof updateAllianceDisplay === "function") updateAllianceDisplay();
+            if (typeof updateRelationshipDisplay === "function") updateRelationshipDisplay();
+        } catch (error) {
+            console.error("Big Brother Simulator boot warning:", error);
+            const log = document.getElementById("eventLog");
+            if (log) {
+                log.insertAdjacentHTML("afterbegin", `<div class="event-entry error-entry">Simulator loaded with a display warning: ${String(error.message || error).replace(/[<>&]/g, "")}.</div>`);
+            }
+        }
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", safeBoot, { once: true });
+    } else {
+        safeBoot();
     }
 })();
