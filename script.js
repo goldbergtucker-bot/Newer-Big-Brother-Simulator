@@ -804,12 +804,14 @@ function rankNominationTargets(hoh, candidates) {
 }
 
 function isProtectedFromNomination(player) {
-    return player.safety || (player.app === "The Cloud" && !player.appUsed);
+    return !!player.safety || (player.app === "The Cloud" && !player.appUsed && player.appUsedWeek !== currentWeek);
 }
 
 function makeNominations() {
     const hoh = findPlayer(currentHOH);
     if (!hoh) return;
+    // Safety is ceremony-specific. Clear stale protection before calculating targets.
+    getActiveHouseguests().forEach(p => { if (p.id !== hoh.id && p.app !== "The Cloud") p.safety = false; });
     const candidates = getActiveHouseguests().filter(p => p.id !== hoh.id && !isProtectedFromNomination(p));
     if (candidates.length < 2) return;
     const ranked = rankNominationTargets(hoh, candidates);
@@ -829,6 +831,13 @@ function makeNominations() {
             identity.appUsed = true;
             addEvent(`${getDisplayName(identity)} secretly used Identity Theft to replace the HOH's nominations with ${getDisplayName(nominees[0])} and ${getDisplayName(nominees[1])}.`, "twist");
         }
+    }
+    const cloudHolder = getActiveHouseguests().find(p => p.app === "The Cloud" && !p.appUsed);
+    if (cloudHolder) {
+        // The Cloud is consumed after protecting its holder from this nomination ceremony.
+        cloudHolder.appUsed = true;
+        cloudHolder.appUsedWeek = currentWeek;
+        addEvent(`${getDisplayName(cloudHolder)} was protected by The Cloud for this nomination ceremony. The Cloud has been used.`, "twist");
     }
     currentStage = currentWeek >= 6 && currentWeek <= 7 ? "hacker" : "pov";
 }
@@ -889,19 +898,21 @@ function runPOV() {
     const event = getCompetitionEvent("pov");
     const guaranteed = [findPlayer(currentHOH), ...nominees].filter(Boolean);
     const randomPool = active.filter(p => !guaranteed.some(g => g.id === p.id));
-    const extras = randomPool.slice().sort(() => Math.random() - 0.5).slice(0, Math.max(0, 6 - guaranteed.length));
-    povPlayers = [...guaranteed, ...extras];
+    // BB20 has three randomly selected Veto players in addition to HOH + nominees.
+    const randomExtras = randomPool.slice().sort(() => Math.random() - 0.5).slice(0, Math.max(0, 6 - guaranteed.length));
+    povPlayers = [...guaranteed, ...randomExtras];
 
     if (hackerWinner && !hackerPower.vetoPickUsed && currentWeek >= 6 && currentWeek <= 7) {
         const hacker = findPlayer(hackerWinner);
         const hackerEligible = randomPool.filter(p => !povPlayers.some(v => v.id === p.id));
         if (hacker && hackerEligible.length && povPlayers.length >= 6) {
-            const weakest = povPlayers.slice(3).sort((a, b) => scoreCompetition(a, event?.category || "overall", false) - scoreCompetition(b, event?.category || "overall", false))[0];
-            const selected = hackerEligible.slice().sort((a, b) => scoreCompetition(b, event?.category || "overall") - scoreCompetition(a, event?.category || "overall"))[0];
-            if (weakest && selected && selected.id !== weakest.id) {
+            const randomSlots = povPlayers.slice(guaranteed.length);
+            const weakest = randomSlots.slice().sort((a, b) => scoreCompetition(a, event?.category || "overall", false) - scoreCompetition(b, event?.category || "overall", false))[0];
+            const selected = hackerEligible.slice().sort((a, b) => scoreCompetition(b, event?.category || "overall", false) - scoreCompetition(a, event?.category || "overall", false))[0];
+            if (weakest && selected) {
                 povPlayers[povPlayers.indexOf(weakest)] = selected;
                 hackerPower.vetoPickUsed = true;
-                addEvent(`${getDisplayName(hacker)} used the H@cker power to select ${getDisplayName(selected)} as a Veto player.`, "twist");
+                addEvent(`${getDisplayName(hacker)} used the H@cker power to select ${getDisplayName(selected)} as a Veto player, replacing ${getDisplayName(weakest)}.`, "twist");
             }
         }
     }
@@ -1239,6 +1250,7 @@ function resetGame() {
     seasonStarted = false;
     seasonFinished = false;
     currentWeek = 1;
+    currentCycle = 1;
     currentStage = "opening";
     currentHOH = null;
     nominees = [];
@@ -1246,6 +1258,19 @@ function resetGame() {
     povWinner = null;
     currentEvictionTarget = null;
     finaleWinner = null;
+    hackerWinner = null;
+    replacementNominee = null;
+    evictionVotes = {};
+    currentEvictedPlayer = null;
+    finalHOH = { part1: null, part2: null, part3: null, winner: null };
+    juryVotes = {};
+    juryVoteRevealIndex = 0;
+    outgoingHOH = null;
+    hackerPower = { replacementUsed: false, vetoPickUsed: false, voteNullified: false };
+    appStoreHistory = [];
+    bonusLifeEligible = null;
+    battleBackCompleted = false;
+    pendingSecondCycle = false;
     clearHouseguestEditor();
     updateAllDisplays();
     showSection("home");
@@ -1275,3 +1300,126 @@ function initialize() {
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
+
+
+/* ================================================================
+   BRANTSTEELE-STYLE WEEKLY PRESENTATION LAYER
+   ================================================================ */
+(function installWeeklyPresentation() {
+    const baseRenderGameHouseguests = renderGameHouseguests;
+    const baseRenderEventLog = renderEventLog;
+    const baseUpdateGameStageDisplay = updateGameStageDisplay;
+
+    function competitionForStage() {
+        if (currentStage === "hoh") return getCompetitionEvent("hoh");
+        if (currentStage === "hacker") return getCompetitionEvent("hacker");
+        if (currentStage === "pov" || currentStage === "veto") return getCompetitionEvent("pov");
+        if (currentStage === "finalHOH1") return getCurrentSeasonTemplate()?.competitions?.[13]?.finalHOH?.[0];
+        if (currentStage === "finalHOH2") return getCurrentSeasonTemplate()?.competitions?.[13]?.finalHOH?.[1];
+        if (currentStage === "finalHOH3") return getCurrentSeasonTemplate()?.competitions?.[13]?.finalHOH?.[2];
+        return null;
+    }
+
+    function ensureTimelineHeader() {
+        const game = $("game");
+        if (!game || $("weeklyPresentationIntro")) return;
+        const host = document.createElement("div");
+        host.id = "weeklyPresentationIntro";
+        host.className = "weekly-presentation-intro";
+        const panel = game.querySelector(".game-header");
+        if (panel) panel.insertAdjacentElement("afterend", host);
+    }
+
+    function personCard(p, extraClass = "") {
+        if (!p) return "";
+        const status = p.status || "Active";
+        return `<div class="weekly-person ${extraClass}">
+            ${getPlayerImageHTML(p, "weekly-person-photo")}
+            <div class="weekly-person-name">${escapeHTML(getDisplayName(p))}</div>
+            <div class="weekly-person-status">${escapeHTML(status)}</div>
+        </div>`;
+    }
+
+    function eventPeople(text) {
+        const found = [];
+        const all = [...houseguests, ...evictedHouseguests].filter(Boolean);
+        all.forEach(p => {
+            const name = getDisplayName(p);
+            if (name && String(text).toLowerCase().includes(name.toLowerCase()) && !found.some(x => x.id === p.id)) found.push(p);
+        });
+        return found;
+    }
+
+    renderGameHouseguests = function() {
+        const container = $("gameHouseguests");
+        if (!container) return;
+        const active = getActiveHouseguests();
+        if (!active.length) {
+            container.innerHTML = `<div class="empty-state">No active Houseguests.</div>`;
+            return;
+        }
+        container.innerHTML = active.map(p => {
+            const tags = [];
+            if (p.id === currentHOH) tags.push("HOH");
+            if (nominees.some(n => n.id === p.id)) tags.push("NOMINATED");
+            if (povWinner?.id === p.id) tags.push("POV");
+            if (p.app) tags.push(p.app);
+            return `<article class="game-houseguest-card weekly-houseguest-card ${p.id === currentHOH ? "is-hoh" : ""} ${nominees.some(n => n.id === p.id) ? "is-nominee" : ""}">
+                ${getPlayerImageHTML(p, "game-houseguest-photo")}
+                <div class="game-houseguest-info"><strong>${escapeHTML(getDisplayName(p))}</strong><span>${escapeHTML(tags.join(" • ") || "ACTIVE")}</span></div>
+            </article>`;
+        }).join("");
+    };
+
+    renderEventLog = function() {
+        const container = $("eventLog");
+        if (!container) return;
+        if (!eventLog.length) {
+            container.innerHTML = `<div class="empty-state">No events yet. Press PROCEED to begin the week.</div>`;
+            return;
+        }
+        const groups = [];
+        const reversed = eventLog.slice().reverse();
+        reversed.forEach(e => {
+            const key = `${e.week || 0}-${e.cycle || 1}`;
+            let group = groups.find(g => g.key === key);
+            if (!group) { group = { key, week: e.week || 0, cycle: e.cycle || 1, events: [] }; groups.push(group); }
+            group.events.push(e);
+        });
+        container.innerHTML = groups.map(group => {
+            const cards = group.events.map(e => {
+                const people = eventPeople(e.text || e.message || e);
+                const icon = ({competition:"🏆", "competition-detail":"📊", nomination:"🎯", twist:"✨", veto:"🛡️", "veto-draw":"🎲", vote:"🗳️", "vote-detail":"🗳️", "vote-summary":"📋", "vote-result":"🚪", eviction:"🚪", jury:"🏛️", finale:"👑", season:"📅", social:"🤝", alliance:"🤝", cast:"👤", format:"📺"})[e.type] || "•";
+                return `<article class="weekly-event-card event-${escapeAttribute(e.type || "general")}">
+                    <div class="weekly-event-icon">${icon}</div>
+                    <div class="weekly-event-main">
+                        <div class="weekly-event-type">${escapeHTML(String(e.type || "event").replaceAll("-", " ").toUpperCase())}</div>
+                        <div class="weekly-event-text">${escapeHTML(e.text || e.message || e)}</div>
+                        ${people.length ? `<div class="weekly-event-people">${people.map(p => personCard(p)).join("")}</div>` : ""}
+                    </div>
+                </article>`;
+            }).join("");
+            return `<section class="weekly-block"><div class="weekly-block-title">WEEK ${group.week}${group.cycle > 1 ? ` • CYCLE ${group.cycle}` : ""}</div>${cards}</section>`;
+        }).join("");
+    };
+
+    updateGameStageDisplay = function() {
+        baseUpdateGameStageDisplay();
+        ensureTimelineHeader();
+        const intro = $("weeklyPresentationIntro");
+        if (!intro) return;
+        const event = competitionForStage();
+        const template = getCurrentSeasonTemplate();
+        const weekData = getWeekData();
+        const twistLabels = [];
+        if (template?.twists?.appStore && currentWeek <= 3) twistLabels.push("BB App Store");
+        if (template?.twists?.hacker && currentWeek >= 6 && currentWeek <= 7) twistLabels.push("H@cker Competition");
+        if (weekData?.doubleEviction || currentCycle === 2) twistLabels.push("DOUBLE EVICTION");
+        if (jury.length && currentWeek >= 3) twistLabels.push("Jury Phase");
+        intro.innerHTML = `<div class="weekly-presentation-title"><span>WEEK ${currentWeek}</span><strong>${escapeHTML(seasonName)}</strong></div>
+            ${event ? `<div class="current-competition"><div class="current-competition-label">${escapeHTML(currentStage === "hacker" ? "H@CKER COMPETITION" : currentStage.includes("finalHOH") ? "FINAL HOH COMPETITION" : currentStage === "pov" || currentStage === "veto" ? "POWER OF VETO COMPETITION" : "HEAD OF HOUSEHOLD COMPETITION")}</div><div class="current-competition-name">${escapeHTML(event.name || "Competition")}</div><div class="current-competition-description">${escapeHTML(event.description || "Houseguests compete for power.")}</div></div>` : ""}
+            ${twistLabels.length ? `<div class="active-week-twists"><strong>Active twists:</strong> ${twistLabels.map(escapeHTML).join(" • ")}</div>` : ""}`;
+    };
+
+    window.__BBWeeklyPresentation = { competitionForStage, ensureTimelineHeader };
+})();
