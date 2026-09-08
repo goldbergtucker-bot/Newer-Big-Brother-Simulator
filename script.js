@@ -408,11 +408,11 @@ function updateSelectedSeasonInfo() {
                 }
 
                 if (data.hoh) {
-                    text += `HOH — ${escapeHTML(data.hoh)}`;
+                    text += `HOH - ${escapeHTML(data.hoh)}`;
                 }
 
                 if (data.pov) {
-                    text += ` | POV — ${escapeHTML(data.pov)}`;
+                    text += ` | POV - ${escapeHTML(data.pov)}`;
                 }
 
                 return `<div>${text}</div>`;
@@ -1199,11 +1199,11 @@ const relationshipValues = {
 
 const relationshipLabels = {
 
-    love: "❤️ Love",
-    like: "😊 Like",
-    neutral: "😐 Neutral",
-    dislike: "😒 Dislike",
-    hate: "😡 Hate"
+    love: "Love",
+    like: "Like",
+    neutral: "Neutral",
+    dislike: "Dislike",
+    hate: "Hate"
 
 };
 
@@ -2028,19 +2028,19 @@ function updateStageDisplay() {
         opening1: [
             "OPENING SAFETY",
             "The Trash Folder",
-            "Opening safety competition — Part 1."
+            "Opening safety competition - Part 1."
         ],
 
         opening2: [
             "OPENING SAFETY",
             "HouseGuest CAPTCHA",
-            "Opening safety competition — Part 2."
+            "Opening safety competition - Part 2."
         ],
 
         opening3: [
             "OPENING SAFETY",
             "Surfing the BB Web",
-            "Opening safety competition — Part 3."
+            "Opening safety competition - Part 3."
         ],
 
         hoh: [
@@ -3971,7 +3971,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        —
+                        -
                     </div>
 
                     <div>
@@ -4027,7 +4027,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        →
+                        to
                     </div>
 
                     <div class="${
@@ -4082,7 +4082,7 @@ function renderEvictionVoteReveal() {
                     </div>
 
                     <div class="vote-arrow">
-                        →
+                        to
                     </div>
 
                     <div class="vote-pending">
@@ -4124,7 +4124,7 @@ function renderEvictionVoteReveal() {
 
 
                 <div class="vote-arrow">
-                    →
+                    to
                 </div>
 
 
@@ -5220,7 +5220,7 @@ function renderFinaleJuryVoteReveal() {
                         </div>
 
                         <div class="vote-arrow">
-                            →
+                            to
                         </div>
 
                         <div class="vote-person">
@@ -5578,7 +5578,7 @@ function updateGameDisplay() {
 
         $("formatStatus").textContent =
             currentCycle === 2
-                ? "DOUBLE EVICTION — ROUND 2"
+                ? "DOUBLE EVICTION - ROUND 2"
                 : "DOUBLE EVICTION";
 
     } else {
@@ -6434,7 +6434,7 @@ document.addEventListener(
 
     }
 );/* =========================================================
-   BIG BROTHER SIMULATOR — SOCIAL / MEMORY / POV ENHANCEMENTS
+   BIG BROTHER SIMULATOR - SOCIAL / MEMORY / POV ENHANCEMENTS
    Added as a safe extension layer so the original simulator engine
    remains intact.
 ========================================================= */
@@ -6996,7 +6996,7 @@ if (document.readyState === "loading") {
 }
 
 /* =========================================================
-   FINAL RELIABILITY FIX — ALLIANCE CHECKLIST + TWIST STATUS
+   FINAL RELIABILITY FIX - ALLIANCE CHECKLIST + TWIST STATUS
    This replaces the fragile CTRL/CMD multi-select workflow with
    clickable checkboxes while keeping the original select in sync.
 ========================================================= */
@@ -7101,15 +7101,15 @@ if (document.readyState === "loading") {
             <h2>Active Season Twists</h2>
             <div class="bb-active-twist-grid">
                 <div class="bb-active-twist ${appActive ? "active" : ""}">
-                    <strong>📱 App Store</strong>
+                    <strong>App Store</strong>
                     <span>${appActive ? "ACTIVE THIS WEEK" : "Not active this week"}</span>
                 </div>
                 <div class="bb-active-twist ${hackerActive ? "active" : ""}">
-                    <strong>🕵️ Hacker Competition</strong>
+                    <strong>Hacker Competition</strong>
                     <span>${hackerActive ? "ACTIVE THIS WEEK" : "Not active this week"}</span>
                 </div>
                 <div class="bb-active-twist ${battleBackActive ? "active" : ""}">
-                    <strong>🎪 Jury Battle Back</strong>
+                    <strong>Jury Battle Back</strong>
                     <span>${battleBackActive ? "SCHEDULED" : "Not active this week"}</span>
                 </div>
             </div>
@@ -7211,7 +7211,7 @@ if (document.readyState === "loading") {
                 html=`<div class="bb-ceremony-kicker">WEEK ${currentWeek}</div><h2 class="bb-ceremony-title">BB App Store</h2><p class="bb-ceremony-subtitle">The week's special powers and punishments are being assigned.</p><div class="bb-ceremony-stage">${getActivePlayers().map(p=>card(p,'HOUSEGUEST')).join('')}</div>`;
                 break;
             case 'nominations':
-                html=`<div class="bb-ceremony-kicker">NOMINATION CEREMONY</div><h2 class="bb-ceremony-title">${hoh?escapeHTML(getDisplayName(hoh)):'HOH'}'s Nominations</h2><p class="bb-ceremony-subtitle">The Head of Household must nominate two Houseguests for eviction.</p><div class="bb-ceremony-stage">${card(hoh,'HEAD OF HOUSEHOLD','bb-role-hoh')}<div class="bb-ceremony-vs">→</div>${names.length?names.map(p=>card(p,'NOMINEE','bb-role-nominee')).join(''):'<div class="bb-ceremony-banner">Nominations have not been made yet.</div>'}</div>`;
+                html=`<div class="bb-ceremony-kicker">NOMINATION CEREMONY</div><h2 class="bb-ceremony-title">${hoh?escapeHTML(getDisplayName(hoh)):'HOH'}'s Nominations</h2><p class="bb-ceremony-subtitle">The Head of Household must nominate two Houseguests for eviction.</p><div class="bb-ceremony-stage">${card(hoh,'HEAD OF HOUSEHOLD','bb-role-hoh')}<div class="bb-ceremony-vs">to</div>${names.length?names.map(p=>card(p,'NOMINEE','bb-role-nominee')).join(''):'<div class="bb-ceremony-banner">Nominations have not been made yet.</div>'}</div>`;
                 break;
             case 'hacker':
                 html=`<div class="bb-ceremony-kicker">HACKER COMPETITION</div><h2 class="bb-ceremony-title">Secret Power in Play</h2><p class="bb-ceremony-subtitle">The Hacker can alter the nominations and influence the Veto player selection.</p><div class="bb-ceremony-stage">${getActivePlayers().map(p=>card(p,p.id===hackerWinner?.id?'HACKER':'HOUSEGUEST')).join('')}</div>`;
@@ -7229,7 +7229,7 @@ if (document.readyState === "loading") {
                 html=`<div class="bb-ceremony-kicker">LIVE EVICTION</div><h2 class="bb-ceremony-title">Eviction Vote</h2><p class="bb-ceremony-subtitle">Each eligible Houseguest will cast a vote to evict.</p><div class="bb-ceremony-stage">${names.map(p=>card(p,'ON THE BLOCK','bb-role-nominee')).join('')}</div><div class="bb-ceremony-banner">Advance to prepare the individual votes.</div>`;
                 break;
             case 'eviction':
-                html=`<div class="bb-ceremony-kicker">LIVE EVICTION</div><h2 class="bb-ceremony-title">Vote Reveal</h2><p class="bb-ceremony-subtitle">Votes are revealed one at a time.</p><div class="bb-vote-board">${Object.keys(currentEvictionVotes||{}).map(id=>{const voter=houseguests.find(p=>p.id===id),v=currentEvictionVotes[id]; if(!voter||v.type==='no-vote')return ''; const target=houseguests.find(p=>p.id===v.target); const revealed=(typeof currentVoteRevealIndex==='number')&&getActivePlayers().filter(x=>currentEvictionVotes[x.id]&&currentEvictionVotes[x.id].type!=='no-vote').slice(0,currentVoteRevealIndex).some(x=>x.id===id); return `<div class="bb-vote-item">${img(voter)}<strong>${escapeHTML(getDisplayName(voter))}</strong><div class="bb-vote-arrow">→</div><strong>${revealed&&target?escapeHTML(getDisplayName(target)):'Vote Pending'}</strong></div>`;}).join('')}</div>`;
+                html=`<div class="bb-ceremony-kicker">LIVE EVICTION</div><h2 class="bb-ceremony-title">Vote Reveal</h2><p class="bb-ceremony-subtitle">Votes are revealed one at a time.</p><div class="bb-vote-board">${Object.keys(currentEvictionVotes||{}).map(id=>{const voter=houseguests.find(p=>p.id===id),v=currentEvictionVotes[id]; if(!voter||v.type==='no-vote')return ''; const target=houseguests.find(p=>p.id===v.target); const revealed=(typeof currentVoteRevealIndex==='number')&&getActivePlayers().filter(x=>currentEvictionVotes[x.id]&&currentEvictionVotes[x.id].type!=='no-vote').slice(0,currentVoteRevealIndex).some(x=>x.id===id); return `<div class="bb-vote-item">${img(voter)}<strong>${escapeHTML(getDisplayName(voter))}</strong><div class="bb-vote-arrow">to</div><strong>${revealed&&target?escapeHTML(getDisplayName(target)):'Vote Pending'}</strong></div>`;}).join('')}</div>`;
                 break;
             default:
                 if(evictedHouseguests.length){const last=evictedHouseguests[evictedHouseguests.length-1];html=`<div class="bb-ceremony-kicker">MEMORY WALL UPDATE</div><h2 class="bb-ceremony-title">${escapeHTML(getDisplayName(last))} has been evicted</h2><div class="bb-ceremony-stage">${card(last,'EVICTED','bb-role-evicted')}</div>`;}else html=`<div class="bb-ceremony-kicker">BIG BROTHER</div><h2 class="bb-ceremony-title">${escapeHTML(document.getElementById('stageName')?.textContent||'Game in Progress')}</h2>`;
@@ -7244,4 +7244,276 @@ if (document.readyState === "loading") {
     if(typeof oldReveal==='function') renderEvictionVoteReveal=function(){oldReveal();render();};
     function init(){inject();render();}
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+/* =========================================================
+   BRANTSTEELE-STYLE PRESENTATION / CEREMONY ENHANCEMENTS
+   ========================================================= */
+(function () {
+    const originalSetStage = window.setStage;
+    const originalUpdateStageDisplay = window.updateStageDisplay;
+
+    function playerCard(player, role, extraClass) {
+        if (!player) return "";
+        const roleText = role ? `<div class="ceremony-role">${escapeHTML(role)}</div>` : "";
+        const image = getPlayerImageHTML(player, "ceremony-photo");
+        return `
+            <div class="ceremony-card ${extraClass || ""}">
+                ${image}
+                <div class="ceremony-name">${escapeHTML(getDisplayName(player))}</div>
+                ${roleText}
+            </div>
+        `;
+    }
+
+    function getCompetitionDisplay(stage) {
+        if (typeof BB20 === "undefined" || selectedSeasonTemplate !== "bb20") return null;
+        const data = BB20.competitions[currentWeek];
+        if (!data) return null;
+
+        if (stage === "hoh") {
+            return currentCycle === 2 && data.secondHOH ? data.secondHOH : data.hoh;
+        }
+        if (stage === "pov") {
+            return currentCycle === 2 && data.secondPOV ? data.secondPOV : data.pov;
+        }
+        if (stage === "hacker") return data.hacker;
+        if (stage === "finalHOH1") return data.finalHOH ? data.finalHOH[0] : null;
+        if (stage === "finalHOH2") return data.finalHOH ? data.finalHOH[1] : null;
+        if (stage === "finalHOH3") return data.finalHOH ? data.finalHOH[2] : null;
+        return null;
+    }
+
+    function cleanLabel(value) {
+        return String(value || "")
+            .replace(/[\u{1F300}-\u{1FAFF}]/gu, "")
+            .replace(/[\u{2600}-\u{27BF}]/gu, "")
+            .replace(/\s{2,}/g, " ")
+            .trim();
+    }
+
+    window.updateStageDisplay = function () {
+        originalUpdateStageDisplay();
+
+        const competition = getCompetitionDisplay(currentStage);
+        const stageTitle = $("stageTitle");
+        const stageName = $("stageName");
+
+        if (competition) {
+            const cleaned = cleanLabel(competition);
+            if (currentStage === "hoh") {
+                stageName.textContent = "HEAD OF HOUSEHOLD";
+                stageTitle.textContent = cleaned;
+            } else if (currentStage === "pov") {
+                stageName.textContent = "POWER OF VETO";
+                stageTitle.textContent = cleaned;
+            } else if (currentStage === "hacker") {
+                stageName.textContent = "HACKER COMPETITION";
+                stageTitle.textContent = cleaned;
+            } else if (currentStage.indexOf("finalHOH") === 0) {
+                stageName.textContent = "FINAL HOH";
+                stageTitle.textContent = `Part ${currentStage.slice(-1)}: ${cleaned}`;
+            }
+        }
+
+        if (currentStage === "povDraw") {
+            stageName.textContent = "POWER OF VETO";
+            stageTitle.textContent = "Veto Player Selection";
+        }
+
+        renderCeremonyDisplay();
+    };
+
+    window.setStage = function (stage) {
+        originalSetStage(stage);
+        renderCeremonyDisplay();
+    };
+
+    function renderCeremonyDisplay() {
+        let container = $("ceremonyDisplay");
+        if (!container) {
+            const anchor = document.querySelector(".status-grid");
+            if (!anchor) return;
+            container = document.createElement("div");
+            container.id = "ceremonyDisplay";
+            container.className = "ceremony-display";
+            anchor.parentNode.insertBefore(container, anchor);
+        }
+
+        const active = getActivePlayers();
+        let html = "";
+        const competition = getCompetitionDisplay(currentStage);
+
+        if (currentStage === "opening1" || currentStage === "opening2" || currentStage === "opening3") {
+            const names = {
+                opening1: "The Trash Folder",
+                opening2: "HouseGuest CAPTCHA",
+                opening3: "Surfing the BB Web"
+            };
+            html = `
+                <div class="ceremony-heading">
+                    <span>OPENING COMPETITION</span>
+                    <h2>${cleanLabel(names[currentStage])}</h2>
+                    <p>${active.length} Houseguests competing</p>
+                </div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, "Competing", "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "hoh") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>HEAD OF HOUSEHOLD COMPETITION</span>
+                    <h2>${cleanLabel(competition || "Head of Household")}</h2>
+                    <p>Players competing for the power to nominate.</p>
+                </div>
+                <div class="ceremony-grid">${active.filter(p => !p.safety).map(p => playerCard(p, p.id === currentHOH ? "HOH WINNER" : "Competing", p.id === currentHOH ? "winner-card" : "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "nominations") {
+            const hoh = houseguests.find(p => p.id === currentHOH);
+            html = `
+                <div class="ceremony-heading">
+                    <span>NOMINATION CEREMONY</span>
+                    <h2>${hoh ? escapeHTML(getDisplayName(hoh)) : "HOH"} makes the nominations</h2>
+                    <p>The two Houseguests placed on the block are shown below.</p>
+                </div>
+                <div class="ceremony-feature-row">
+                    ${playerCard(hoh, "HEAD OF HOUSEHOLD", "ceremony-hoh")}
+                    <div class="ceremony-arrow">NOMINATES</div>
+                    ${nominees.map(p => playerCard(p, "NOMINEE", "nominee-card")).join("")}
+                </div>
+            `;
+        }
+
+        if (currentStage === "hacker") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>HACKER COMPETITION</span>
+                    <h2>${cleanLabel(competition || "Hacker Competition")}</h2>
+                </div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, p.id === (hackerWinner && hackerWinner.id) ? "HACKER WINNER" : "Competing", p.id === (hackerWinner && hackerWinner.id) ? "winner-card" : "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "povDraw") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>POWER OF VETO</span>
+                    <h2>Veto Player Selection</h2>
+                    <p>The HOH, two nominees and three additional Houseguests will play.</p>
+                </div>
+                <div class="ceremony-grid">${povPlayers.map((p, i) => playerCard(p, i === 0 ? "HOH" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "SELECTED PLAYER"), nominees.some(n => n.id === p.id) ? "nominee-card" : "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "pov") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>POWER OF VETO COMPETITION</span>
+                    <h2>${cleanLabel(competition || "Power of Veto")}</h2>
+                    <p>Six Houseguests are competing for the Golden Power of Veto.</p>
+                </div>
+                ${povPlayers.map(p => playerCard(p, povWinner && p.id === povWinner.id ? "VETO WINNER" : (nominees.some(n => n.id === p.id) ? "NOMINEE" : "COMPETING"), povWinner && p.id === povWinner.id ? "winner-card" : (nominees.some(n => n.id === p.id) ? "nominee-card" : ""))).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "veto") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>VETO CEREMONY</span>
+                    <h2>${povWinner ? escapeHTML(getDisplayName(povWinner)) : "Veto Holder"} holds the Power of Veto</h2>
+                    <p>The Veto holder decides whether to save a nominee.</p>
+                </div>
+                <div class="ceremony-feature-row">
+                    ${playerCard(povWinner, "POWER OF VETO HOLDER", "winner-card")}
+                    ${nominees.map(p => playerCard(p, "ON THE BLOCK", "nominee-card")).join("")}
+                </div>
+            `;
+        }
+
+        if (currentStage === "evictionVoting" || currentStage === "eviction") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>LIVE EVICTION</span>
+                    <h2>Eviction Vote</h2>
+                    <p>${nominees.map(p => escapeHTML(getDisplayName(p))).join(" vs. ")}</p>
+                </div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, p.id === currentHOH ? "HOH - DOES NOT VOTE" : (nominees.some(n => n.id === p.id) ? "NOMINEE - DOES NOT VOTE" : "VOTER"), "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "nextcycle") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>NEXT WEEK</span>
+                    <h2>Continue to Week ${currentWeek + 1}</h2>
+                </div>
+            `;
+        }
+
+        if (currentStage === "finalHOH1" || currentStage === "finalHOH2" || currentStage === "finalHOH3") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>FINAL HOH COMPETITION</span>
+                    <h2>${cleanLabel(competition || "Final HOH")}</h2>
+                    <p>Final 3 competition - Part ${currentStage.slice(-1)}</p>
+                </div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, "FINALIST", "")).join("")}</div>
+            `;
+        }
+
+        if (currentStage === "finalEviction" || currentStage === "juryVote" || currentStage === "finished") {
+            html = `
+                <div class="ceremony-heading">
+                    <span>FINALE</span>
+                    <h2>${currentStage === "juryVote" ? "Jury Vote" : "Finalists"}</h2>
+                </div>
+                <div class="ceremony-grid">${active.map(p => playerCard(p, p.id === (finalHOH.winner && finalHOH.winner.id) ? "FINAL HOH" : "FINALIST", "")).join("")}</div>
+            `;
+        }
+
+        container.innerHTML = html;
+    }
+
+    window.skipToEnd = function () {
+        if (!seasonStarted) {
+            alert("Start a season first.");
+            return;
+        }
+
+        let guard = 0;
+        const maxSteps = 500;
+
+        while (seasonStarted && currentStage !== "finished" && guard < maxSteps) {
+            const beforeStage = currentStage;
+            const beforeWeek = currentWeek;
+            proceedGame();
+            guard++;
+
+            if (currentStage === beforeStage && currentWeek === beforeWeek && guard > 10) {
+                break;
+            }
+        }
+
+        if (currentStage === "finished") {
+            showFinale();
+        } else {
+            updateAllDisplays();
+            alert("The simulator could not safely finish the season automatically. It stopped so the current result is not lost.");
+        }
+    };
+
+    const oldUpdateAllDisplays = window.updateAllDisplays;
+    window.updateAllDisplays = function () {
+        oldUpdateAllDisplays();
+        renderCeremonyDisplay();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", renderCeremonyDisplay);
+    } else {
+        renderCeremonyDisplay();
+    }
 })();
