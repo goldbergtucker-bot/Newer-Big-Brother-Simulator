@@ -2,10 +2,15 @@ const BB20 = {
     id: "bb20",
     name: "Big Brother 20",
     year: 2018,
+    description: "The BB20 format, including its competition schedule and season-specific twists. Stage 2 will attach the full competition descriptions and mechanics to each event.",
     startingPlayers: 16,
     nominationCount: 2,
     jurySize: 9,
     juryStartAfterEvictions: 7,
+    competitionCategories: {
+        hoh: "overall",
+        pov: "overall"
+    },
     competitions: {
         1: { hoh: "Microchip Mayhem", pov: "Going Viral" },
         2: { hoh: "Land a Job", pov: "HouseGuestsOnly.com" },
@@ -45,3 +50,7 @@ const BB20 = {
         }
     }
 };
+
+
+window.BB_SEASON_REGISTRY = window.BB_SEASON_REGISTRY || {};
+window.BB_SEASON_REGISTRY.bb20 = BB20;
