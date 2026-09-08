@@ -6,22 +6,27 @@ const BB20 = {
     startingPlayers: 16,
     nominationCount: 2,
     jurySize: 9,
-    juryStartAfterEvictions: 7,
+    juryStartAfterEvictions: 5,
     juryBattleBackAfterJurors: 4,
     competitionCategories: { hoh: "overall", pov: "overall" },
+    safetyCompetitions: [
+        { id: "trashFolder", name: "Trash Folder", category: "mental", competitors: 8, type: "immunity-punishment", description: "Houseguests hunt for folders—one fewer than the number of competitors. The player left without a folder receives a Unitard punishment. One special folder grants automatic advancement to the next round." },
+        { id: "cyberSecurity", name: "Cyber Security", category: "physical", competitors: 8, type: "immunity-punishment", description: "Houseguests are harnessed above a sea of letters and blocks. They gather blocks and spell HOUSEGUEST vertically while standing. The winner advances to Surfing the BB Web." },
+        { id: "surfingBBWeb", name: "Surfing the BB Web", category: "physical", competitors: 2, type: "immunity", description: "The winners of Trash Folder and Cyber Security balance on mechanical surfboards while facing obstacles themed around backdoors, chopping blocks and targets. The winner selects eight Houseguests to be safe from the first eviction." }
+    ],
     competitions: {
         1: { hoh: { name: "Microchip Mayhem", category: "general", description: "A technology-themed HOH competition testing broad competition ability." }, pov: { name: "Going Viral", category: "general", description: "A BB20 technology-themed Power of Veto competition." } },
-        2: { hoh: { name: "Land a Job", category: "mental", description: "A job-search themed HOH competition emphasizing mental skill." }, pov: { name: "HouseGuestsOnly.com", category: "mental", description: "A web-themed Power of Veto competition emphasizing memory and mental ability." } },
-        3: { hoh: { name: "Product Launch", category: "strategic", description: "A product-themed competition rewarding strategy and decision making." }, pov: { name: "Mamma Mia! Madness", category: "physical", description: "A fast-paced themed veto competition emphasizing physical ability." } },
-        4: { hoh: { name: "Out on a Limb", category: "endurance", description: "An endurance-focused competition where staying power matters." }, pov: { name: "Chop, Bonk, Spank", category: "physical", description: "A physical Power of Veto competition." } },
-        5: { hoh: { name: "Perfect Timing", category: "mental", description: "A timing and precision themed HOH competition." }, pov: { name: "Goober Driver", category: "physical", description: "A driving-themed Power of Veto competition." } },
-        6: { hoh: { name: "GIF That Keeps on Giving", category: "mental", description: "A technology and memory themed HOH competition." }, hacker: { name: "Crack The Code", category: "mental", description: "Anonymous H@cker Competition. The winner can alter a nomination, select a Veto player, and nullify one eviction vote." }, pov: { name: "Boom Power Trip", category: "physical", description: "A power-themed Power of Veto competition." } },
-        7: { hoh: { name: "#HashtagTooLong", category: "mental", description: "A hashtag and memory themed HOH competition." }, hacker: { name: "Hack the House", category: "mental", description: "Anonymous H@cker Competition with the same three hacking powers." }, pov: { name: "OTEV the Sneezy Skunk", category: "general", description: "An OTEV-style Power of Veto competition." } },
-        8: { hoh: { name: "Glow & Flow", category: "endurance", description: "A glowing, balance and endurance themed HOH competition." }, pov: { name: "Zing Force", category: "physical", description: "A Zingbot-themed Power of Veto competition." } },
-        9: { hoh: { name: "Sweet Shot", category: "physical", description: "A candy and precision themed HOH competition." }, pov: { name: "Mission to Planet Veto", category: "mental", description: "A space-themed Power of Veto competition." } },
+        2: { hoh: { name: "Level 6", category: "mental", description: "A job-search themed HOH competition emphasizing mental skill." }, pov: { name: "Pop Goes the Power", category: "mental", description: "A web-themed Power of Veto competition emphasizing memory and mental ability." } },
+        3: { hoh: { name: "Hacker", category: "strategic", description: "A product-themed competition rewarding strategy and decision making." }, pov: { name: "BB Comics", category: "physical", description: "A fast-paced themed veto competition emphasizing physical ability." } },
+        4: { hoh: { name: "What's the Buzz?", category: "endurance", description: "An endurance-focused competition where staying power matters." }, pov: { name: "Mission to Planet Veto", category: "physical", description: "A physical Power of Veto competition." } },
+        5: { hoh: { name: "Popped Quiz", category: "mental", description: "A timing and precision themed HOH competition." }, pov: { name: "Hide and Go Veto", category: "physical", description: "A driving-themed Power of Veto competition." } },
+        6: { hoh: { name: "Bumper Pool", category: "mental", description: "A technology and memory themed HOH competition." }, hacker: { name: "H@cker Competition", category: "mental", description: "Anonymous H@cker Competition. The winner can alter a nomination, select a Veto player, and nullify one eviction vote." }, pov: { name: "Yankee Swap", category: "physical", description: "A power-themed Power of Veto competition." } },
+        7: { hoh: { name: "What the Bleep?", category: "mental", description: "A hashtag and memory themed HOH competition." }, hacker: { name: "H@cker Competition", category: "mental", description: "Anonymous H@cker Competition with the same three hacking powers." }, pov: { name: "Veto OTEV", category: "general", description: "An OTEV-style Power of Veto competition." } },
+        8: { hoh: { name: "Name That BB Tune", category: "endurance", description: "A glowing, balance and endurance themed HOH competition." }, pov: { name: "BB Comics", category: "physical", description: "A Zingbot-themed Power of Veto competition." } },
+        9: { hoh: { name: "Roll With It", category: "physical", description: "A candy and precision themed HOH competition." }, pov: { name: "Mission to Planet Veto", category: "mental", description: "A space-themed Power of Veto competition." } },
         10: { hoh: { name: "High in the Sky", category: "endurance", description: "A high-altitude themed endurance HOH competition." }, pov: { name: "Control Your Emojis", category: "mental", description: "A technology and memory themed Power of Veto competition." } },
         11: { hoh: { name: "Shell or Highwater", category: "endurance", description: "An endurance HOH competition." }, pov: { name: "BB Comics", category: "mental", description: "A BB Comics-style memory and observation competition." }, doubleEviction: true, secondHOH: { name: "Buffering", category: "mental", description: "The second HOH of the double eviction." }, secondPOV: { name: "Block and Roll", category: "physical", description: "The rapid second Power of Veto of the double eviction." } },
-        12: { hoh: { name: "BBFlix & Chill", category: "mental", description: "A movie and memory themed HOH competition." }, pov: { name: "Your Mazes are Numbered", category: "mental", description: "A maze and memory themed Power of Veto competition." }, secondHOH: { name: "What the Bleep", category: "mental", description: "The second HOH of the week." }, secondPOV: { name: "Down to the Wires", category: "physical", description: "A rapid second Power of Veto competition." } },
+        12: { hoh: { name: "BBFlix & Chill", category: "mental", description: "A movie and memory themed HOH competition." }, pov: { name: "Your Mazes are Numbered", category: "mental", description: "A maze and memory themed Power of Veto competition." } },
         13: { finalHOH: [
             { name: "Jetpack Attack", category: "endurance", description: "Final HOH Part 1: endurance." },
             { name: "Mount Evictus", category: "mental", description: "Final HOH Part 2: mental/skill." },
@@ -52,3 +57,4 @@ const BB20 = {
 
 window.BB_SEASON_REGISTRY = window.BB_SEASON_REGISTRY || {};
 window.BB_SEASON_REGISTRY.bb20 = BB20;
+
