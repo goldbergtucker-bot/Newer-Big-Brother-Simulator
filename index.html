@@ -1,10 +1,10 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Big Brother Simulator</title>
+
     <link rel="stylesheet" href="style.css?v=20260907">
 
     <style>
@@ -137,6 +137,79 @@ html
         .final-stage-card {
             margin-top: 12px;
         }
+
+        /* BB20 TWISTS */
+
+        .bb-twist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .bb-twist-card {
+            background: #101010;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .bb-twist-card h4 {
+            margin: 14px 0 6px;
+        }
+
+        .bb-twist-card ul {
+            margin: 6px 0 0 20px;
+            padding: 0;
+        }
+
+        .bb-twist-card li {
+            margin: 6px 0;
+        }
+
+        .bb-twist-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .bb-twist-weeks {
+            color: #aaa;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .bb-twist-note {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* BB20 COMPETITION SCHEDULE */
+
+        .bb-competition-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .bb-week-card {
+            background: #101010;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .bb-week-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+
+        .bb-week-card p {
+            margin: 6px 0;
+            line-height: 1.4;
+        }
     </style>
 </head>
 
@@ -150,14 +223,39 @@ html
     </div>
 
     <nav class="main-nav">
-        <button onclick="showSection('home')">HOME</button>
-        <button onclick="showSection('cast')">CAST</button>
-        <button onclick="showSection('twists')">TWISTS</button>
-        <button onclick="showSection('house')">HOUSE</button>
-        <button onclick="showSection('game')">GAME</button>
-        <button onclick="showSection('memory')">MEMORY WALL</button>
-        <button onclick="showSection('jury')">JURY</button>
-        <button onclick="showSection('finale')">FINALE</button>
+
+        <button onclick="showSection('home')">
+            HOME
+        </button>
+
+        <button onclick="showSection('cast')">
+            CAST
+        </button>
+
+        <button onclick="showSection('twists')">
+            TWISTS
+        </button>
+
+        <button onclick="showSection('house')">
+            HOUSE
+        </button>
+
+        <button onclick="showSection('game')">
+            GAME
+        </button>
+
+        <button onclick="showSection('memory')">
+            MEMORY WALL
+        </button>
+
+        <button onclick="showSection('jury')">
+            JURY
+        </button>
+
+        <button onclick="showSection('finale')">
+            FINALE
+        </button>
+
     </nav>
 
 </header>
@@ -165,24 +263,35 @@ html
 
 <main>
 
+<!-- ========================================================= -->
 <!-- HOME -->
+<!-- ========================================================= -->
 
 <section id="home" class="page-section active-section">
 
     <div class="hero-panel">
-        <h1>BIG BROTHER</h1>
-        <h2>SIMULATOR</h2>
+
+        <h1>
+            BIG BROTHER
+        </h1>
+
+        <h2>
+            SIMULATOR
+        </h2>
 
         <p>
             Create your own Big Brother season with custom Houseguests,
             relationships, alliances, twists and season formats.
         </p>
+
     </div>
 
 
     <div class="panel">
 
-        <h2>Season Format</h2>
+        <h2>
+            Season Format
+        </h2>
 
         <div class="form-group">
 
@@ -245,7 +354,9 @@ html
 
     <div class="panel">
 
-        <h2>Season Controls</h2>
+        <h2>
+            Season Controls
+        </h2>
 
         <div class="button-row">
 
@@ -292,7 +403,9 @@ html
 
     <div class="panel">
 
-        <h2>Season Summary</h2>
+        <h2>
+            Season Summary
+        </h2>
 
         <div
             id="seasonSummary"
@@ -304,13 +417,17 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- CAST -->
+<!-- ========================================================= -->
 
 <section id="cast" class="page-section">
 
     <div class="section-heading">
 
-        <h1>HOUSEGUEST CAST</h1>
+        <h1>
+            HOUSEGUEST CAST
+        </h1>
 
         <p>
             Create and edit your Houseguests before or during your season.
@@ -334,7 +451,10 @@ html
 
         <div class="form-section">
 
-            <h3>Houseguest Identity</h3>
+            <h3>
+                Houseguest Identity
+            </h3>
+
 
             <div class="form-grid">
 
@@ -400,7 +520,9 @@ html
 
         <div class="form-section">
 
-            <h3>Competition Stats</h3>
+            <h3>
+                Competition Stats
+            </h3>
 
             <p class="form-help">
                 Set each Houseguest's ability from 1 to 10.
@@ -668,21 +790,479 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- TWISTS -->
+<!-- ========================================================= -->
 
 <section id="twists" class="page-section">
 
     <div class="section-heading">
 
-        <h1>TWISTS</h1>
+        <h1>
+            BB20 TWISTS & COMPETITIONS
+        </h1>
 
         <p>
-            Built-in BB20 twists are shown automatically
-            when the BB20 format is selected.
+            Big Brother 20 format, twists and competitions.
         </p>
 
     </div>
 
+
+    <!-- BB20 TWISTS -->
+
+    <div class="panel">
+
+        <h2>
+            Big Brother 20 Twists
+        </h2>
+
+
+        <div class="bb-twist-grid">
+
+
+            <div class="bb-twist-card">
+
+                <div class="bb-twist-title">
+                    BB App Store
+                </div>
+
+                <div class="bb-twist-weeks">
+                    Weeks 1–3
+                </div>
+
+                <p>
+                    Houseguests compete for special powers and punishments
+                    through the BB App Store.
+                </p>
+
+                <h4>
+                    Apps
+                </h4>
+
+                <ul>
+
+                    <li>
+                        <strong>Bonus Life</strong> —
+                        Gives an evicted Houseguest an opportunity to return.
+                    </li>
+
+                    <li>
+                        <strong>Hamazon</strong> —
+                        A punishment involving food deliveries.
+                    </li>
+
+                    <li>
+                        <strong>The Cloud</strong> —
+                        A power that can protect a Houseguest from nomination.
+                    </li>
+
+                    <li>
+                        <strong>Yell!</strong> —
+                        A punishment/power involving an interruption.
+                    </li>
+
+                    <li>
+                        <strong>Identity Theft</strong> —
+                        Allows a Houseguest to alter the nomination ceremony.
+                    </li>
+
+                    <li>
+                        <strong>Read It!</strong> —
+                        A punishment involving reading.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="bb-twist-card">
+
+                <div class="bb-twist-title">
+                    H@cker Competition
+                </div>
+
+                <div class="bb-twist-weeks">
+                    Weeks 6–7
+                </div>
+
+                <p>
+                    The winner receives special control over the week's
+                    nominations, Power of Veto players and eviction vote.
+                </p>
+
+                <h4>
+                    H@cker Powers
+                </h4>
+
+                <ul>
+
+                    <li>
+                        Replace one nominee.
+                    </li>
+
+                    <li>
+                        Select one Houseguest to participate in the POV.
+                    </li>
+
+                    <li>
+                        Nullify one eviction vote.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="bb-twist-card">
+
+                <div class="bb-twist-title">
+                    Jury Battle Back
+                </div>
+
+                <div class="bb-twist-weeks">
+                    Jury Phase
+                </div>
+
+                <p>
+                    The first four eligible jury members compete for a chance
+                    to return to the game.
+                </p>
+
+                <h4>
+                    Battle Back Competition
+                </h4>
+
+                <ul>
+
+                    <li>
+                        Big Top Drop
+                    </li>
+
+                    <li>
+                        Four eligible jury members participate.
+                    </li>
+
+                    <li>
+                        Winner returns to the game.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="bb-twist-card">
+
+                <div class="bb-twist-title">
+                    Double Eviction
+                </div>
+
+                <div class="bb-twist-weeks">
+                    Week 11
+                </div>
+
+                <p>
+                    The second eviction occurs immediately after the first
+                    eviction with a new HOH and POV cycle.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BB20 COMPETITION SCHEDULE -->
+
+    <div class="panel">
+
+        <h2>
+            BB20 Competition Schedule
+        </h2>
+
+        <div class="bb-competition-schedule">
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 1
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Microchip Mayhem
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Going Viral
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 2
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Level 6
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Pop Goes the Power
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 3
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Hacker
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    BB Comics
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 4
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    What's the Buzz?
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Mission to Planet Veto
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 5
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Popped Quiz
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Hide and Go Veto
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 6
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Bumper Pool
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Yankee Swap
+                </p>
+
+                <p>
+                    <strong>H@cker:</strong>
+                    H@cker Competition
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 7
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    What the Bleep?
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Veto OTEV
+                </p>
+
+                <p>
+                    <strong>H@cker:</strong>
+                    H@cker Competition
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 8
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Name That BB Tune
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    BB Comics
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 9
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Roll With It
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Mission to Planet Veto
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 10
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    High in the Sky
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Control Your Emojis
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 11 — Double Eviction
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    Shell or Highwater
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    BB Comics
+                </p>
+
+                <p>
+                    <strong>2nd HOH:</strong>
+                    Buffering
+                </p>
+
+                <p>
+                    <strong>2nd POV:</strong>
+                    Block and Roll
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Week 12
+                </h3>
+
+                <p>
+                    <strong>HOH:</strong>
+                    BBFlix &amp; Chill
+                </p>
+
+                <p>
+                    <strong>POV:</strong>
+                    Your Mazes are Numbered
+                </p>
+
+            </div>
+
+
+            <div class="bb-week-card">
+
+                <h3>
+                    Finale
+                </h3>
+
+                <p>
+                    <strong>Final HOH Part 1:</strong>
+                    Jetpack Attack
+                </p>
+
+                <p>
+                    <strong>Final HOH Part 2:</strong>
+                    Mount Evictus
+                </p>
+
+                <p>
+                    <strong>Final HOH Part 3:</strong>
+                    Jury Oddcasts
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVE TWISTS -->
 
     <div
         id="bbTwistStatusPanel"
@@ -694,6 +1274,8 @@ html
 
     </div>
 
+
+    <!-- CUSTOM TWIST -->
 
     <div class="panel">
 
@@ -726,8 +1308,7 @@ html
 
                 <textarea
                     id="twistDescription"
-                    placeholder="Describe the twist...">
-                </textarea>
+                    placeholder="Describe the twist..."></textarea>
 
             </div>
 
@@ -753,7 +1334,9 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- HOUSE -->
+<!-- ========================================================= -->
 
 <section id="house" class="page-section">
 
@@ -826,7 +1409,9 @@ html
                     Weak
                 </option>
 
-                <option value="moderate" selected>
+                <option
+                    value="moderate"
+                    selected>
                     Moderate
                 </option>
 
@@ -929,7 +1514,9 @@ html
                     😊 Like
                 </option>
 
-                <option value="neutral" selected>
+                <option
+                    value="neutral"
+                    selected>
                     😐 Neutral
                 </option>
 
@@ -1009,7 +1596,9 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- GAME -->
+<!-- ========================================================= -->
 
 <section id="game" class="page-section">
 
@@ -1183,7 +1772,9 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- MEMORY WALL -->
+<!-- ========================================================= -->
 
 <section id="memory" class="page-section">
 
@@ -1209,7 +1800,9 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- JURY -->
+<!-- ========================================================= -->
 
 <section id="jury" class="page-section">
 
@@ -1252,7 +1845,9 @@ html
 </section>
 
 
+<!-- ========================================================= -->
 <!-- FINALE -->
+<!-- ========================================================= -->
 
 <section id="finale" class="page-section">
 
@@ -1275,7 +1870,9 @@ html
 </main>
 
 
-<!-- LOAD SEASON DATA FIRST, THEN THE SIMULATOR ENGINE -->
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
 
 <script src="seasons/bb20.js?v=20260907-1"></script>
 <script src="script.js?v=20260907-1"></script>
