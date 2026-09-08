@@ -7,132 +7,28 @@
     <link rel="stylesheet" href="style.css?v=20260907">
     <style>
         #allianceMembers { display:none !important; }
+        .bb-alliance-checklist { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px; margin:10px 0 8px; }
+        .bb-alliance-check { display:flex; align-items:center; gap:9px; padding:10px; background:#111; border:1px solid #444; border-radius:8px; cursor:pointer; }
+        .bb-alliance-check:hover { background:#1d1d1d; }
+        .bb-alliance-check input { width:auto; margin:0; cursor:pointer; }
+        .bb-alliance-empty { color:#999; padding:12px; border:1px dashed #444; border-radius:8px; }
+        .bb-active-twist-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+        .bb-active-twist { padding:14px; border:1px solid #333; border-radius:10px; background:#101010; }
+        .bb-active-twist.active { border-color:#fff; background:#181818; }
+        .bb-active-twist strong,.bb-active-twist span { display:block; }
+        .bb-active-twist span { margin-top:6px; font-size:12px; color:#999; }
+        .bb-active-twist.active span { color:#fff; font-weight:800; }
 
-        .bb-alliance-checklist {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-            gap:8px;
-            margin:10px 0 8px;
-        }
-
-        .bb-alliance-check {
-            display:flex;
-            align-items:center;
-            gap:9px;
-            padding:10px;
-            background:#111;
-            border:1px solid #444;
-            border-radius:8px;
-            cursor:pointer;
-        }
-
-        .bb-alliance-check:hover {
-            background:#1d1d1d;
-        }
-
-        .bb-alliance-check input {
-            width:auto;
-            margin:0;
-            cursor:pointer;
-        }
-
-        .bb-alliance-empty {
-            color:#999;
-            padding:12px;
-            border:1px dashed #444;
-            border-radius:8px;
-        }
-
-        .bb-active-twist-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-            gap:10px;
-        }
-
-        .bb-active-twist {
-            padding:14px;
-            border:1px solid #333;
-            border-radius:10px;
-            background:#101010;
-        }
-
-        .bb-active-twist.active {
-            border-color:#fff;
-            background:#181818;
-        }
-
-        .bb-active-twist strong,
-        .bb-active-twist span {
-            display:block;
-        }
-
-        .bb-active-twist span {
-            margin-top:6px;
-            font-size:12px;
-            color:#999;
-        }
-
-        .bb-active-twist.active span {
-            color:#fff;
-            font-weight:800;
-        }
-
-        .status-card > div {
-            min-height:48px;
-        }
-
-        .status-player-image {
-            width:44px;
-            height:44px;
-            object-fit:cover;
-            border-radius:8px;
-            flex:0 0 44px;
-        }
-
-        .status-player-text {
-            display:flex;
-            flex-direction:column;
-            gap:4px;
-            min-width:0;
-        }
-
-        .status-player-text span {
-            font-size:12px;
-            opacity:.75;
-        }
-
-        .status-person-inline {
-            display:inline-flex;
-            align-items:center;
-            gap:7px;
-            margin:3px 8px 3px 0;
-        }
-
-        .status-person-inline span {
-            font-weight:700;
-        }
-
-        .status-none {
-            opacity:.65;
-        }
-
-        #hohStatus,
-        #nomineesStatus,
-        #povStatus {
-            display:flex;
-            align-items:center;
-            flex-wrap:wrap;
-            gap:8px;
-        }
-
-        .skip-end-button {
-            margin-top:10px;
-            width:100%;
-        }
-
-        .final-stage-card {
-            margin-top:12px;
-        }
+        .status-card > div { min-height:48px; }
+        .status-player-image { width:44px; height:44px; object-fit:cover; border-radius:8px; flex:0 0 44px; }
+        .status-player-text { display:flex; flex-direction:column; gap:4px; min-width:0; }
+        .status-player-text span { font-size:12px; opacity:.75; }
+        .status-person-inline { display:inline-flex; align-items:center; gap:7px; margin:3px 8px 3px 0; }
+        .status-person-inline span { font-weight:700; }
+        .status-none { opacity:.65; }
+        #hohStatus, #nomineesStatus, #povStatus { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+        .skip-end-button { margin-top:10px; width:100%; }
+        .final-stage-card { margin-top:12px; }
     </style>
 </head>
 
@@ -190,12 +86,14 @@
         <button
             id="selectSeasonButton"
             class="primary-button"
-            onclick="selectSeasonTemplate()"
-        >
+            onclick="selectSeasonTemplate()">
             SELECT SEASON
         </button>
 
-        <div id="selectedSeasonInfo" class="season-info"></div>
+        <div
+            id="selectedSeasonInfo"
+            class="season-info">
+        </div>
 
     </div>
 
@@ -208,29 +106,25 @@
             <button
                 id="startSeasonButton"
                 class="primary-button"
-                onclick="startNewSeason()"
-            >
+                onclick="startNewSeason()">
                 START NEW SEASON
             </button>
 
             <button
                 class="secondary-button"
-                onclick="saveGame()"
-            >
+                onclick="saveGame()">
                 SAVE
             </button>
 
             <button
                 class="secondary-button"
-                onclick="loadGame()"
-            >
+                onclick="loadGame()">
                 LOAD
             </button>
 
             <button
                 class="danger-button"
-                onclick="resetGame()"
-            >
+                onclick="resetGame()">
                 RESET
             </button>
 
@@ -242,7 +136,10 @@
 
         <h2>Season Summary</h2>
 
-        <div id="seasonSummary" class="summary-grid"></div>
+        <div
+            id="seasonSummary"
+            class="summary-grid">
+        </div>
 
     </div>
 
@@ -260,13 +157,14 @@
 
     <div class="panel">
 
-        <h2 id="castEditorTitle">Add Houseguest</h2>
+        <h2 id="castEditorTitle">
+            Add Houseguest
+        </h2>
 
         <input
             type="hidden"
             id="editingHouseguestId"
-            value=""
-        >
+            value="">
 
         <div class="form-section">
 
@@ -275,21 +173,25 @@
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label for="firstName">First Name</label>
+                    <label for="firstName">
+                        First Name
+                    </label>
+
                     <input
                         id="firstName"
                         type="text"
-                        placeholder="First name"
-                    >
+                        placeholder="First name">
                 </div>
 
                 <div class="form-group">
-                    <label for="lastName">Last Name</label>
+                    <label for="lastName">
+                        Last Name
+                    </label>
+
                     <input
                         id="lastName"
                         type="text"
-                        placeholder="Last name"
-                    >
+                        placeholder="Last name">
                 </div>
 
                 <div class="form-group">
@@ -300,24 +202,23 @@
                     <input
                         id="nickname"
                         type="text"
-                        placeholder="What they go by"
-                    >
+                        placeholder="What they go by">
                 </div>
 
                 <div class="form-group">
-                    <label for="imageUrl">Image URL</label>
+                    <label for="imageUrl">
+                        Image URL
+                    </label>
 
                     <input
                         id="imageUrl"
                         type="text"
-                        placeholder="https://i.imgur.com/example.jpg"
-                    >
+                        placeholder="https://i.imgur.com/example.jpg">
                 </div>
 
             </div>
 
         </div>
-
 
         <div class="form-section">
 
@@ -332,8 +233,13 @@
                 <div class="stat-control">
 
                     <div class="stat-header">
-                        <label for="physical">Physical</label>
-                        <span id="physicalValue">5</span>
+                        <label for="physical">
+                            Physical
+                        </label>
+
+                        <span id="physicalValue">
+                            5
+                        </span>
                     </div>
 
                     <input
@@ -342,8 +248,7 @@
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('physical')"
-                    >
+                        oninput="updateStatValue('physical')">
 
                 </div>
 
@@ -351,8 +256,13 @@
                 <div class="stat-control">
 
                     <div class="stat-header">
-                        <label for="mental">Mental</label>
-                        <span id="mentalValue">5</span>
+                        <label for="mental">
+                            Mental
+                        </label>
+
+                        <span id="mentalValue">
+                            5
+                        </span>
                     </div>
 
                     <input
@@ -361,8 +271,7 @@
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('mental')"
-                    >
+                        oninput="updateStatValue('mental')">
 
                 </div>
 
@@ -370,8 +279,13 @@
                 <div class="stat-control">
 
                     <div class="stat-header">
-                        <label for="social">Social</label>
-                        <span id="socialValue">5</span>
+                        <label for="social">
+                            Social
+                        </label>
+
+                        <span id="socialValue">
+                            5
+                        </span>
                     </div>
 
                     <input
@@ -380,8 +294,7 @@
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('social')"
-                    >
+                        oninput="updateStatValue('social')">
 
                 </div>
 
@@ -389,8 +302,13 @@
                 <div class="stat-control">
 
                     <div class="stat-header">
-                        <label for="strategy">Strategy</label>
-                        <span id="strategyValue">5</span>
+                        <label for="strategy">
+                            Strategy
+                        </label>
+
+                        <span id="strategyValue">
+                            5
+                        </span>
                     </div>
 
                     <input
@@ -399,8 +317,7 @@
                         min="1"
                         max="10"
                         value="5"
-                        oninput="updateStatValue('strategy')"
-                    >
+                        oninput="updateStatValue('strategy')">
 
                 </div>
 
@@ -414,16 +331,14 @@
             <button
                 id="saveHouseguestButton"
                 class="primary-button"
-                onclick="saveHouseguest()"
-            >
+                onclick="saveHouseguest()">
                 ADD HOUSEGUEST
             </button>
 
             <button
                 id="cancelEditButton"
                 class="secondary-button hidden"
-                onclick="cancelHouseguestEdit()"
-            >
+                onclick="cancelHouseguestEdit()">
                 CANCEL EDIT
             </button>
 
@@ -435,14 +350,21 @@
     <div class="panel">
 
         <div class="panel-title-row">
+
             <h2>Your Houseguests</h2>
-            <span id="castCount" class="count-badge">0</span>
+
+            <span
+                id="castCount"
+                class="count-badge">
+                0
+            </span>
+
         </div>
 
         <div
             id="castGrid"
-            class="cast-grid"
-        ></div>
+            class="cast-grid">
+        </div>
 
     </div>
 
@@ -452,20 +374,22 @@
 <section id="twists" class="page-section">
 
     <div class="section-heading">
+
         <h1>TWISTS</h1>
 
         <p>
-            Built-in BB20 twists are shown automatically when the
-            BB20 format is selected.
+            Built-in BB20 twists are shown automatically
+            when the BB20 format is selected.
         </p>
-    </div>
 
+    </div>
 
     <div
         id="bbTwistStatusPanel"
-        class="panel"
-    >
+        class="panel">
+
         <h2>Active Season Twists</h2>
+
     </div>
 
 
@@ -484,8 +408,7 @@
                 <input
                     id="twistName"
                     type="text"
-                    placeholder="Twist name"
-                >
+                    placeholder="Twist name">
 
             </div>
 
@@ -498,8 +421,8 @@
 
                 <textarea
                     id="twistDescription"
-                    placeholder="Describe the twist..."
-                ></textarea>
+                    placeholder="Describe the twist...">
+                </textarea>
 
             </div>
 
@@ -507,17 +430,17 @@
 
         <button
             class="primary-button"
-            onclick="createTwist()"
-        >
+            onclick="createTwist()">
             ADD TWIST
         </button>
 
     </div>
 
+
     <div
         id="twistList"
-        class="twist-list"
-    ></div>
+        class="twist-list">
+    </div>
 
 </section>
 
@@ -548,8 +471,7 @@
             <input
                 id="allianceName"
                 type="text"
-                placeholder="The Level 6"
-            >
+                placeholder="The Level 6">
 
         </div>
 
@@ -563,8 +485,8 @@
             <select
                 id="allianceMembers"
                 multiple
-                size="8"
-            ></select>
+                size="8">
+            </select>
 
             <div class="form-help">
                 Check the Houseguests below to add them to the alliance.
@@ -589,7 +511,9 @@
                     Weak
                 </option>
 
-                <option value="moderate" selected>
+                <option
+                    value="moderate"
+                    selected>
                     Moderate
                 </option>
 
@@ -608,8 +532,7 @@
 
         <button
             class="primary-button"
-            onclick="createAlliance()"
-        >
+            onclick="createAlliance()">
             CREATE ALLIANCE
         </button>
 
@@ -618,8 +541,8 @@
 
     <div
         id="allianceList"
-        class="alliance-list"
-    ></div>
+        class="alliance-list">
+    </div>
 
 
     <div class="panel">
@@ -644,8 +567,8 @@
 
                 <div
                     id="relationshipFromPreview"
-                    class="relationship-preview"
-                ></div>
+                    class="relationship-preview">
+                </div>
 
             </div>
 
@@ -665,8 +588,8 @@
 
                 <div
                     id="relationshipToPreview"
-                    class="relationship-preview"
-                ></div>
+                    class="relationship-preview">
+                </div>
 
             </div>
 
@@ -689,7 +612,9 @@
                     😊 Like
                 </option>
 
-                <option value="neutral" selected>
+                <option
+                    value="neutral"
+                    selected>
                     😐 Neutral
                 </option>
 
@@ -715,8 +640,7 @@
             <input
                 id="relationshipNote"
                 type="text"
-                placeholder="Best friends, former enemies, etc."
-            >
+                placeholder="Best friends, former enemies, etc.">
 
         </div>
 
@@ -725,22 +649,19 @@
 
             <button
                 class="primary-button"
-                onclick="saveRelationship()"
-            >
+                onclick="saveRelationship()">
                 SAVE RELATIONSHIP
             </button>
 
             <button
                 class="secondary-button"
-                onclick="loadSelectedRelationship()"
-            >
+                onclick="loadSelectedRelationship()">
                 LOAD EXISTING
             </button>
 
             <button
                 class="danger-button"
-                onclick="deleteSelectedRelationship()"
-            >
+                onclick="deleteSelectedRelationship()">
                 REMOVE RELATIONSHIP
             </button>
 
@@ -755,8 +676,8 @@
 
         <div
             id="relationshipsList"
-            class="relationships-list"
-        ></div>
+            class="relationships-list">
+        </div>
 
     </div>
 
@@ -771,8 +692,7 @@
 
             <div
                 id="weekBadge"
-                class="week-badge"
-            >
+                class="week-badge">
                 WEEK 1
             </div>
 
@@ -793,8 +713,9 @@
 
         <div
             id="stageIcon"
-            class="stage-icon"
-        ></div>
+            class="stage-icon">
+            ★
+        </div>
 
         <div>
 
@@ -864,16 +785,14 @@
         <button
             id="proceedButton"
             class="proceed-button"
-            onclick="proceedGame()"
-        >
+            onclick="proceedGame()">
             PROCEED
         </button>
 
         <button
             id="skipEndButton"
             class="secondary-button skip-end-button"
-            onclick="skipToEnd()"
-        >
+            onclick="skipToEnd()">
             SIMULATE TO END
         </button>
 
@@ -886,8 +805,8 @@
 
         <div
             id="gameHouseguests"
-            class="game-houseguest-grid"
-        ></div>
+            class="game-houseguest-grid">
+        </div>
 
     </div>
 
@@ -898,24 +817,21 @@
 
         <div
             id="eventLog"
-            class="event-log"
-        ></div>
+            class="event-log">
+        </div>
 
     </div>
 
 
     <div
         id="evictionResults"
-        class="panel hidden"
-    ></div>
+        class="panel hidden">
+    </div>
 
 </section>
 
 
-<section
-    id="memory"
-    class="page-section"
->
+<section id="memory" class="page-section">
 
     <div class="section-heading">
 
@@ -930,21 +846,16 @@
 
     <div
         id="memoryWall"
-        class="memory-wall"
-    ></div>
+        class="memory-wall">
+    </div>
 
 </section>
 
 
-<section
-    id="jury"
-    class="page-section"
->
+<section id="jury" class="page-section">
 
     <div class="section-heading">
-
         <h1>JURY</h1>
-
     </div>
 
 
@@ -954,8 +865,8 @@
 
         <div
             id="juryList"
-            class="jury-grid"
-        ></div>
+            class="jury-grid">
+        </div>
 
     </div>
 
@@ -966,37 +877,32 @@
 
         <div
             id="evictedPlayers"
-            class="jury-grid"
-        ></div>
+            class="jury-grid">
+        </div>
 
     </div>
 
 </section>
 
 
-<section
-    id="finale"
-    class="page-section"
->
+<section id="finale" class="page-section">
 
     <div class="section-heading">
-
         <h1>FINALE</h1>
-
     </div>
 
     <div
         id="finaleContent"
-        class="finale-content"
-    ></div>
+        class="finale-content">
+    </div>
 
 </section>
 
 </main>
 
 
-<script src="seasons/bb20.js?v=20260908-3"></script>
-<script src="script.js?v=20260908-3"></script>
+<script src="seasons/bb20.js?v=20260907-1"></script>
+<script src="script.js?v=20260907-1"></script>
 
 </body>
 </html>
